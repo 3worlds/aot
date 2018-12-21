@@ -1,0 +1,36 @@
+<!--===================================================================================
+ ant and ivy scripts for project <aot> version 0.0.2 (Fri Dec 21 15:36:24 CET 2018)
+ author: Jacques Gignoux <jacques.gignoux@upmc.fr>
+
+ CAUTION: this file is generated - DO NOT EDIT!
+ If you need to change this file, edit ../version/Setup.java appropriately and run it.
+ This will re-generate this file and manage version numbers properly. 
+===================================================================================-->
+<ivy-module version="2.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+	<info	organisation="au.edu.anu.rscs.aot"
+			module="aot"
+			revision="0.0.2"
+			status="integration">
+		<license name="gpl3" url="https://www.gnu.org/licenses/gpl-3.0.txt"/>
+		<description>AOT is a method to generate elaborate software code from a series of independent domains of knowledge. It enables one to manage and maintain software from explicit specifications that can be translated into any programming language.</description>
+	</info>
+
+	<configurations>
+		<conf name="java library"/>
+	</configurations>
+
+	<publications>
+		<artifact type="jar" ext="jar">
+			<conf name="java library"/>
+		</artifact>
+	</publications>
+
+	<dependencies>
+		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="0.0.5+"/>
+		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="+"/>
+	</dependencies>
+
+</ivy-module>
