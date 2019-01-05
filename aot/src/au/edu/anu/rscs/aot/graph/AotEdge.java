@@ -31,6 +31,7 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
@@ -40,9 +41,11 @@ import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
+import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.ens.biologie.generic.Labelled;
 import fr.ens.biologie.generic.Named;
 import fr.ens.biologie.generic.NamedAndLabelled;
+
 
 /**
  * reimplementation of AOTEdge
@@ -51,173 +54,181 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  *
  */
 public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
+	// this only holds the node edges
+	private Edge edge = null;
+	// this holds the properties
+	private ExtendablePropertyListImpl properties;
+	// the name
+	private String name;
+	// the label - remember that label+name = uniqueID within the graph context
+	private String label;
+	// the factory for such nodes - constructors must be protected
+	private AotGraph factory;
 
+	// TODO constructors
+	protected AotEdge (Node start, Node end,AotGraph factory) {
+		super();
+		this.factory = factory;
+		edge =  factory.makeEdge(start, end);
+		properties = new ExtendablePropertyListImpl();
+	}
+ 
+
+	// -----------------------ResizeablePropertyList
 	@Override
-	public ResizeablePropertyList addProperties(List<String> arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperties(List<String> keys) {
+		properties.addProperties(keys);
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList addProperties(String... arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperties(String... keys) {
+		properties.addProperties(keys);
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList addProperties(ReadOnlyPropertyList arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperties(ReadOnlyPropertyList list) {
+		properties.addProperties(list);
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList addProperty(Property arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(Property property) {
+		properties.addProperty(property);
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList addProperty(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(String key) {
+		properties.addProperty(key);
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList addProperty(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(String key, Object value) {
+		properties.addProperty(key, value);
+		return properties;
 	}
 
 	@Override
-	public Object getPropertyValue(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getPropertyValue(String key, Object defaultValue) {
+		return properties.getPropertyValue(key, defaultValue);
 	}
 
 	@Override
 	public ResizeablePropertyList removeAllProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		properties.removeAllProperties();
+		return properties;
 	}
 
 	@Override
-	public ResizeablePropertyList removeProperty(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList removeProperty(String key) {
+		properties.removeProperty(key);
+		return properties;
 	}
 
+	// ---------------- edge
 	@Override
-	public Element addConnectionsLike(Element arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Element addConnectionsLike(Element element) {
+		edge.addConnectionsLike(element);
+		return edge;
 	}
 
 	@Override
 	public Element disconnect() {
-		// TODO Auto-generated method stub
-		return null;
+		edge.disconnect();
+		return edge;
 	}
 
 	@Override
-	public GraphElementFactory factory() {
-		// TODO Auto-generated method stub
-		return null;
+	public GraphElementFactory graphElementFactory() {
+		return factory;
 	}
 
 	@Override
-	public Collection<Node> traversal(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<Node> traversal(int distance) {
+		return edge.traversal(distance);
 	}
 
 	@Override
-	public Collection<? extends Node> traversal(int arg0, Direction arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<? extends Node> traversal(int distance, Direction direction) {
+		return edge.traversal(distance, direction);
 	}
 
 	@Override
 	public String instanceId() {
-		// TODO Auto-generated method stub
-		return null;
+		return edge.instanceId();
 	}
 
 	@Override
 	public Node endNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return edge.endNode();
 	}
 
 	@Override
-	public Node otherNode(Node arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Node otherNode(Node other) {
+		return edge.otherNode(other);
 	}
 
 	@Override
-	public Edge setEndNode(Node arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Edge setEndNode(Node node) {
+		edge.setEndNode(node);
+		return edge;
 	}
 
 	@Override
-	public Edge setStartNode(Node arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Edge setStartNode(Node node) {
+		edge.setStartNode(node);
+		return edge;
 	}
 
 	@Override
 	public Node startNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return edge.startNode();
 	}
 
+// -----------------------------NamedAndLabelled
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public Named setName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		this.name = name;
+		return this;
 	}
 
 	@Override
 	public boolean sameName(Named item) {
-		// TODO Auto-generated method stub
-		return false;
+		return hasName(item.getName());
 	}
 
 	@Override
 	public boolean hasName(String name) {
-		// TODO Auto-generated method stub
-		return false;
+		return Objects.equals(this.name, name);
 	}
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
-		return null;
+		return label;
 	}
 
 	@Override
 	public Labelled setLabel(String label) {
-		// TODO Auto-generated method stub
-		return null;
+		this.label=label;
+		return this;
 	}
 
 	@Override
 	public boolean sameLabel(Labelled item) {
-		// TODO Auto-generated method stub
-		return false;
+		return hasLabel(item.getLabel());
 	}
 
 	@Override
 	public boolean hasLabel(String label) {
-		// TODO Auto-generated method stub
-		return false;
+		return Objects.equals(this.label, label);
 	}
 
 }

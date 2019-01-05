@@ -31,17 +31,23 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Element;
+import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.NodeAdapter;
 import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
+import fr.cnrs.iees.properties.PropertyListGetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.cnrs.iees.tree.TreeNode;
+import fr.cnrs.iees.tree.TreeNodeFactory;
 import fr.cnrs.iees.tree.impl.SimpleTreeNodeImpl;
 import fr.ens.biologie.generic.Labelled;
 import fr.ens.biologie.generic.Named;
@@ -53,237 +59,280 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
-public class AotNode 
-	implements Node, TreeNode, ResizeablePropertyList, NamedAndLabelled, Configurable {
+public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAndLabelled, Configurable {
+
+	/**
+	 * Problem here: There is a name space collision for Element.factory() and //
+	 * TreeNode.factory()
+	 * 
+	 * As I understand it, and AotNode is a composite class of 2 nodes (Element and
+	 * TreeNode) and a property class.
+	 * 
+	 * If we want to implement these interfaces as well as contain one of each then
+	 * all methods must have different signatures. The return type is not part of
+	 * the signature. 
+	 */
 	
 	// this only holds the node edges
-	private SimpleNodeImpl node = null;
+	private Node node;
 	// this only holds the children and parent nodes
-	private SimpleTreeNodeImpl treenode = null;
+	private TreeNode treenode;
 	// this holds the properties
-	private ExtendablePropertyListImpl properties = null;
+	private ExtendablePropertyListImpl properties;
 	// the name
-	private String name = null;
+	private String name;
 	// the label - remember that label+name = uniqueID within the graph context
-	private String label =  "AOTnode";
+	private String label;
 	// the factory for such nodes - constructors must be protected
-	private AotGraph factory = null;
-	
+	private AotGraph factory;
+
 	// Constructors
-	
-	// NODE
-	
+	public AotNode(AotGraph factory, String label, String name) {
+		super();
+		this.label = label;
+		this.name = name;
+		this.factory = factory;
+		this.node = factory.getGraphElementFactory().makeNode();
+		this.treenode = factory.getTreeFactory().makeTreeNode();
+		this.properties = new ExtendablePropertyListImpl();
+	}
+
+	public AotNode(AotGraph factory) {
+		this(factory, "AOTnode", "");
+	}
+
+	// --------------- NODE --------------
+
 	@Override
 	public Element disconnect() {
 		return node.disconnect();
 	}
+
 	@Override
 	public Collection<Node> traversal(int arg0) {
 		return node.traversal(arg0);
 	}
+
 	@Override
 	public Collection<? extends Node> traversal(int arg0, Direction arg1) {
-		return node.traversal(arg0,arg1);
+		return node.traversal(arg0, arg1);
 	}
-	
+
 	@Override
 	public String classId() {
 		return label;
 	}
-	
+
 	@Override
 	public String instanceId() {
 		return name;
 	}
+
 	@Override
 	public ResizeablePropertyList addProperties(List<String> arg0) {
 		return properties.addProperties(arg0);
 	}
-	
+
 	// TODO: ETC...
 
-	// PropertyList
-	
+	// ---------------------- PropertyList
+
 	@Override
-	public ResizeablePropertyList addProperties(String... arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperties(String... keys) {
+		properties.addProperties(keys);
+		return properties;
 	}
+
 	@Override
-	public ResizeablePropertyList addProperties(ReadOnlyPropertyList arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperties(ReadOnlyPropertyList list) {
+		properties.addProperties(list);
+		return properties;
 	}
+
 	@Override
-	public ResizeablePropertyList addProperty(Property arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(Property property) {
+		properties.addProperty(property);
+		return properties;
 	}
+
 	@Override
-	public ResizeablePropertyList addProperty(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(String key) {
+		properties.addProperty(key);
+		return properties;
 	}
+
 	@Override
-	public ResizeablePropertyList addProperty(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList addProperty(String key, Object value) {
+		properties.addProperty(key, value);
+		return properties;
 	}
+
 	@Override
-	public Object getPropertyValue(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getPropertyValue(String key, Object defaultValue) {
+		properties.getPropertyValue(key, defaultValue);
+		return properties;
 	}
+
 	@Override
 	public ResizeablePropertyList removeAllProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		properties.removeAllProperties();
+		return properties;
 	}
+
 	@Override
-	public ResizeablePropertyList removeProperty(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResizeablePropertyList removeProperty(String key) {
+		properties.removeProperty(key);
+		return properties;
 	}
-	
-	// TreeNode
-	
+
+	// ---------------- TreeNode
+
 	@Override
-	public void addChild(TreeNode arg0) {
-		treenode.addChild(arg0);
+	public void addChild(TreeNode child) {
+		treenode.addChild(child);
 	}
 
 	@Override
 	public Iterable<TreeNode> getChildren() {
-		// TODO Auto-generated method stub
-		return null;
+		return treenode.getChildren();
 	}
+
 	@Override
 	public TreeNode getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return treenode.getParent();
 	}
+
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
-		return false;
+		return treenode.hasChildren();
 	}
+
 	@Override
-	public void setChildren(TreeNode... arg0) {
-		// TODO Auto-generated method stub
-		
+	public void setChildren(TreeNode... children) {
+		treenode.setChildren(children);
 	}
+
 	@Override
-	public void setChildren(Iterable<TreeNode> arg0) {
-		// TODO Auto-generated method stub
-		
+	public void setChildren(Iterable<TreeNode> children) {
+		treenode.setChildren(children);
 	}
+
 	@Override
-	public void setChildren(Collection<TreeNode> arg0) {
-		// TODO Auto-generated method stub
-		
+	public void setChildren(Collection<TreeNode> children) {
+		treenode.setChildren(children);
 	}
+
 	@Override
-	public void setParent(TreeNode arg0) {
-		// TODO Auto-generated method stub
-		
+	public void setParent(TreeNode parent) {
+		treenode.setParent(parent);
+
 	}
+
 	@Override
-	public boolean addEdge(Edge arg0) {
+	public TreeNodeFactory treeNodeFactory() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
+
 	@Override
-	public boolean addEdge(Edge arg0, Direction arg1) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean addEdge(Edge edge) {
+		return node.addEdge(edge);
 	}
+
 	@Override
-	public int degree(Direction arg0) {
-		// TODO Auto-generated method stub
-		return 0;
+	public boolean addEdge(Edge edge, Direction direction) {
+		return node.addEdge(edge, direction);
 	}
+
+	@Override
+	public int degree(Direction direction) {
+		return node.degree(direction);
+	}
+
 	@Override
 	public Iterable<? extends Edge> getEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return node.getEdges();
 	}
+
 	@Override
-	public Iterable<? extends Edge> getEdges(Direction arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Iterable<? extends Edge> getEdges(Direction direction) {
+		return node.getEdges(direction);
 	}
+
 	@Override
 	public boolean isLeaf() {
-		// TODO Auto-generated method stub
-		return false;
+		return node.isLeaf();
 	}
+
 	@Override
 	public boolean isRoot() {
-		// TODO Auto-generated method stub
-		return false;
+		return node.isRoot();
 	}
+
 	@Override
-	public boolean removeEdge(Edge arg0, Direction arg1) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean removeEdge(Edge edge, Direction direction) {
+		return node.removeEdge(edge, direction);
 	}
-	@Override
-	public AotGraph factory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	// Named
-	
+
+	// -------------------------- Named
+
 	@Override
 	public String getName() {
 		return name;
 	}
+
 	@Override
 	public Named setName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		this.name = name;
+		return this;
 	}
+
 	@Override
 	public boolean sameName(Named item) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.hasName(item.getName());
 	}
+
 	@Override
 	public boolean hasName(String name) {
-		// TODO Auto-generated method stub
-		return false;
+		return Objects.equals(this.name, name);
 	}
+
 	@Override
-	
-	// Labelled
-	
+
+	// ---------------------- Labelled
+
 	public String getLabel() {
 		return label;
 	}
+
 	@Override
 	public Labelled setLabel(String label) {
-		// TODO Auto-generated method stub
-		return null;
+		this.label = label;
+		return this;
 	}
+
 	@Override
 	public boolean sameLabel(Labelled item) {
-		// TODO Auto-generated method stub
-		return false;
+		return hasLabel(item.getLabel());
 	}
+
 	@Override
 	public boolean hasLabel(String label) {
-		// TODO Auto-generated method stub
-		return false;
+		return Objects.equals(this.label, label);
 	}
-	
-	// Configurable
-	
+
+	// ------------------- Configurable
+
 	@Override
 	public AotNode initialise() {
 		return this;
 	}
-	
-	
+
+	@Override
+	public GraphElementFactory graphElementFactory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
