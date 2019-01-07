@@ -44,10 +44,8 @@ import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.ReadOnlyDataEdge;
 import fr.cnrs.iees.graph.ReadOnlyDataNode;
 import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
-import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.tree.DataTreeNode;
 import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
@@ -68,7 +66,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	private int minDepth;
 	private int maxDepth;
 	private AotNode root;
-	private int capacity;
+//	private int capacity;
 	private GraphElementFactory graphElementFactory;
 	private TreeNodeFactory treeFactory;
 
@@ -137,6 +135,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		return nodes.contains(n);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterable<AotEdge> edges() {
 		QuickListOfLists<AotEdge> edges = new QuickListOfLists<>();
