@@ -61,8 +61,8 @@ import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
  *
  */
 
-public class AotGraph
-		implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,GraphElementFactory/*, TreeNodeFactory */{
+public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,
+		GraphElementFactory/* , TreeNodeFactory */ {
 
 	private List<AotNode> nodes;
 	private int minDepth;
@@ -71,7 +71,6 @@ public class AotGraph
 	private int capacity;
 	private GraphElementFactory graphElementFactory;
 	private TreeNodeFactory treeFactory;
-	
 
 	// constructors
 	protected AotGraph() {
@@ -84,33 +83,33 @@ public class AotGraph
 		graphElementFactory = new DefaultGraphFactory();
 		treeFactory = new DefaultTreeFactory();
 	}
-	
+
 	public GraphElementFactory getGraphElementFactory() {
-		return graphElementFactory;		
+		return graphElementFactory;
 	}
+
 	public TreeNodeFactory getTreeFactory() {
 		return treeFactory;
 	}
-	// If a Tree constructor is implemented what happens to
-	// nodes with xlinks - they have to be stripped?
+
 	public AotGraph(AotNode root) {
 		this(new ArrayList<AotNode>());
 		this.root = root;
-		insertOnlyChildren(root,nodes);
-		computeDepths(root);		
-	}
-	
-	private void computeDepths(AotNode parent) {
-		// TODO Auto-generated method stub
-		
+		insertOnlyChildren(root, nodes);
+		computeDepths(root);
 	}
 
-	//  
+	private void computeDepths(AotNode parent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	// Bit of a mess here
 	private void insertOnlyChildren(TreeNode parent, List<AotNode> list) {
-		for (TreeNode child:parent.getChildren()) {
-			list.add((AotNode)child);
-			insertOnlyChildren(child,list);
-		}		
+		for (TreeNode child : parent.getChildren()) {
+			list.add((AotNode) child);
+			insertOnlyChildren(child, list);
+		}
 	}
 
 	@Override
@@ -177,18 +176,16 @@ public class AotGraph
 		return minDepth;
 	}
 
-	
-
 	private AotNode findRoot() {
 		Iterable<AotNode> roots = roots();
 		int count = 0;
 		AotNode result = null;
-		for (AotNode n: roots) {
-			result=n;
+		for (AotNode n : roots) {
+			result = n;
 			count++;
-			if (count>1)
-				return null;				
-		}	
+			if (count > 1)
+				return null;
+		}
 		return result;
 	}
 
@@ -209,12 +206,12 @@ public class AotGraph
 		// BUT what happens to xlinks? They must be removed!!
 		return new AotGraph(parent);
 	}
-	
+
 	// ----------------------GRAPH ELEMENT FACTORY -------------------------
 
 	@Override
-	public Edge makeEdge(Node start,Node end) {
-		return new AotEdge(start,end,this);
+	public Edge makeEdge(Node start, Node end) {
+		return new AotEdge(start, end, this);
 	}
 
 	@Override
@@ -249,20 +246,20 @@ public class AotGraph
 	}
 
 	// ----------------------TREE FACTORY -----------------------------
-//	@Override
-//	public DataTreeNode makeDataTreeNode(SimplePropertyList arg0) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public TreeNode makeTreeNode() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	// @Override
+	// public DataTreeNode makeDataTreeNode(SimplePropertyList arg0) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
+	//
+	// @Override
+	// public TreeNode makeTreeNode() {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------
-	
+
 	@Override
 	public NodeExceptionList castNodes() {
 		// TODO Auto-generated method stub
@@ -274,6 +271,5 @@ public class AotGraph
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }

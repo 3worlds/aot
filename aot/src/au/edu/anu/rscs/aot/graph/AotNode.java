@@ -42,6 +42,7 @@ import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.NodeAdapter;
 import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
+import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListGetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
@@ -61,24 +62,12 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  */
 public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAndLabelled, Configurable {
 
-	/**
-	 * Problem here: There is a name space collision for Element.factory() and //
-	 * TreeNode.factory()
-	 * 
-	 * As I understand it, and AotNode is a composite class of 2 nodes (Element and
-	 * TreeNode) and a property class.
-	 * 
-	 * If we want to implement these interfaces as well as contain one of each then
-	 * all methods must have different signatures. The return type is not part of
-	 * the signature. 
-	 */
-	
 	// this only holds the node edges
 	private Node node;
 	// this only holds the children and parent nodes
 	private TreeNode treenode;
 	// this holds the properties
-	private ExtendablePropertyListImpl properties;
+	private ExtendablePropertyList properties;
 	// the name
 	private String name;
 	// the label - remember that label+name = uniqueID within the graph context
@@ -87,37 +76,17 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 	private AotGraph factory;
 
 	// Constructors
-	public AotNode(AotGraph factory, String label, String name) {
+	protected AotNode(AotGraph factory) {
 		super();
-		this.label = label;
-		this.name = name;
+		this.label = "AOTNode";
 		this.factory = factory;
 		this.node = factory.getGraphElementFactory().makeNode();
 		this.treenode = factory.getTreeFactory().makeTreeNode();
 		this.properties = new ExtendablePropertyListImpl();
 	}
 
-	public AotNode(AotGraph factory) {
-		this(factory, "AOTnode", "");
-	}
-
-	// --------------- NODE --------------
-
-	@Override
-	public Element disconnect() {
-		return node.disconnect();
-	}
-
-	@Override
-	public Collection<Node> traversal(int arg0) {
-		return node.traversal(arg0);
-	}
-
-	@Override
-	public Collection<? extends Node> traversal(int arg0, Direction arg1) {
-		return node.traversal(arg0, arg1);
-	}
-
+	// ---------------------------Identifiable (from both Node and TreeNode). Is
+	// this conflict a problem??
 	@Override
 	public String classId() {
 		return label;
@@ -128,14 +97,11 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 		return name;
 	}
 
+	// -------------- ExtendablePropertyList
 	@Override
 	public ResizeablePropertyList addProperties(List<String> arg0) {
 		return properties.addProperties(arg0);
 	}
-
-	// TODO: ETC...
-
-	// ---------------------- PropertyList
 
 	@Override
 	public ResizeablePropertyList addProperties(String... keys) {
@@ -234,6 +200,22 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 		return null;
 	}
 
+	// --------------- NODE
+	@Override
+	public Element disconnect() {
+		return node.disconnect();
+	}
+
+	@Override
+	public Collection<Node> traversal(int arg0) {
+		return node.traversal(arg0);
+	}
+
+	@Override
+	public Collection<? extends Node> traversal(int arg0, Direction arg1) {
+		return node.traversal(arg0, arg1);
+	}
+
 	@Override
 	public boolean addEdge(Edge edge) {
 		return node.addEdge(edge);
@@ -274,7 +256,12 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 		return node.removeEdge(edge, direction);
 	}
 
-	// -------------------------- Named
+	@Override
+	public GraphElementFactory graphElementFactory() {
+		return factory;
+	}
+
+	// -------------------------- NamedAndLabelled
 
 	@Override
 	public String getName() {
@@ -298,9 +285,6 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 	}
 
 	@Override
-
-	// ---------------------- Labelled
-
 	public String getLabel() {
 		return label;
 	}
@@ -327,12 +311,5 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 	public AotNode initialise() {
 		return this;
 	}
-
-	@Override
-	public GraphElementFactory graphElementFactory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 }

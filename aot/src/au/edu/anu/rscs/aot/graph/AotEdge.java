@@ -39,13 +39,13 @@ import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Element;
 import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.ens.biologie.generic.Labelled;
 import fr.ens.biologie.generic.Named;
 import fr.ens.biologie.generic.NamedAndLabelled;
-
 
 /**
  * reimplementation of AOTEdge
@@ -57,7 +57,7 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 	// this only holds the node edges
 	private Edge edge = null;
 	// this holds the properties
-	private ExtendablePropertyListImpl properties;
+	private ExtendablePropertyList properties;
 	// the name
 	private String name;
 	// the label - remember that label+name = uniqueID within the graph context
@@ -66,15 +66,14 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 	private AotGraph factory;
 
 	// TODO constructors
-	protected AotEdge (Node start, Node end,AotGraph factory) {
+	protected AotEdge(Node start, Node end, AotGraph factory) {
 		super();
 		this.factory = factory;
-		edge =  factory.makeEdge(start, end);
+		edge = factory.makeEdge(start, end);
 		properties = new ExtendablePropertyListImpl();
 	}
- 
 
-	// -----------------------ResizeablePropertyList
+	// -----------------------ExtendablePropertyList
 	@Override
 	public ResizeablePropertyList addProperties(List<String> keys) {
 		properties.addProperties(keys);
@@ -188,7 +187,7 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 		return edge.startNode();
 	}
 
-// -----------------------------NamedAndLabelled
+	// -----------------------------NamedAndLabelled
 	@Override
 	public String getName() {
 		return name;
@@ -217,7 +216,7 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 
 	@Override
 	public Labelled setLabel(String label) {
-		this.label=label;
+		this.label = label;
 		return this;
 	}
 
