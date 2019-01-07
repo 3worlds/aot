@@ -29,6 +29,11 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph;
 
+/**
+ * 
+ * @author Jacques Gignoux - 21 déc. 2018
+ *
+ */
 public interface Configurable {
 
 	public Configurable initialise();

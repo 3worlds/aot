@@ -46,6 +46,7 @@ import fr.cnrs.iees.graph.ReadOnlyDataNode;
 import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.cnrs.iees.tree.DataTreeNode;
 import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
@@ -60,7 +61,7 @@ import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
  */
 
 public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,
-		GraphElementFactory/* , TreeNodeFactory */ {
+		GraphElementFactory, TreeNodeFactory  {
 
 	private List<AotNode> nodes;
 	private int minDepth;
@@ -90,6 +91,10 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		return treeFactory;
 	}
 
+	/**
+	 * builds the graph from a tree root by inserting all children of the argument
+	 * @param root
+	 */
 	public AotGraph(AotNode root) {
 		this(new ArrayList<AotNode>());
 		this.root = root;
@@ -203,6 +208,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		// TODO Auto-generated method stub
 		// So we make a new AotGraph from this node using a Tree constructor.
 		// BUT what happens to xlinks? They must be removed!!
+		// trees dont know about edges, so no need to remove them. that's the power of interfaces
 		return new AotGraph(parent);
 	}
 
@@ -214,15 +220,13 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	@Override
-	public ReadOnlyDataEdge makeEdge(Node arg0, Node arg1, ReadOnlyPropertyList arg2) {
-		// TODO Auto-generated method stub
-		return null;
+	public AotEdge makeEdge(Node arg0, Node arg1, ReadOnlyPropertyList arg2) {
+		return new AotEdge(arg0,arg1,arg2,this);
 	}
 
 	@Override
-	public DataEdge makeEdge(Node arg0, Node arg1, SimplePropertyList arg2) {
-		// TODO Auto-generated method stub
-		return null;
+	public AotEdge makeEdge(Node arg0, Node arg1, SimplePropertyList arg2) {
+		return new AotEdge(arg0,arg1,arg2,this);
 	}
 
 	@Override
@@ -233,29 +237,33 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	@Override
-	public ReadOnlyDataNode makeNode(ReadOnlyPropertyList arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public AotNode makeNode(ReadOnlyPropertyList arg0) {
+		AotNode node = new AotNode(this);
+		nodes.add(node);
+		node.addProperties(arg0);
+		return node;
 	}
 
 	@Override
-	public DataNode makeNode(SimplePropertyList arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public AotNode makeNode(SimplePropertyList arg0) {
+		AotNode node = new AotNode(this);
+		nodes.add(node);
+		node.addProperties(arg0);
+		return node;
 	}
 
 	// ----------------------TREE FACTORY -----------------------------
-	// @Override
-	// public DataTreeNode makeDataTreeNode(SimplePropertyList arg0) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public TreeNode makeTreeNode() {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+	@Override
+	public DataTreeNode makeDataTreeNode(SimplePropertyList arg0) {
+	  // TODO Auto-generated method stub
+	  return null;
+	}
+	
+	@Override
+	public TreeNode makeTreeNode() {
+	  // TODO Auto-generated method stub
+	  return null;
+	}
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 

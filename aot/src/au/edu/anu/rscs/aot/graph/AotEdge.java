@@ -54,7 +54,8 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  *
  */
 public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
-	// this only holds the node edges
+
+	// this only holds the edge start and end nodes
 	private Edge edge = null;
 	// this holds the properties
 	private ExtendablePropertyList properties;
@@ -71,6 +72,11 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 		this.factory = factory;
 		edge = factory.makeEdge(start, end);
 		properties = new ExtendablePropertyListImpl();
+	}
+	
+	protected AotEdge(Node start, Node end, ReadOnlyPropertyList properties, AotGraph factory) {
+		this(start,end,factory);
+		this.properties.addProperties(properties);
 	}
 
 	// -----------------------ExtendablePropertyList

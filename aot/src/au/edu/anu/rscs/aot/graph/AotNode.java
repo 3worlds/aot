@@ -54,7 +54,8 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
-public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAndLabelled, Configurable {
+public class AotNode implements Node, TreeNode, 
+								ResizeablePropertyList, NamedAndLabelled, Configurable {
 
 	// this only holds the node edges
 	private Node node;
@@ -81,6 +82,7 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 
 	// ---------------------------Identifiable (from both Node and TreeNode). Is
 	// this conflict a problem??
+	// apparently not because it does not refer to super.classId()
 	@Override
 	public String classId() {
 		return label;
@@ -185,13 +187,11 @@ public class AotNode implements Node, TreeNode, ResizeablePropertyList, NamedAnd
 	@Override
 	public void setParent(TreeNode parent) {
 		treenode.setParent(parent);
-
 	}
 
 	@Override
 	public TreeNodeFactory treeNodeFactory() {
-		// TODO Auto-generated method stub
-		return null;
+		return factory;
 	}
 
 	// --------------- NODE
