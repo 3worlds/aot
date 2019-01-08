@@ -32,21 +32,25 @@ package au.edu.anu.rscs.aot.graph;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Element;
-import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
+import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.cnrs.iees.tree.TreeNode;
-import fr.cnrs.iees.tree.TreeNodeFactory;
+import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
 import fr.ens.biologie.generic.Labelled;
 import fr.ens.biologie.generic.Named;
 import fr.ens.biologie.generic.NamedAndLabelled;
+import fr.ens.biologie.generic.Sealable;
 
 /**
  * Reimplementation of AOTNode
@@ -55,7 +59,7 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  *
  */
 public class AotNode implements Node, TreeNode, 
-								ResizeablePropertyList, NamedAndLabelled, Configurable {
+								ExtendablePropertyList, NamedAndLabelled, Configurable {
 
 	// this only holds the node edges
 	private Node node;
@@ -75,8 +79,8 @@ public class AotNode implements Node, TreeNode,
 		super();
 		this.label = "AOTNode";
 		this.factory = factory;
-		this.node = factory.getGraphElementFactory().makeNode();
-		this.treenode = factory.getTreeFactory().makeTreeNode();
+		this.node =  DefaultGraphFactory.makeSimpleNode(factory);
+		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(factory);
 		this.properties = new ExtendablePropertyListImpl();
 	}
 
@@ -146,6 +150,50 @@ public class AotNode implements Node, TreeNode,
 		properties.removeProperty(key);
 		return properties;
 	}
+	
+	// Not sure about this one - maybe it should be disabled by throwing an exception
+	// need careful checking
+	@Override
+	public AotNode clone() {
+		AotNode n = new AotNode(factory);
+		n.setProperties(this.properties);
+		return n;
+	}
+
+	@Override
+	public PropertyListSetters setProperty(String key, Object value) {
+		return properties.setProperty(key, value);
+	}
+
+	@Override
+	public Set<String> getKeysAsSet() {
+		return properties.getKeysAsSet();
+	}
+
+	@Override
+	public Object getPropertyValue(String arg0) {
+		return properties.getPropertyValue(arg0);
+	}
+
+	@Override
+	public boolean hasProperty(String arg0) {
+		return properties.hasProperty(arg0);
+	}
+
+	@Override
+	public int size() {
+		return properties.size();
+	}
+
+	@Override
+	public Sealable seal() {
+		return properties.seal();
+	}
+
+	@Override
+	public boolean isSealed() {
+		return properties.isSealed();
+	}
 
 	// ---------------- TreeNode
 
@@ -190,7 +238,7 @@ public class AotNode implements Node, TreeNode,
 	}
 
 	@Override
-	public TreeNodeFactory treeNodeFactory() {
+	public AotGraph treeNodeFactory() {
 		return factory;
 	}
 
@@ -251,7 +299,7 @@ public class AotNode implements Node, TreeNode,
 	}
 
 	@Override
-	public GraphElementFactory graphElementFactory() {
+	public AotGraph graphElementFactory() {
 		return factory;
 	}
 

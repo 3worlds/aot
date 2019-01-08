@@ -32,6 +32,7 @@ package au.edu.anu.rscs.aot.graph;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
@@ -40,12 +41,15 @@ import fr.cnrs.iees.graph.Element;
 import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
+import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
+import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.ens.biologie.generic.Labelled;
 import fr.ens.biologie.generic.Named;
 import fr.ens.biologie.generic.NamedAndLabelled;
+import fr.ens.biologie.generic.Sealable;
 
 /**
  * reimplementation of AOTEdge
@@ -53,7 +57,7 @@ import fr.ens.biologie.generic.NamedAndLabelled;
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
-public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
+public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 
 	// this only holds the edge start and end nodes
 	private Edge edge = null;
@@ -131,6 +135,47 @@ public class AotEdge implements Edge, ResizeablePropertyList, NamedAndLabelled {
 	public ResizeablePropertyList removeProperty(String key) {
 		properties.removeProperty(key);
 		return properties;
+	}
+	
+	@Override
+	public SimplePropertyList clone() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PropertyListSetters setProperty(String arg0, Object arg1) {
+		return properties.setProperty(arg0, arg1);
+	}
+
+	@Override
+	public Set<String> getKeysAsSet() {
+		return properties.getKeysAsSet();
+	}
+
+	@Override
+	public Object getPropertyValue(String arg0) {
+		return properties.getPropertyValue(arg0);
+	}
+
+	@Override
+	public boolean hasProperty(String arg0) {
+		return properties.hasProperty(arg0);
+	}
+
+	@Override
+	public int size() {
+		return properties.size();
+	}
+
+	@Override
+	public Sealable seal() {
+		return properties.seal();
+	}
+
+	@Override
+	public boolean isSealed() {
+		return properties.isSealed();
 	}
 
 	// ---------------- edge

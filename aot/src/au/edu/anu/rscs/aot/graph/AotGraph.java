@@ -29,32 +29,32 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.DynamicList;
 import au.edu.anu.rscs.aot.collections.QuickListOfLists;
-import fr.cnrs.iees.graph.DataEdge;
-import fr.cnrs.iees.graph.DataNode;
 import fr.cnrs.iees.graph.Direction;
-import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Graph;
 import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.ReadOnlyDataEdge;
-import fr.cnrs.iees.graph.ReadOnlyDataNode;
 import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.tree.DataTreeNode;
 import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
 import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
 
 /**
- * Re-implementation of AotGraph as a tree, a graph, a tree and graph factory, a
- * configurable graph
+ * <p>Re-implementation of AotGraph as a tree, a graph, a tree and graph factory, a
+ * configurable graph.</p>
+ * 
+ * <p>NOTE: This implementation assumes that every newly created node is inserted within the
+ * graph (factory interfaces). </p>
+ * <p>Should this class implement DynamicGraph ? it's already mutable because it is a factory...</p>
  * 
  * @author Jacques Gignoux - 21 déc. 2018
  *
@@ -67,7 +67,6 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	private int minDepth;
 	private int maxDepth;
 	private AotNode root;
-//	private int capacity;
 	private GraphElementFactory graphElementFactory;
 	private TreeNodeFactory treeFactory;
 
@@ -195,7 +194,6 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	@Override
 	public AotNode root() {
-		// TODO Auto-generated method stub
 		// Can only be asked of a valid graph so when
 		// should it be set? Use lazy method but is dodgy
 		if (root == null)
@@ -215,7 +213,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	// ----------------------GRAPH ELEMENT FACTORY -------------------------
 
 	@Override
-	public Edge makeEdge(Node start, Node end) {
+	public AotEdge makeEdge(Node start, Node end) {
 		return new AotEdge(start, end, this);
 	}
 
@@ -230,7 +228,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	@Override
-	public Node makeNode() {
+	public AotNode makeNode() {
 		AotNode node = new AotNode(this);
 		nodes.add(node);
 		return node;
@@ -253,30 +251,69 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	// ----------------------TREE FACTORY -----------------------------
+	// These methods are disabled because one cannot know where to insert the tree node in the
+	// tree hierarchy - makeNode() methods should be used instead.
+	// TODO: we may need these one day - how do we insert tree nodes at the right spot otherwise?
+	// the problem is that the tree structure is in the tree nodes, not in the tree.
+	
 	@Override
-	public DataTreeNode makeDataTreeNode(SimplePropertyList arg0) {
-	  // TODO Auto-generated method stub
-	  return null;
+	public AotNode makeDataTreeNode(SimplePropertyList props) {
+		throw new AotException("Cannot create a tree node in AotGraph: where should it be inserted?");
 	}
 	
 	@Override
-	public TreeNode makeTreeNode() {
-	  // TODO Auto-generated method stub
-	  return null;
+	public AotNode makeTreeNode() {
+		throw new AotException("Cannot create a tree node in AotGraph: where should it be inserted?");
 	}
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public NodeExceptionList castNodes() {
-		// TODO Auto-generated method stub
-		return null;
+		NodeExceptionList castFailList = new NodeExceptionList();
+		List<AotNode> removedNodes = new ArrayList<>(nodes.size());
+		List<AotNode> addedNodes = new ArrayList<>(nodes.size());
+		for (AotNode n : nodes) {
+			try {
+				String className;
+				className = (String) n.getPropertyValue("class");
+//				I dont like this, so try to remove it
+//				if (className != null && !n.getLabel().equals("defaultPropertyList")) {				
+				if (className != null) {				
+					AotNode newNode = n;
+					try {
+						ClassLoader c = Thread.currentThread().getContextClassLoader();
+						Class<? extends AotNode> nodeClass = (Class<? extends AotNode>) Class.forName(className,false,c);
+						Constructor<? extends AotNode> nodeConstructor = nodeClass.getConstructor();
+						// NOTE: a node constructor always has a factory as argument...
+						newNode = nodeConstructor.newInstance(this);
+						newNode.setLabel(n.getLabel());
+						newNode.setName(n.getName());
+						newNode.connectLike(n);
+						newNode.setProperties(n);
+						n.disconnect();
+						removedNodes.add(n);
+						addedNodes.add(newNode);
+					} catch (Exception e) {
+						throw new AotException("Cannot clone " + this + " with class " + className, e);
+					}
+				}
+			} catch (Exception e) {
+				castFailList.add(n, e);
+//				log.warning("AotGraph: Node " + n + " could not be cast.", e);
+			}
+		}
+		nodes.removeAll(removedNodes);
+		nodes.addAll(addedNodes);
+		return castFailList;
 	}
 
 	@Override
 	public NodeExceptionList initialise() {
-		// TODO Auto-generated method stub
-		return null;
+		NodeInitialiser initialiser = new NodeInitialiser(this);
+		initialiser.showInitialisationOrder();
+		return initialiser.initialise();
 	}
 
 }
