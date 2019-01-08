@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
@@ -60,6 +61,8 @@ import fr.ens.biologie.generic.Sealable;
  */
 public class AotNode implements Node, TreeNode, 
 								ExtendablePropertyList, NamedAndLabelled, Configurable {
+	
+	private static Logger log = Logger.getLogger(AotNode.class.getName());
 
 	// this only holds the node edges
 	private Node node;
@@ -351,7 +354,38 @@ public class AotNode implements Node, TreeNode,
 
 	@Override
 	public AotNode initialise() {
+		log.fine(()->uniqueId()+" initialising");
 		return this;
 	}
+	
+	// -------------------  Textable
 
+	@Override
+	public String toUniqueString() {
+		return uniqueId();
+	}
+
+	@Override
+	public String toShortString() {
+		return uniqueId();
+	}
+
+	@Override
+	public String toDetailedString() {
+		StringBuilder sb = new StringBuilder(toUniqueString());
+		sb.append(' ');
+		// TODO: this is not finished. parents and children needed
+		sb.append(Direction.IN).append("=(");
+		for (Edge e:node.getEdges(Direction.IN))
+			sb.append("[").append(e.toDetailedString()).append("]");
+		sb.append(") ").append(Direction.OUT).append("=(");
+		for (Edge e:node.getEdges(Direction.OUT))
+			sb.append("[").append(e.toDetailedString()).append("]");
+		sb.append(")");
+
+		
+		sb.append(properties.toString());
+		return sb.toString();
+	}
+	
 }

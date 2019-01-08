@@ -21,7 +21,7 @@ import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.get;
  */
 public class NodeInitialiser {
 
-	Logger log = Logger.getLogger(NodeInitialiser.class.getName());
+	private static Logger log = Logger.getLogger(NodeInitialiser.class.getName());
 
 	private AotGraph nodeList;
 
@@ -66,7 +66,7 @@ public class NodeInitialiser {
 				StackTraceElement[] stes = e.getStackTrace();
 				for (StackTraceElement ste:stes)
 					System.out.println(ste);
-				log.warning("NodeInitialiser: Node " + node	+ " could not be initialised.");
+				log.warning(()->"NodeInitialiser: Node " + node	+ " could not be initialised.");
 			}
 		return initialisationFailList;
 	}
@@ -90,8 +90,11 @@ public class NodeInitialiser {
 			String msg = "  " + String.format("%05d", count) + theTitle + ": "
 					+ node.getClass().getSimpleName() + " ["
 					+ node.uniqueId() + "]" + annotationString(node);
-//			System.out.println(msg);
 			log.fine(msg);
+//			this doesnt work but I dont know why ??? the lambda syntax is incorrect
+//			log.fine(() -> "  " + String.format("%05d", count) + theTitle + ": "
+//					+ node.getClass().getSimpleName() + " ["
+//					+ node.uniqueId() + "]" + annotationString(node));
 		}
 	}
 

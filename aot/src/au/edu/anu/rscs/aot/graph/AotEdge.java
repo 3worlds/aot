@@ -70,7 +70,12 @@ public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 	// the factory for such nodes - constructors must be protected
 	private AotGraph factory;
 
-	// TODO constructors
+	/**
+	 * Constructor with no properties
+	 * @param start the start node
+	 * @param end the end node
+	 * @param factory the AotGraph
+	 */
 	protected AotEdge(Node start, Node end, AotGraph factory) {
 		super();
 		this.factory = factory;
@@ -78,6 +83,13 @@ public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 		properties = new ExtendablePropertyListImpl();
 	}
 	
+	/**
+	 * Constructor with properties
+	 * @param start the start node
+	 * @param end the end node
+	 * @param properties the property list (copied)
+	 * @param factory the AotGraph
+	 */
 	protected AotEdge(Node start, Node end, ReadOnlyPropertyList properties, AotGraph factory) {
 		this(start,end,factory);
 		this.properties.addProperties(properties);
