@@ -87,9 +87,7 @@ public class AotNode implements Node, TreeNode,
 		this.properties = new ExtendablePropertyListImpl();
 	}
 
-	// ---------------------------Identifiable (from both Node and TreeNode). Is
-	// this conflict a problem??
-	// apparently not because it does not refer to super.classId()
+	// ---------------------------Identifiable (from both Node and TreeNode). 
 	@Override
 	public String classId() {
 		return label;

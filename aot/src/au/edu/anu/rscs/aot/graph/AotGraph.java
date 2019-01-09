@@ -203,10 +203,6 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	@Override
 	public Tree<AotNode> subTree(AotNode parent) {
-		// TODO Auto-generated method stub
-		// So we make a new AotGraph from this node using a Tree constructor.
-		// BUT what happens to xlinks? They must be removed!!
-		// trees dont know about edges, so no need to remove them. that's the power of interfaces
 		return new AotGraph(parent);
 	}
 
