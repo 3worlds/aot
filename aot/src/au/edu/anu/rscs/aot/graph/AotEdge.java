@@ -29,17 +29,13 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
-import fr.cnrs.iees.graph.Direction;
-import fr.cnrs.iees.graph.Edge;
-import fr.cnrs.iees.graph.Element;
-import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.impl.SimpleEdgeImpl;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -57,10 +53,11 @@ import fr.ens.biologie.generic.Sealable;
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
-public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
+public class AotEdge extends SimpleEdgeImpl 
+		implements ExtendablePropertyList, NamedAndLabelled {
 
 	// this only holds the edge start and end nodes
-	private Edge edge = null;
+//	private Edge edge = null;
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
@@ -68,7 +65,7 @@ public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 	// the label - remember that label+name = uniqueID within the graph context
 	private String label;
 	// the factory for such nodes - constructors must be protected
-	private AotGraph factory;
+//	private AotGraph factory;
 
 	/**
 	 * Constructor with no properties
@@ -77,9 +74,9 @@ public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 	 * @param factory the AotGraph
 	 */
 	protected AotEdge(Node start, Node end, AotGraph factory) {
-		super();
-		this.factory = factory;
-		edge = factory.makeEdge(start, end);
+		super(start,end,factory);
+//		this.factory = factory;
+//		edge = DefaultGraphFactory.makeSimpleEdge(start,end,factory);
 		properties = new ExtendablePropertyListImpl();
 	}
 	
@@ -191,64 +188,64 @@ public class AotEdge implements Edge, ExtendablePropertyList, NamedAndLabelled {
 	}
 
 	// ---------------- edge
-	@Override
-	public Element addConnectionsLike(Element element) {
-		edge.addConnectionsLike(element);
-		return edge;
-	}
-
-	@Override
-	public Element disconnect() {
-		edge.disconnect();
-		return edge;
-	}
-
-	@Override
-	public GraphElementFactory graphElementFactory() {
-		return factory;
-	}
-
-	@Override
-	public Collection<Node> traversal(int distance) {
-		return edge.traversal(distance);
-	}
-
-	@Override
-	public Collection<? extends Node> traversal(int distance, Direction direction) {
-		return edge.traversal(distance, direction);
-	}
-
-	@Override
-	public String instanceId() {
-		return edge.instanceId();
-	}
-
-	@Override
-	public Node endNode() {
-		return edge.endNode();
-	}
-
-	@Override
-	public Node otherNode(Node other) {
-		return edge.otherNode(other);
-	}
-
-	@Override
-	public Edge setEndNode(Node node) {
-		edge.setEndNode(node);
-		return edge;
-	}
-
-	@Override
-	public Edge setStartNode(Node node) {
-		edge.setStartNode(node);
-		return edge;
-	}
-
-	@Override
-	public Node startNode() {
-		return edge.startNode();
-	}
+//	@Override
+//	public Element addConnectionsLike(Element element) {
+//		edge.addConnectionsLike(element);
+//		return edge;
+//	}
+//
+//	@Override
+//	public Element disconnect() {
+//		edge.disconnect();
+//		return edge;
+//	}
+//
+//	@Override
+//	public GraphElementFactory graphElementFactory() {
+//		return factory;
+//	}
+//
+//	@Override
+//	public Collection<Node> traversal(int distance) {
+//		return edge.traversal(distance);
+//	}
+//
+//	@Override
+//	public Collection<? extends Node> traversal(int distance, Direction direction) {
+//		return edge.traversal(distance, direction);
+//	}
+//
+//	@Override
+//	public String instanceId() {
+//		return edge.instanceId();
+//	}
+//
+//	@Override
+//	public Node endNode() {
+//		return edge.endNode();
+//	}
+//
+//	@Override
+//	public Node otherNode(Node other) {
+//		return edge.otherNode(other);
+//	}
+//
+//	@Override
+//	public Edge setEndNode(Node node) {
+//		edge.setEndNode(node);
+//		return edge;
+//	}
+//
+//	@Override
+//	public Edge setStartNode(Node node) {
+//		edge.setStartNode(node);
+//		return edge;
+//	}
+//
+//	@Override
+//	public Node startNode() {
+//		return edge.startNode();
+//	}
 
 	// -----------------------------NamedAndLabelled
 	@Override

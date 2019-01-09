@@ -32,10 +32,17 @@ package au.edu.anu.rscs.aot.graph;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import au.edu.anu.rscs.aot.graph.property.Property;
+import fr.cnrs.iees.OmugiException;
+import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
+import fr.cnrs.iees.tree.TreeNode;
 
 class AotNodeTest {
 	
@@ -72,138 +79,265 @@ class AotNodeTest {
 		l.add("y"); 
 		l.add("z");
 		node.addProperties(l);
-		show("testAddPropertiesListOfString",node.toUniqueString());
+		node.setProperty("x", 1);
+		node.setProperty("y", 2);
+		node.setProperty("z", 3.0);
+		node.setName("bidon");
+//		show("testAddPropertiesListOfString",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT x=1 y=2 z=3.0]");
 	}
 
 	@Test
 	void testAddPropertiesStringArray() {
 		node.addProperties("x","y","z");
-		show("testAddPropertiesStringArray",node.toUniqueString());
+		node.setProperty("x", 1);
+		node.setProperty("y", 2);
+		node.setProperty("z", 3.0);
+		node.setName("bidon");
+//		show("testAddPropertiesStringArray",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT x=1 y=2 z=3.0]");
 	}
 
 	@Test
 	void testAddPropertiesReadOnlyPropertyList() {
-		fail("Not yet implemented");
+		SimplePropertyList pl = new SimplePropertyListImpl("a","b","c");
+		pl.setProperty("a",1);
+		pl.setProperty("b",2);
+		pl.setProperty("c",3);
+		node.addProperties(pl);
+		node.setName("bidon");
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=1 b=2 c=3]");
 	}
 
 	@Test
 	void testAddPropertyProperty() {
-		fail("Not yet implemented");
+		Property p = new Property("a",1);
+		node.addProperty(p);
+		node.setName("bidon");
+//		show("testAddPropertyProperty",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=1]");
 	}
 
 	@Test
 	void testAddPropertyString() {
-		fail("Not yet implemented");
+		node.addProperty("a");
+		node.setProperty("a",2);
+		node.setName("bidon");
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=2]");
 	}
 
 	@Test
 	void testAddPropertyStringObject() {
-		fail("Not yet implemented");
+		node.addProperty("a",3);
+		node.setName("bidon");
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=3]");
 	}
 
 	@Test
 	void testGetPropertyValueStringObject() {
-		fail("Not yet implemented");
+		int z = (Integer) node.getPropertyValue("k",3);
+//		show("testGetPropertyValueStringObject",String.valueOf(node.getPropertyValue("a",3)));
+		assertEquals(z,3);
+		assertEquals(node.getPropertyValue("k",5),3);
 	}
 
 	@Test
 	void testRemoveAllProperties() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+		show("testRemoveAllProperties",node.toDetailedString());
+		node.removeAllProperties();
+		show("testRemoveAllProperties",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:=[ROOT]");
 	}
 
 	@Test
 	void testRemoveProperty() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+		node.setProperty("x", 1);
+		node.setProperty("y", 2);
+		node.setProperty("z", 3.0);
+		show("testRemoveProperty",node.toDetailedString());
+		node.removeProperty("y");
+		show("testRemoveProperty",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:=[ROOT x=1 z=3.0]");
 	}
 
 	@Test
 	void testClone() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+		node.setProperty("x", 1);
+		node.setProperty("y", 2);
+		node.setProperty("z", 3.0);
+		node.setName("coucou");
+		node.setLabel("zoziau");
+		show("testClone",node.toDetailedString());
+		AotNode n = node.clone();
+		show("testClone",n.toDetailedString());
+		assertEquals(node,n);
 	}
 
 	@Test
 	void testSetProperty() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+//		show("testSetProperty",String.valueOf(node.getPropertyValue("x")));
+		node.setProperty("x", 1);
+//		show("testSetProperty",String.valueOf(node.getPropertyValue("x")));
+		assertEquals(node.getPropertyValue("x"),1);
 	}
 
 	@Test
 	void testGetKeysAsSet() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+//		show("testGetKeysAsSet",node.getKeysAsSet().toString());
+		assertEquals(node.getKeysAsSet().toString(),"[x, y, z]");
 	}
 
 	@Test
 	void testGetPropertyValueString() {
-		fail("Not yet implemented");
+		node.addProperty("w",125);
+//		show("testGetPropertyValueString",String.valueOf(node.getPropertyValue("w")));
+		assertEquals(node.getPropertyValue("w"),125);
 	}
 
 	@Test
 	void testHasProperty() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+		assertTrue(node.hasProperty("x"));
+		assertFalse(node.hasProperty("xx"));
 	}
 
 	@Test
 	void testSize() {
-		fail("Not yet implemented");
+		node.addProperties("x","y","z");
+		assertEquals(node.size(),3);
 	}
 
 	@Test
 	void testSeal() {
-		fail("Not yet implemented");
+		assertFalse(node.isSealed());
+		node.seal();
+		assertThrows(OmugiException.class,()->node.addProperty("q"));
 	}
 
 	@Test
 	void testIsSealed() {
-		fail("Not yet implemented");
+		assertFalse(node.isSealed());
+		node.seal();
+		assertTrue(node.isSealed());
 	}
 
 	@Test
 	void testAddChild() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		node.addChild(n);
+		assertTrue(node.hasChild(n));
+		assertFalse(n.getParent()==node);
 	}
 
 	@Test
 	void testGetChildren() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		n.setName("1");		
+		AotNode n2 = node.graphElementFactory().makeNode();
+		n2.setName("2");
+		node.addChild(n);
+		node.addChild(n); // this should fail silently because container is a Set
+		node.addChild(n2);
+		int i=0;
+		for (TreeNode tn:node.getChildren()) {
+			show("testGetChildren",tn.toDetailedString());
+			i++;
+		}
+		assertEquals(i,2);
 	}
 
 	@Test
 	void testGetParent() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		node.setParent(n);
+		show("testGetParent",node.toDetailedString());
+		assertTrue(node.getParent()==n);
+		assertFalse(n.hasChild(node));
 	}
 
 	@Test
 	void testHasChildren() {
-		fail("Not yet implemented");
+		assertFalse(node.hasChildren());
+		AotNode n = node.graphElementFactory().makeNode();
+		node.addChild(n);
+		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetChildrenTreeNodeArray() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		n.setName("1");		
+		AotNode n2 = node.graphElementFactory().makeNode();
+		n2.setName("2");
+		assertFalse(node.hasChildren());
+		node.setChildren(n,n2);
+		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetChildrenIterableOfTreeNode() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		n.setName("1");		
+		AotNode n2 = node.graphElementFactory().makeNode();
+		n2.setName("2");
+		List<TreeNode> l = new LinkedList<>();
+		l.add(n);
+		l.add(n2);
+		assertFalse(node.hasChildren());
+		Iterable<TreeNode> it = l;
+		node.setChildren(it);
+		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetChildrenCollectionOfTreeNode() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		n.setName("1");		
+		AotNode n2 = node.graphElementFactory().makeNode();
+		n2.setName("2");
+		List<TreeNode> l = new LinkedList<>();
+		l.add(n);
+		l.add(n2);
+		assertFalse(node.hasChildren());
+		node.setChildren(l);
+		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetParent() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		node.setParent(n);
+		assertTrue(n==node.getParent());
+		assertFalse(n.hasChild(node));
 	}
 
 	@Test
 	void testTreeNodeFactory() {
-		fail("Not yet implemented");
+		show("testTreeNodeFactory",node.treeNodeFactory().toString());
+		assertNotNull(node.treeNodeFactory());
 	}
 
 	@Test
 	void testDisconnect() {
-		fail("Not yet implemented");
+		AotNode n = node.graphElementFactory().makeNode();
+		n.setName("1");		
+		AotNode n2 = node.graphElementFactory().makeNode();
+		n2.setName("2");
+		node.graphElementFactory().makeEdge(node, n);
+		node.graphElementFactory().makeEdge(n2, node);
+		node.graphElementFactory().makeEdge(node, node);
+		node.setParent(n);
+		node.addChild(n2);
+		show("testDisconnect",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:=[↑AOTNode:1 ↓AOTNode:2 ←AOTNode:2 ←AOTNode: →AOTNode:1 →AOTNode:]");
+		node.disconnect();
+		show("testDisconnect",node.toDetailedString());
+		assertEquals(node.toDetailedString(),"AOTNode:=[↑AOTNode:1 ↓AOTNode:2]");
 	}
 
 	@Test
