@@ -32,6 +32,7 @@ package au.edu.anu.rscs.aot.graph;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.OmugiException;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
+import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
 import fr.cnrs.iees.tree.TreeNode;
@@ -202,7 +204,9 @@ class AotNodeTest {
 		show("testClone",node.toDetailedString());
 		AotNode n = node.clone();
 		show("testClone",n.toDetailedString());
-		assertEquals(node,n);
+		assertNotNull(n);
+		assertTrue(node.sameLabel(n));
+		assertFalse(node.sameName(n));
 	}
 
 	@Test
@@ -351,33 +355,63 @@ class AotNodeTest {
 		assertNotNull(node.treeNodeFactory());
 	}
 
+	@SuppressWarnings({"unchecked" })
 	@Test
 	void testDisconnect() {
 		AotNode n = new AotNode(null,"1",node.graphElementFactory());
 		AotNode n2 = new AotNode(null,"2",node.graphElementFactory());
-		node.graphElementFactory().makeEdge(node, n);
-		node.graphElementFactory().makeEdge(n2, node);
-		node.graphElementFactory().makeEdge(node, node);
+		Edge ed1 = node.graphElementFactory().makeEdge(node, n);
+		Edge ed2 = node.graphElementFactory().makeEdge(n2, node);
+		Edge ed3 = node.graphElementFactory().makeEdge(node, node);
 		node.setParent(n);
 		node.addChild(n2);
 		show("testDisconnect",node.toDetailedString());
-		assertEquals(node.toDetailedString(),"AOTNode:=[↑AOTNode:1 ↓AOTNode:2 ←AOTNode:2 ←AOTNode: →AOTNode:1 →AOTNode:]");
+		Iterable<Edge> i = (Iterable<Edge>) node.getEdges();
+		List<Edge> l = new LinkedList<Edge>();
+		for (Edge e:i)
+			l.add(e);
+		assertTrue(l.contains(ed1));
+		assertTrue(l.contains(ed2));
+		assertTrue(l.contains(ed3));
 		node.disconnect();
+		i = (Iterable<Edge>) node.getEdges();
+		l.clear();
+		for (Edge e:i)
+			l.add(e);
 		show("testDisconnect",node.toDetailedString());
-		assertEquals(node.toDetailedString(),"AOTNode:=[↑AOTNode:1 ↓AOTNode:2]");
+		assertFalse(l.contains(ed1));
+		assertFalse(l.contains(ed2));
+		assertFalse(l.contains(ed3));
 	}
 
 	@Test
 	void testTraversalInt() {
-		show("testTraversalInt",node1.traversal(2).toString());
-		assertEquals(node1.traversal(2).toString(),
-			"[[AOTNode:1=[ROOT →AOTNode:2 →AOTNode:3]], [AOTNode:2=[ROOT ←AOTNode:1 ←AOTNode:4]], [AOTNode:3=[ROOT ←AOTNode:1 ←AOTNode:5 ←AOTNode:3 →AOTNode:4 →AOTNode:3]]]"); 
+		Collection<Node> c = node1.traversal(2);
+		show("testTraversalInt",c.toString());
+		assertTrue(c.contains(node1));
+		assertTrue(c.contains(node2));
+		assertTrue(c.contains(node3));
+		assertFalse(c.contains(node4));
+		assertFalse(c.contains(node5));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void testTraversalIntDirection() {
-		show("testTraversalIntDirection",node1.traversal(2,Direction.OUT).toString());
-		show("testTraversalIntDirection",node1.traversal(2,Direction.IN).toString());
+		Collection<AotNode> c = (Collection<AotNode>) node1.traversal(2,Direction.OUT);
+		show("testTraversalInt",c.toString());
+		assertTrue(c.contains(node1));
+		assertTrue(c.contains(node2));
+		assertTrue(c.contains(node3));
+		assertFalse(c.contains(node4));
+		assertFalse(c.contains(node5));
+		c = (Collection<AotNode>) node1.traversal(2,Direction.IN);
+		show("testTraversalInt",c.toString());
+		assertTrue(c.contains(node1));
+		assertFalse(c.contains(node2));
+		assertFalse(c.contains(node3));
+		assertFalse(c.contains(node4));
+		assertFalse(c.contains(node5));
 	}
 
 	@Test

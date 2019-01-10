@@ -247,19 +247,23 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	// ----------------------TREE FACTORY -----------------------------
-	// These methods are disabled because one cannot know where to insert the tree node in the
-	// tree hierarchy - makeNode() methods should be used instead.
-	// TODO: we may need these one day - how do we insert tree nodes at the right spot otherwise?
-	// the problem is that the tree structure is in the tree nodes, not in the tree.
 	
 	@Override
-	public AotNode makeDataTreeNode(SimplePropertyList props) {
-		throw new AotException("Cannot create a tree node in AotGraph: where should it be inserted?");
+	public AotNode makeDataTreeNode(TreeNode parent,SimplePropertyList props) {
+		AotNode node = makeNode(props);
+		node.setParent(parent);
+		if (parent!=null)
+			parent.addChild(node);
+		return node;
 	}
 	
 	@Override
-	public AotNode makeTreeNode() {
-		throw new AotException("Cannot create a tree node in AotGraph: where should it be inserted?");
+	public AotNode makeTreeNode(TreeNode parent) {
+		AotNode node = makeNode();
+		node.setParent(parent);
+		if (parent!=null)
+			parent.addChild(node);
+		return node;
 	}
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------

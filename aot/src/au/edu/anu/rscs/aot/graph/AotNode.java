@@ -77,6 +77,7 @@ import fr.ens.biologie.generic.Sealable;
  *
  */
 // Tested OK with version 0.0.3 on 10/1/2019
+// Tested OK with version 0.0.4 on 10/1/2019
 public class AotNode extends SimpleNodeImpl 
 		implements TreeNode, ExtendablePropertyList, NamedAndLabelled, Configurable {
 	
@@ -105,7 +106,7 @@ public class AotNode extends SimpleNodeImpl
 		super(factory);
 		this.label = label;
 		this.name = name;
-		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(factory);
+		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
 		this.properties = new ExtendablePropertyListImpl();
 	}
 
@@ -259,9 +260,14 @@ public class AotNode extends SimpleNodeImpl
 		treenode.setChildren(children);
 	}
 
+	/**
+	 * CAUTION: to prevent problems, parent can only be set if it was null. It should
+	 * be set by the factory in the makeTreeNode(...) methods
+	 */
 	@Override
 	public void setParent(TreeNode parent) {
-		treenode.setParent(parent);
+		if (treenode.getParent()==null)
+			treenode.setParent(parent);
 	}
 
 	@Override
