@@ -56,17 +56,15 @@ import fr.ens.biologie.generic.Sealable;
 public class AotEdge extends SimpleEdgeImpl 
 		implements ExtendablePropertyList, NamedAndLabelled {
 
-	// this only holds the edge start and end nodes
-//	private Edge edge = null;
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
 	private String name;
 	// the label - remember that label+name = uniqueID within the graph context
 	private String label;
-	// the factory for such nodes - constructors must be protected
-//	private AotGraph factory;
 
+	// ----------------------------- Constructors - all protected
+	
 	/**
 	 * Constructor with no properties
 	 * @param start the start node
@@ -75,8 +73,6 @@ public class AotEdge extends SimpleEdgeImpl
 	 */
 	protected AotEdge(Node start, Node end, AotGraph factory) {
 		super(start,end,factory);
-//		this.factory = factory;
-//		edge = DefaultGraphFactory.makeSimpleEdge(start,end,factory);
 		properties = new ExtendablePropertyListImpl();
 	}
 	
@@ -253,9 +249,14 @@ public class AotEdge extends SimpleEdgeImpl
 		return name;
 	}
 
+	/**
+	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
+	 * on which sets base their unicity of element constraint.
+	 */
 	@Override
 	public Named setName(String name) {
-		this.name = name;
+		if (this.name==null)
+			this.name = name;
 		return this;
 	}
 
@@ -274,9 +275,14 @@ public class AotEdge extends SimpleEdgeImpl
 		return label;
 	}
 
+	/**
+	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
+	 * on which sets base their unicity of element constraint.
+	 */
 	@Override
 	public Labelled setLabel(String label) {
-		this.label = label;
+		if (this.label==null)
+			this.label = label;
 		return this;
 	}
 

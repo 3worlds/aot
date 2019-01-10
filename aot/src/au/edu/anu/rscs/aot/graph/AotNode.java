@@ -70,7 +70,8 @@ import fr.ens.biologie.generic.Sealable;
  * to mistakenly add the same edge twice. {@link GraphElementFactory} edge creation methods
  * normally take care of node lists, so that an Edge is always consistently created. </li>
  * <li>The same applies to tree management: an {@code AotNode} is always created within the context of
- * a tree, so it must have a parent.</li>
+ * a tree, so it must have a parent. {@link TreeNodeFactory} proposes methods to create 
+ * a {@code TreeNode} with a parent, which take care of the connection settings.</li>
  * </ul>
  * 
  * @author Jacques Gignoux - 21 déc. 2018
@@ -275,6 +276,11 @@ public class AotNode extends SimpleNodeImpl
 		return (AotGraph)graphElementFactory();
 	}
 
+	@Override
+	public int nChildren() {
+		return treenode.nChildren();
+	}
+
 	// --------------- NODE
 
 	@Override
@@ -351,11 +357,20 @@ public class AotNode extends SimpleNodeImpl
 		return uniqueId();
 	}
 
-//	@Override
-//	public String toShortString() {
-//		return uniqueId();
-//	}
-
+	/**
+	 * Displays an AotNode as follows (on a single line):
+	 * 
+	 * <pre>
+	 * node_label:node_name=[
+	 *    ↑parent_label:parent_name      // the parent node, or ROOT if null
+	 *    ↓child_label:child_name        // child node, repeated as needed
+	 *    →out_node_label:out_node_name  // end node of outgoing edge, repeated as needed
+	 *    ←in_node_label:in_node_name    // start node of incoming edge, repeated as needed
+	 * ] 
+	 * </pre>
+	 * <p>e.g.: {@code AOTNode:=[↑AOTNode:1 ↓AOTNode:2 ←AOTNode:2 ←AOTNode: →AOTNode: →AOTNode:1]}
+	 *  (in this case, the name is missing).</p>
+	 */
 	@Override
 	public String toDetailedString() {
 		StringBuilder sb = new StringBuilder(toUniqueString());
