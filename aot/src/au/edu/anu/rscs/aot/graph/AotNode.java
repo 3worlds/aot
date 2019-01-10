@@ -52,40 +52,68 @@ import fr.ens.biologie.generic.NamedAndLabelled;
 import fr.ens.biologie.generic.Sealable;
 
 /**
- * Reimplementation of AOTNode
+ * <p>Reimplementation of AOTNode</p>
+ * <p>Some important points:</p>
+ * <ul>
+ * <li>The label:name pair is used to uniquely identify {@code AotNode}s in replacement for Uids.
+ * This means that {@code .equals()} uses these fields to decide if {@code AotNode}s are identical.
+ * This also means that {@code Set}s of {@code AotNode}s will rely on these to decide if 
+ * items are duplicate. Therefore, name and label should be set at construction time, or 
+ * "not too late" after that (eg when loading from a file). To prevent accidental change of 
+ * name and label, the {@code setName()} and {@code setLabel()} methods have been protected:
+ * name and label can only be changed if they are null, ie only once (or never if
+ * a constructor with name and label arguments was used).</li>
+ * <li>The {@code addEdge(...)} methods should never be used directly at runtime, because
+ * linking two {@code Node}s through an {@code Edge} implies some consistency (ie the 
+ * {@code Edge} startNode and endNode fields must be consistent with their respective Edge 
+ * lists). In {@link NodeAdapter}, edges are stored in {@link HashSet}s so that it is impossible
+ * to mistakenly add the same edge twice. {@link GraphElementFactory} edge creation methods
+ * normally take care of node lists, so that an Edge is always consistently created. </li>
+ * <li>The same applies to tree management: an {@code AotNode} is always created within the context of
+ * a tree, so it must have a parent.</li>
+ * </ul>
  * 
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
+// Tested OK with version 0.0.3 on 10/1/2019
 public class AotNode extends SimpleNodeImpl 
 		implements TreeNode, ExtendablePropertyList, NamedAndLabelled, Configurable {
 	
 	private static Logger log = Logger.getLogger(AotNode.class.getName());
 	private static String defaultLabel = "AOTNode";
 
-	// this only holds the node edges
-//	private Node node;
 	// this only holds the children and parent nodes
 	private TreeNode treenode;
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
-	private String name;
+	private String name=null;
 	// the label - remember that label+name = uniqueID within the graph context
-	private String label;
-	// the factory for such nodes - constructors must be protected
-//	private AotGraph factory;
+	private String label=null;
 
-	// Constructors
+	// ----------------------- Constructors
+
+	// this constructor sets the name to the uniqueID
 	protected AotNode(AotGraph factory) {
+		this(defaultLabel,null,factory);
+		name = super.instanceId();
+	}
+
+	// this is the constructor to use with descendant classes
+	protected AotNode(String label, String name, AotGraph factory) {
 		super(factory);
-		this.label = defaultLabel;
-//		this.factory = factory;
-//		this.node =  DefaultGraphFactory.makeSimpleNode(factory);
+		this.label = label;
+		this.name = name;
 		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(factory);
 		this.properties = new ExtendablePropertyListImpl();
 	}
 
+	// this is the constructor to use for plain aot nodes
+	protected AotNode(String name, AotGraph factory) {
+		this(defaultLabel,name,factory);
+	}
+	
 	// ---------------------------Identifiable (from both Node and TreeNode). 
 	@Override
 	public String classId() {
@@ -242,60 +270,6 @@ public class AotNode extends SimpleNodeImpl
 	}
 
 	// --------------- NODE
-//	@Override
-//	public Element disconnect() {
-//		return node.disconnect();
-//	}
-
-//	@Override
-//	public Collection<Node> traversal(int arg0) {
-//		return node.traversal(arg0);
-//	}
-
-//	@Override
-//	public Collection<? extends Node> traversal(int arg0, Direction arg1) {
-//		return node.traversal(arg0, arg1);
-//	}
-
-//	@Override
-//	public boolean addEdge(Edge edge) {
-//		return node.addEdge(edge);
-//	}
-
-//	@Override
-//	public boolean addEdge(Edge edge, Direction direction) {
-//		return node.addEdge(edge, direction);
-//	}
-
-//	@Override
-//	public int degree(Direction direction) {
-//		return node.degree(direction);
-//	}
-
-//	@Override
-//	public Iterable<? extends Edge> getEdges() {
-//		return node.getEdges();
-//	}
-
-//	@Override
-//	public Iterable<? extends Edge> getEdges(Direction direction) {
-//		return node.getEdges(direction);
-//	}
-
-//	@Override
-//	public boolean isLeaf() {
-//		return node.isLeaf();
-//	}
-
-//	@Override
-//	public boolean isRoot() {
-//		return node.isRoot();
-//	}
-
-//	@Override
-//	public boolean removeEdge(Edge edge, Direction direction) {
-//		return node.removeEdge(edge, direction);
-//	}
 
 	@Override
 	public AotGraph graphElementFactory() {
@@ -309,9 +283,14 @@ public class AotNode extends SimpleNodeImpl
 		return name;
 	}
 
+	/**
+	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
+	 * on which sets base their unicity of element constraint.
+	 */
 	@Override
 	public Named setName(String name) {
-		this.name = name;
+		if (this.name==null)
+			this.name = name;
 		return this;
 	}
 
@@ -330,9 +309,14 @@ public class AotNode extends SimpleNodeImpl
 		return label;
 	}
 
+	/**
+	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
+	 * on which sets base their unicity of element constraint.
+	 */
 	@Override
 	public Labelled setLabel(String label) {
-		this.label = label;
+		if (this.label==null)
+			this.label = label;
 		return this;
 	}
 
@@ -391,29 +375,6 @@ public class AotNode extends SimpleNodeImpl
 			sb.append(' ').append(properties.toString());
 		sb.append("]");
 		return sb.toString();
-	}
-
-	// -------------------  Object
-//	@Override
-//	public String toString() {
-//		return toDetailedString();
-//	}
-
-	// two AOT nodes are equal if their label, name, properties, parent, children, edges are equal
-	@Override
-	public boolean equals(Object obj) {
-		if (obj==this) // this may occur...
-			return true;
-		if (!AotNode.class.isAssignableFrom(obj.getClass()))
-			return false;
-		AotNode n = (AotNode) obj;
-		return (n.label.equals(label) && 
-				n.name.equals(name) &&
-//				n.factory.equals(factory) &&
-//				// TODO: these tests do not work
-//				n.node.equals(node) &&
-				n.treenode.equals(treenode) &&
-				n.properties.equals(properties));
 	}
 	
 }

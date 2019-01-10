@@ -40,18 +40,49 @@ import org.junit.jupiter.api.Test;
 
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.OmugiException;
+import fr.cnrs.iees.graph.Direction;
+import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
 import fr.cnrs.iees.tree.TreeNode;
 
+/**
+ * 
+ * @author Jacques Gignoux - 10 janv. 2019
+ *
+ */
 class AotNodeTest {
 	
 	private AotNode node = null;
+	private AotNode node1, node2, node3, node4, node5;
+	@SuppressWarnings("unused")
+	private AotEdge e1, e2, e3, e4, e5, e6;
 	
 	@BeforeEach
 	private void init() {
 		AotGraph graph = new AotGraph();
-		node = new AotNode(graph);
+		node = new AotNode(null,graph);
+	}
+	
+	@BeforeEach
+	private void init2() {
+		AotGraph graph = new AotGraph();
+		node1 = new AotNode(null,graph);
+		node1.setName("1");
+		node2 = new AotNode(null,null,graph);
+		node2.setName("2");
+		node3 = new AotNode(null,null,graph);
+		node3.setName("3");
+		node4 = new AotNode(null,null,graph);
+		node4.setName("4");
+		node5 = new AotNode(null,null,graph);
+		node5.setName("5");
+		e1 = graph.makeEdge(node1, node2);
+		e2 = graph.makeEdge(node1, node3);
+		e3 = graph.makeEdge(node3, node4);
+		e4 = graph.makeEdge(node5, node3);
+		e5 = graph.makeEdge(node4, node2);
+		e6 = graph.makeEdge(node3, node3);		
 	}
 	
 	private void show(String method,String text) {
@@ -61,13 +92,11 @@ class AotNodeTest {
 	@Test
 	void testClassId() {
 		assertEquals(node.classId(),"AOTNode");
-		node.setLabel("bidon");
-		assertEquals(node.classId(),"bidon");
 	}
 
 	@Test
 	void testInstanceId() {
-		assertNull(node.instanceId());
+		assertEquals(node.instanceId(),"");
 		node.setName("bidon");
 		assertEquals(node.instanceId(),"bidon");
 	}
@@ -324,10 +353,8 @@ class AotNodeTest {
 
 	@Test
 	void testDisconnect() {
-		AotNode n = node.graphElementFactory().makeNode();
-		n.setName("1");		
-		AotNode n2 = node.graphElementFactory().makeNode();
-		n2.setName("2");
+		AotNode n = new AotNode(null,"1",node.graphElementFactory());
+		AotNode n2 = new AotNode(null,"2",node.graphElementFactory());
 		node.graphElementFactory().makeEdge(node, n);
 		node.graphElementFactory().makeEdge(n2, node);
 		node.graphElementFactory().makeEdge(node, node);
@@ -342,102 +369,131 @@ class AotNodeTest {
 
 	@Test
 	void testTraversalInt() {
-		fail("Not yet implemented");
+		show("testTraversalInt",node1.traversal(2).toString());
+		assertEquals(node1.traversal(2).toString(),
+			"[[AOTNode:1=[ROOT →AOTNode:2 →AOTNode:3]], [AOTNode:2=[ROOT ←AOTNode:1 ←AOTNode:4]], [AOTNode:3=[ROOT ←AOTNode:1 ←AOTNode:5 ←AOTNode:3 →AOTNode:4 →AOTNode:3]]]"); 
 	}
 
 	@Test
 	void testTraversalIntDirection() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testAddEdgeEdge() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testAddEdgeEdgeDirection() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	void testDegree() {
-		fail("Not yet implemented");
+		show("testTraversalIntDirection",node1.traversal(2,Direction.OUT).toString());
+		show("testTraversalIntDirection",node1.traversal(2,Direction.IN).toString());
 	}
 
 	@Test
 	void testGetEdges() {
-		fail("Not yet implemented");
+//		show("testGetEdges",node3.getEdges().toString());
+		List<Edge> l = new ArrayList<Edge>();
+		for (Edge e:node3.getEdges())
+			l.add(e);
+		assertTrue(l.contains(e3));
+		assertFalse(l.contains(e5));
+		assertTrue(l.contains(e2));
 	}
 
 	@Test
 	void testGetEdgesDirection() {
-		fail("Not yet implemented");
+		List<Edge> l = new ArrayList<Edge>();
+		for (Edge e:node3.getEdges(Direction.IN))
+			l.add(e);
+//		show("testGetEdgesDirection",l.toString());
+		assertFalse(l.contains(e3));
+		assertFalse(l.contains(e5));
+		assertTrue(l.contains(e2));
 	}
 
 	@Test
 	void testIsLeaf() {
-		fail("Not yet implemented");
+		assertTrue(node2.isLeaf());
+		assertFalse(node1.isLeaf());
+		assertFalse(node3.isLeaf());
 	}
 
 	@Test
 	void testIsRoot() {
-		fail("Not yet implemented");
+		assertTrue(node1.isRoot());
+		assertTrue(node5.isRoot());
+		assertFalse(node2.isRoot());
 	}
 
 	@Test
 	void testRemoveEdge() {
-		fail("Not yet implemented");
+		show("testRemoveEdge",node3.toDetailedString());
+		node3.removeEdge(e3);
+		show("testRemoveEdge",node3.toDetailedString());
 	}
 
 	@Test
 	void testGraphElementFactory() {
-		fail("Not yet implemented");
+		show("testGraphElementFactory",node2.graphElementFactory().toString());
+		assertFalse(node.graphElementFactory().equals(node1.graphElementFactory()));
 	}
 
 	@Test
 	void testGetName() {
-		fail("Not yet implemented");
+		assertEquals(node1.getName(),"1");		
 	}
 
 	@Test
 	void testSetName() {
-		fail("Not yet implemented");
+		AotNode n = new AotNode(null,null,node.graphElementFactory());
+		assertNull(n.getName());
+		n.setName("bidon");
+		assertEquals(n.getName(),"bidon");
+		// name can only be set once:
+		n.setName("truc");
+		show("testSetName",n.toDetailedString());
+		assertEquals(n.getName(),"bidon");
 	}
 
 	@Test
 	void testSameName() {
-		fail("Not yet implemented");
+		AotGraph g = new AotGraph();
+		AotNode n = new AotNode(null,null,g);
+		n.setName("2");
+		assertTrue(n.sameName(node2));
+		assertFalse(n.sameName(node1));		
 	}
 
 	@Test
 	void testHasName() {
-		fail("Not yet implemented");
+		AotNode n = new AotNode(null,null,node.graphElementFactory());
+		assertFalse(n.hasName("bidon"));
+		n.setName("bidon");
+		assertTrue(n.hasName("bidon"));
 	}
 
 	@Test
 	void testGetLabel() {
-		fail("Not yet implemented");
+		assertEquals(node.getLabel(),"AOTNode");
 	}
 
 	@Test
 	void testSetLabel() {
-		fail("Not yet implemented");
+		AotGraph g = new AotGraph();
+		AotNode n = new AotNode(null,null,g);
+		assertNull(n.getLabel());
+		n.setLabel("bla");
+		assertEquals(n.getLabel(),"bla");
+		// label can only be set once
+		n.setLabel("bli");
+		assertEquals(n.getLabel(),"bla");
 	}
 
 	@Test
 	void testSameLabel() {
-		fail("Not yet implemented");
+		assertTrue(node.sameLabel(node1));
+		assertFalse(node.sameLabel(e1));
 	}
 
 	@Test
 	void testHasLabel() {
-		fail("Not yet implemented");
+		assertTrue(node.hasLabel("AOTNode"));
 	}
 
 	@Test
 	void testInitialise() {
-		fail("Not yet implemented");
+		node.initialise();
 	}
 
 }
