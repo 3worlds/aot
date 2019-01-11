@@ -40,13 +40,11 @@ import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Graph;
 import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
-import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
 
 /**
  * <p>Re-implementation of AotGraph as a tree, a graph, a tree and graph factory, a
@@ -67,27 +65,31 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	private int minDepth;
 	private int maxDepth;
 	private AotNode root;
-	private GraphElementFactory graphElementFactory;
-	private TreeNodeFactory treeFactory;
 
 	// constructors
 	protected AotGraph() {
 		this(new ArrayList<AotNode>());
 	}
 
-	protected AotGraph(Iterable<AotNode> list) {
+	// assumes the first element in the list is the root
+	public AotGraph(Iterable<AotNode> list) {
 		super();
 		nodes = new DynamicList<>(list);
-		graphElementFactory = new DefaultGraphFactory();
-		treeFactory = new DefaultTreeFactory();
+		root = list.iterator().next();
+	}
+	
+	// enables one to specify the root
+	public AotGraph(Iterable<AotNode> list, AotNode root) {
+		this(list);
+		this.root = root;
 	}
 
 	public GraphElementFactory getGraphElementFactory() {
-		return graphElementFactory;
+		return this;
 	}
 
 	public TreeNodeFactory getTreeFactory() {
-		return treeFactory;
+		return this;
 	}
 
 	/**
