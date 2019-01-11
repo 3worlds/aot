@@ -187,7 +187,7 @@ public class NodeInitialiser {
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_AFTER)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER))) {
 			for (AotEdge edge : uiaEdges)
-				node.graphElementFactory().makeEdge(node,edge.endNode()).setLabel(DEPENDENCY);
+				node.nodeFactory().makeEdge(node,edge.endNode()).setLabel(DEPENDENCY);
 //				node.newEdge((AotNode)edge.endNode(), DEPENDENCY);
 		}
 		for (AotNode node : nodeList.nodes()) {
@@ -196,7 +196,7 @@ public class NodeInitialiser {
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE))) {
 			for (AotEdge edge : uibEdges)
 //				((AotNode)edge.endNode()).newEdge(node, DEPENDENCY);
-				node.graphElementFactory().makeEdge(edge.endNode(),node).setLabel(DEPENDENCY);
+				node.nodeFactory().makeEdge(edge.endNode(),node).setLabel(DEPENDENCY);
 		}
 	}
 
@@ -228,7 +228,7 @@ public class NodeInitialiser {
 					for (AotNode dep : nodeList.nodes())
 						if (order(dep) > -1 && order(dep) < order)
 //							node.newEdge(dep, DEPENDENCY);
-							node.graphElementFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
 				}
 
 			if (hasInitialiseAfterClasses(node)) {
@@ -240,11 +240,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (afterClass.isInstance(dep))
 //								node.newEdge(dep, DEPENDENCY);
-								node.graphElementFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
 						} else {
 							if (afterClass.getName().equals(dep.getName()))
 //								node.newEdge(dep, DEPENDENCY);
-								node.graphElementFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
 						}
 			}
 			if (hasInitialiseBeforeClasses(node)) {
@@ -256,11 +256,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (beforeClass.isInstance(dep))
 //								dep.newEdge(node, DEPENDENCY);
-								node.graphElementFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
 						} else {
 							if (beforeClass.getName().equals(dep.getName()))
 //								dep.newEdge(node, DEPENDENCY);
-								node.graphElementFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
 						}
 					}
 			}
@@ -270,7 +270,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							node.newEdge(dep, DEPENDENCY);
-							node.graphElementFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
 
 			if (hasInitialiseBeforeNodesMatching(node))
 				for (String ref : beforeNodesMatching(node))
@@ -278,7 +278,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							dep.newEdge(node, DEPENDENCY);
-							node.graphElementFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
 		}
 	}
 

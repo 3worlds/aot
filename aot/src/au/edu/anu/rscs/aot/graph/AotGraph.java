@@ -37,9 +37,10 @@ import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.DynamicList;
 import au.edu.anu.rscs.aot.collections.QuickListOfLists;
 import fr.cnrs.iees.graph.Direction;
+import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Graph;
-import fr.cnrs.iees.graph.GraphElementFactory;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.tree.Tree;
@@ -59,7 +60,7 @@ import fr.cnrs.iees.tree.TreeNodeFactory;
  */
 
 public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,
-		GraphElementFactory, TreeNodeFactory  {
+		NodeFactory, EdgeFactory, TreeNodeFactory  {
 
 	private List<AotNode> nodes;
 	private int minDepth;
@@ -75,7 +76,8 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	public AotGraph(Iterable<AotNode> list) {
 		super();
 		nodes = new DynamicList<>(list);
-		root = list.iterator().next();
+		if (list.iterator().hasNext())
+			root = list.iterator().next();
 	}
 	
 	// enables one to specify the root
@@ -84,7 +86,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		this.root = root;
 	}
 
-	public GraphElementFactory getGraphElementFactory() {
+	public EdgeFactory getEdgeFactory() {
 		return this;
 	}
 
@@ -208,7 +210,16 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		return new AotGraph(parent);
 	}
 
-	// ----------------------GRAPH ELEMENT FACTORY -------------------------
+	// ---------------------- NODE FACTORY -------------------------
+
+	// This is disabled because any new node has to be inserted into the tree at the
+	// proper spot. We dont want free-floating nodes in an AOT graph because it's a tree.
+	@Override
+	public AotNode makeNode(String arg0, String arg1, ReadOnlyPropertyList arg2) {
+		throw new AotException("Attempt to instantiate an AotNode outside of the tree context.");
+	}
+	
+	// ---------------------- EDGE FACTORY -------------------------
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end) {
@@ -216,58 +227,54 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	@Override
-	public AotEdge makeEdge(Node arg0, Node arg1, ReadOnlyPropertyList arg2) {
-		return new AotEdge(arg0,arg1,arg2,this);
+	public AotEdge makeEdge(Node start, Node end, ReadOnlyPropertyList props) {
+		return new AotEdge(start,end,props,this);
 	}
 
+	// use with caution - name+label must be unique within the graph
 	@Override
-	public AotEdge makeEdge(Node arg0, Node arg1, SimplePropertyList arg2) {
-		return new AotEdge(arg0,arg1,arg2,this);
+	public AotEdge makeEdge(Node start, Node end, String classId, String instanceId, 
+			ReadOnlyPropertyList props) {
+		AotEdge result = new AotEdge(start,end,props,this);
+		result.setLabel(classId);
+		result.setName(instanceId);
+		return result;
 	}
 
-	@Override
-	public AotNode makeNode() {
-		AotNode node = new AotNode(this);
-		nodes.add(node);
-		return node;
-	}
-
-	@Override
-	public AotNode makeNode(ReadOnlyPropertyList arg0) {
-		AotNode node = new AotNode(this);
-		nodes.add(node);
-		node.addProperties(arg0);
-		return node;
-	}
-
-	@Override
-	public AotNode makeNode(SimplePropertyList arg0) {
-		AotNode node = new AotNode(this);
-		nodes.add(node);
-		node.addProperties(arg0);
-		return node;
-	}
 
 	// ----------------------TREE FACTORY -----------------------------
 	
 	@Override
-	public AotNode makeDataTreeNode(TreeNode parent,SimplePropertyList props) {
-		AotNode node = makeNode(props);
+	public AotNode makeTreeNode(TreeNode parent,SimplePropertyList props) {
+		AotNode node = new AotNode(this);
 		node.setParent(parent);
 		if (parent!=null)
 			parent.addChild(node);
+		node.addProperties(props);
 		return node;
 	}
 	
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		AotNode node = makeNode();
+		AotNode node = new AotNode(this);
 		node.setParent(parent);
 		if (parent!=null)
 			parent.addChild(node);
 		return node;
 	}
 
+	// use with caution - name+label must be unique within the graph
+	@Override
+	public TreeNode makeTreeNode(TreeNode parent, String label, String name, 
+			SimplePropertyList props) {
+		AotNode node = new AotNode(label,name,this);
+		node.setParent(parent);
+		if (parent!=null)
+			parent.addChild(node);
+		node.addProperties(props);
+		return node;
+	}
+	
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 
 	@SuppressWarnings("unchecked")

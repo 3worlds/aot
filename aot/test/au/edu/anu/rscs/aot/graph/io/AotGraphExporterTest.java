@@ -58,7 +58,7 @@ class AotGraphExporterTest {
 		SimplePropertyList pl1 = new SimplePropertyListImpl("x","y","z");
 		SimplePropertyList pl2 = new SimplePropertyListImpl("a","b");
 		SimplePropertyList pl3 = new SimplePropertyListImpl("i","j","k","l");
-		AotNode tw = g.makeDataTreeNode(null,pl1);
+		AotNode tw = g.makeTreeNode(null,pl1);
 		tw.setLabel("3Worlds");
 		
 	}

@@ -59,9 +59,9 @@ public class AotEdge extends SimpleEdgeImpl
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
-	private String name;
+	private String name = null;
 	// the label - remember that label+name = uniqueID within the graph context
-	private String label;
+	private String label = null;
 
 	// ----------------------------- Constructors - all protected
 	

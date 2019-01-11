@@ -59,10 +59,11 @@ class AotNodeTest {
 	private AotNode node1, node2, node3, node4, node5;
 	@SuppressWarnings("unused")
 	private AotEdge e1, e2, e3, e4, e5, e6;
+	private AotGraph graph = null;
 	
 	@BeforeEach
 	private void init() {
-		AotGraph graph = new AotGraph();
+		graph = new AotGraph();
 		node = new AotNode(null,graph);
 	}
 	
@@ -261,7 +262,7 @@ class AotNodeTest {
 
 	@Test
 	void testAddChild() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		node.addChild(n);
 		assertTrue(node.hasChild(n));
 		assertFalse(n.getParent()==node);
@@ -269,9 +270,9 @@ class AotNodeTest {
 
 	@Test
 	void testGetChildren() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		n.setName("1");		
-		AotNode n2 = node.graphElementFactory().makeNode();
+		AotNode n2 = new AotNode(graph);
 		n2.setName("2");
 		node.addChild(n);
 		node.addChild(n); // this should fail silently because container is a Set
@@ -286,7 +287,7 @@ class AotNodeTest {
 
 	@Test
 	void testGetParent() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		node.setParent(n);
 		show("testGetParent",node.toDetailedString());
 		assertTrue(node.getParent()==n);
@@ -296,16 +297,16 @@ class AotNodeTest {
 	@Test
 	void testHasChildren() {
 		assertFalse(node.hasChildren());
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		node.addChild(n);
 		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetChildrenTreeNodeArray() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		n.setName("1");		
-		AotNode n2 = node.graphElementFactory().makeNode();
+		AotNode n2 = new AotNode(graph);
 		n2.setName("2");
 		assertFalse(node.hasChildren());
 		node.setChildren(n,n2);
@@ -314,9 +315,9 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenIterableOfTreeNode() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		n.setName("1");		
-		AotNode n2 = node.graphElementFactory().makeNode();
+		AotNode n2 = new AotNode(graph);
 		n2.setName("2");
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
@@ -329,9 +330,9 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenCollectionOfTreeNode() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		n.setName("1");		
-		AotNode n2 = node.graphElementFactory().makeNode();
+		AotNode n2 = new AotNode(graph);
 		n2.setName("2");
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
@@ -343,7 +344,7 @@ class AotNodeTest {
 
 	@Test
 	void testSetParent() {
-		AotNode n = node.graphElementFactory().makeNode();
+		AotNode n = new AotNode(graph);
 		node.setParent(n);
 		assertTrue(n==node.getParent());
 		assertFalse(n.hasChild(node));
@@ -358,11 +359,11 @@ class AotNodeTest {
 	@SuppressWarnings({"unchecked" })
 	@Test
 	void testDisconnect() {
-		AotNode n = new AotNode(null,"1",node.graphElementFactory());
-		AotNode n2 = new AotNode(null,"2",node.graphElementFactory());
-		Edge ed1 = node.graphElementFactory().makeEdge(node, n);
-		Edge ed2 = node.graphElementFactory().makeEdge(n2, node);
-		Edge ed3 = node.graphElementFactory().makeEdge(node, node);
+		AotNode n = new AotNode(null,"1",node.nodeFactory());
+		AotNode n2 = new AotNode(null,"2",node.nodeFactory());
+		Edge ed1 = node.nodeFactory().makeEdge(node, n);
+		Edge ed2 = node.nodeFactory().makeEdge(n2, node);
+		Edge ed3 = node.nodeFactory().makeEdge(node, node);
 		node.setParent(n);
 		node.addChild(n2);
 		show("testDisconnect",node.toDetailedString());
@@ -458,9 +459,9 @@ class AotNodeTest {
 	}
 
 	@Test
-	void testGraphElementFactory() {
-		show("testGraphElementFactory",node2.graphElementFactory().toString());
-		assertFalse(node.graphElementFactory().equals(node1.graphElementFactory()));
+	void testnodeFactory() {
+		show("testnodeFactory",node2.nodeFactory().toString());
+		assertFalse(node.nodeFactory().equals(node1.nodeFactory()));
 	}
 
 	@Test
@@ -470,7 +471,7 @@ class AotNodeTest {
 
 	@Test
 	void testSetName() {
-		AotNode n = new AotNode(null,null,node.graphElementFactory());
+		AotNode n = new AotNode(null,null,node.nodeFactory());
 		assertNull(n.getName());
 		n.setName("bidon");
 		assertEquals(n.getName(),"bidon");
@@ -491,7 +492,7 @@ class AotNodeTest {
 
 	@Test
 	void testHasName() {
-		AotNode n = new AotNode(null,null,node.graphElementFactory());
+		AotNode n = new AotNode(null,null,node.nodeFactory());
 		assertFalse(n.hasName("bidon"));
 		n.setName("bidon");
 		assertTrue(n.hasName("bidon"));

@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
+import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
@@ -104,7 +105,7 @@ public class AotNode extends SimpleNodeImpl
 
 	// this is the constructor to use with descendant classes
 	protected AotNode(String label, String name, AotGraph factory) {
-		super(factory);
+		super((NodeFactory) factory);
 		this.label = label;
 		this.name = name;
 		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
@@ -182,7 +183,7 @@ public class AotNode extends SimpleNodeImpl
 	// need careful checking
 	@Override
 	public AotNode clone() {
-		AotNode n = new AotNode(graphElementFactory());
+		AotNode n = new AotNode(nodeFactory());
 		n.addProperties(this.properties);
 		n.setLabel(label);
 		n.setName(name);
@@ -273,7 +274,7 @@ public class AotNode extends SimpleNodeImpl
 
 	@Override
 	public AotGraph treeNodeFactory() {
-		return (AotGraph)graphElementFactory();
+		return (AotGraph) nodeFactory();
 	}
 
 	@Override
@@ -284,8 +285,8 @@ public class AotNode extends SimpleNodeImpl
 	// --------------- NODE
 
 	@Override
-	public AotGraph graphElementFactory() {
-		return (AotGraph) super.graphElementFactory();
+	public AotGraph nodeFactory() {
+		return (AotGraph) super.nodeFactory();
 	}
 
 	// -------------------------- NamedAndLabelled
