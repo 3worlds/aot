@@ -399,4 +399,25 @@ public class AotNode extends SimpleNodeImpl
 		return sb.toString();
 	}
 	
+	// Object
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj==null)
+			return false;
+		if (!AotNode.class.isAssignableFrom(obj.getClass()))
+			return false;
+		AotNode n = (AotNode) obj;
+		return (getLabel().equals(n.getLabel()) && getName().equals(n.getName()));
+	}
+
+	// Tricky: without this, the above method wont be called and two identically labelled+named
+	// nodes are not recognized as such
+	@Override
+	public int hashCode() {
+		return toUniqueString().hashCode();
+	}
+	
+	
+	
 }

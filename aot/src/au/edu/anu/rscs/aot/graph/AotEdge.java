@@ -56,6 +56,8 @@ import fr.ens.biologie.generic.Sealable;
 public class AotEdge extends SimpleEdgeImpl 
 		implements ExtendablePropertyList, NamedAndLabelled {
 
+	private static String defaultLabel = "AOTEdge";
+	
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
@@ -294,6 +296,21 @@ public class AotEdge extends SimpleEdgeImpl
 	@Override
 	public boolean hasLabel(String label) {
 		return Objects.equals(this.label, label);
+	}
+
+	// ---------------------------Identifiable (from both Node and TreeNode). 
+	@Override
+	public String classId() {
+		if (label==null)
+			return defaultLabel;
+		return label;
+	}
+
+	@Override
+	public String instanceId() {
+		if (name==null)
+			return "";
+		return name;
 	}
 
 }

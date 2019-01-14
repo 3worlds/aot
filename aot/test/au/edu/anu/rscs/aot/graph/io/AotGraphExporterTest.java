@@ -32,12 +32,15 @@ package au.edu.anu.rscs.aot.graph.io;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import au.edu.anu.rscs.aot.graph.AotGraph;
 import au.edu.anu.rscs.aot.graph.AotNode;
+import fr.cnrs.iees.graph.io.GraphExporter;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
 
@@ -45,22 +48,31 @@ class AotGraphExporterTest {
 
 	private AotGraph g = new AotGraph(null,null);
 
-	// little test graph:
-	//
-	//              e3
-	//              ||
-	//              v|
-	//  n1 ---e1--> n2 ---e4--> n3 ---e5--> n4
-	//     <--e2--- 
-
+	// little test graph mimicking a 3w spec:
 	@BeforeEach
 	private void init() {
 		SimplePropertyList pl1 = new SimplePropertyListImpl("x","y","z");
 		SimplePropertyList pl2 = new SimplePropertyListImpl("a","b");
 		SimplePropertyList pl3 = new SimplePropertyListImpl("i","j","k","l");
-		AotNode tw = g.makeTreeNode(null,pl1);
-		tw.setLabel("3Worlds");
-		
+		AotNode tw = g.makeTreeNode(null,"3Worlds",null,null);
+		AotNode eco = g.makeTreeNode(tw,"ecology","my model",pl2);
+		g.makeTreeNode(tw,"experiment","my experiment",null);
+		AotNode cat = g.makeTreeNode(eco,"category","animal",pl1);
+		AotNode cat2 = g.makeTreeNode(eco,"category","plant",pl1);
+		g.makeTreeNode(eco,"engine","my simulator",null);
+		AotNode sys = g.makeTreeNode(eco,"system","entity",pl3);
+		AotNode proc = g.makeTreeNode(eco,"process","growth",null);
+		AotNode cds = g.makeTreeNode(tw,"codeSource",null,null);
+		AotNode fu = g.makeTreeNode(cds,"function","some computation",pl2);
+		g.makeEdge(proc,cat,"appliesTo",null,null);
+		g.makeEdge(proc,cat2,"appliesTo",null,null);
+		g.makeEdge(sys,cat,"belongsTo","random name",null);
+		g.makeEdge(proc,fu,"function",null,null);		
+		g.root();
+		// add a stupid node
+		g.makeTreeNode(cds);
+		// add a duplicate node - this should issue a warning and not insert the node
+		g.makeTreeNode(tw,"experiment","my experiment",null);
 	}
 	
 	@Test
@@ -68,10 +80,56 @@ class AotGraphExporterTest {
 		String testfile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
 				+ File.separator + "test" 
 				+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
-				+ File.separator + "bidon.aot";
+				+ File.separator + "bidon.aot";		
 		File f = new File(testfile);
-		AotGraphExporter age = new AotGraphExporter(f);
+		try {
+			Files.deleteIfExists(f.toPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		GraphExporter age = new AotGraphExporter(f);
 		age.exportGraph(g);
+		assertTrue(f.exists());
 	}
 
+/*	This is how bidon.aot should look like 
+ * (notice that nodes and edges are saved in random order): 
+
+aot // saved by AotGraphExporter on Mon Jan 14 13:37:23 CET 2019
+
+// TREE
+3Worlds 
+	ecology my model
+		a = java.lang.Object(null)
+		b = java.lang.Object(null)
+		category animal
+			x = java.lang.Object(null)
+			y = java.lang.Object(null)
+			z = java.lang.Object(null)
+		system entity
+			i = java.lang.Object(null)
+			j = java.lang.Object(null)
+			k = java.lang.Object(null)
+			l = java.lang.Object(null)
+		category plant
+			x = java.lang.Object(null)
+			y = java.lang.Object(null)
+			z = java.lang.Object(null)
+		engine my simulator
+		process growth
+	codeSource 
+		function some computation
+			a = java.lang.Object(null)
+			b = java.lang.Object(null)
+		AOTNode D89EF3043496-000001684C5DD17F-0000
+	experiment my experiment
+
+// CROSS-LINKS
+[system:entity] belongsTo random name [category:animal]
+[process:growth] appliesTo  [category:animal]
+[process:growth] appliesTo  [category:plant]
+[process:growth] function  [function:some computation]
+
+*/
 }

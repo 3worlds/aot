@@ -31,10 +31,13 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
-import au.edu.anu.rscs.aot.collections.DynamicList;
 import au.edu.anu.rscs.aot.collections.QuickListOfLists;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.EdgeFactory;
@@ -61,8 +64,10 @@ import fr.cnrs.iees.tree.TreeNodeFactory;
 
 public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,
 		NodeFactory, EdgeFactory, TreeNodeFactory  {
+	
+	private Logger log = Logger.getLogger(AotGraph.class.getName());
 
-	private List<AotNode> nodes;
+	private Set<AotNode> nodes; // no duplicate nodes permitted
 	private int minDepth;
 	private int maxDepth;
 	private AotNode root;
@@ -75,9 +80,17 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	// assumes the first element in the list is the root
 	public AotGraph(Iterable<AotNode> list) {
 		super();
-		nodes = new DynamicList<>(list);
-		if (list.iterator().hasNext())
-			root = list.iterator().next();
+		if (list==null) {
+			nodes = new HashSet<AotNode>();
+			root = null;
+		}
+		else {
+			nodes = new HashSet<AotNode>();
+			for (AotNode n:list)
+				nodes.add(n);
+			if (list.iterator().hasNext())
+				root = list.iterator().next();
+		}
 	}
 	
 	// enables one to specify the root
@@ -111,7 +124,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	// Bit of a mess here
-	private void insertOnlyChildren(TreeNode parent, List<AotNode> list) {
+	private void insertOnlyChildren(TreeNode parent, Collection<AotNode> list) {
 		for (TreeNode child : parent.getChildren()) {
 			list.add((AotNode) child);
 			insertOnlyChildren(child, list);
@@ -156,7 +169,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	public Iterable<AotNode> roots() {
 		List<AotNode> result = new ArrayList<>(nodes.size());
 		for (AotNode n : nodes)
-			if (n.isRoot())
+			if (n.getParent()==null)
 				result.add(n);
 		return result;
 	}
@@ -223,21 +236,40 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end) {
-		return new AotEdge(start, end, this);
+		return makeEdge(start,end,null,null,null);
 	}
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end, ReadOnlyPropertyList props) {
-		return new AotEdge(start,end,props,this);
+		return makeEdge(start,end,null,null,props);
+	}
+	
+	@Override
+	public AotEdge makeEdge(Node start, Node end, String label, ReadOnlyPropertyList props) {
+		return makeEdge(start,end,label,null,props);
+	}
+
+	@Override
+	public AotEdge makeEdge(Node start, Node end, String label, String name) {
+		return makeEdge(start,end,label,name,null);
+	}
+
+	@Override
+	public AotEdge makeEdge(Node start, Node end, String label) {
+		return makeEdge(start,end,label,null,null);
 	}
 
 	// use with caution - name+label must be unique within the graph
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String classId, String instanceId, 
+	public AotEdge makeEdge(Node start, Node end, String label, String name, 
 			ReadOnlyPropertyList props) {
-		AotEdge result = new AotEdge(start,end,props,this);
-		result.setLabel(classId);
-		result.setName(instanceId);
+		AotEdge result;
+		if (props!=null)
+			result = new AotEdge(start,end,props,this);
+		else 
+			result = new AotEdge(start,end,this);
+		result.setLabel(label);
+		result.setName(name);
 		return result;
 	}
 
@@ -246,33 +278,59 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	
 	@Override
 	public AotNode makeTreeNode(TreeNode parent,SimplePropertyList props) {
-		AotNode node = new AotNode(this);
-		node.setParent(parent);
-		if (parent!=null)
-			parent.addChild(node);
-		node.addProperties(props);
-		return node;
+		return makeTreeNode(parent,null,null,props);
 	}
 	
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		AotNode node = new AotNode(this);
-		node.setParent(parent);
-		if (parent!=null)
-			parent.addChild(node);
-		return node;
+		return makeTreeNode(parent,null,null,null);
 	}
 
-	// use with caution - name+label must be unique within the graph
 	@Override
-	public TreeNode makeTreeNode(TreeNode parent, String label, String name, 
+	public AotNode makeTreeNode(TreeNode parent, String label, String name) {
+		return makeTreeNode(parent,label,name,null);
+	}
+
+	@Override
+	public AotNode makeTreeNode(TreeNode parent, String label) {
+		return makeTreeNode(parent,label,null,null);
+	}
+
+	@Override
+	public AotNode makeTreeNode(TreeNode parent, String label, SimplePropertyList properties) {
+		return makeTreeNode(parent,label,null,properties);
+	}
+
+	/**
+	 * A node which label and name duplicates a node already in the tree will not be created
+	 * nor inserted, a warning will be issued instead.
+	 * If no label is given, the label defaults to "AOTNode".
+	 * If no label nor name are given, the name defaults to a unique ID, so that 
+	 * the node is always created.
+	 */
+	@Override
+	public AotNode makeTreeNode(TreeNode parent, String label, String name, 
 			SimplePropertyList props) {
-		AotNode node = new AotNode(label,name,this);
-		node.setParent(parent);
-		if (parent!=null)
-			parent.addChild(node);
-		node.addProperties(props);
-		return node;
+		AotNode node;
+		if (label==null)
+			if (name==null)
+				node = new AotNode(this);
+			else
+				node = new AotNode(name,this);
+		else
+			node = new AotNode(label,name,this);
+		if (!nodes.add(node)) {
+			log.warning(()->"Duplicate Node insertion: "+node.toDetailedString());
+			return null;
+		}
+		else {
+			node.setParent(parent);
+			if (parent!=null)
+				parent.addChild(node);
+			if (props!=null)
+				node.addProperties(props);
+			return node;
+		}
 	}
 	
 	// -------------------- CONFIGURABLE GRAPH ------------------------
