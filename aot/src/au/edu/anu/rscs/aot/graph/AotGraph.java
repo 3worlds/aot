@@ -77,20 +77,15 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 		this(new ArrayList<AotNode>());
 	}
 
-	// assumes the first element in the list is the root
 	public AotGraph(Iterable<AotNode> list) {
 		super();
-		if (list==null) {
-			nodes = new HashSet<AotNode>();
-			root = null;
-		}
-		else {
-			nodes = new HashSet<AotNode>();
-			for (AotNode n:list)
-				nodes.add(n);
-			if (list.iterator().hasNext())
-				root = list.iterator().next();
-		}
+		nodes = new HashSet<AotNode>();
+		root = null;
+		for (AotNode n : list)
+			nodes.add(n);
+		// assumes the first element in the list is the root
+		if (list.iterator().hasNext())
+			root = list.iterator().next();
 	}
 	
 	// enables one to specify the root
