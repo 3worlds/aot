@@ -105,7 +105,7 @@ public class AotNode extends SimpleNodeImpl
 
 	// this is the constructor to use with descendant classes
 	protected AotNode(String label, String name, AotGraph factory) {
-		super((NodeFactory) factory);
+		super(factory);
 		this.label = label;
 		this.name = name;
 		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
