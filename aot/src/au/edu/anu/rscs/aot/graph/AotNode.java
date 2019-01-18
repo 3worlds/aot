@@ -35,10 +35,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
-import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
@@ -304,6 +304,9 @@ public class AotNode extends SimpleNodeImpl
 	public Named setName(String name) {
 		if (this.name==null)
 			this.name = name;
+		else
+			throw new AotException("Attempt to rename node "+this.name+" to "+name);
+
 		return this;
 	}
 
@@ -330,6 +333,8 @@ public class AotNode extends SimpleNodeImpl
 	public Labelled setLabel(String label) {
 		if (this.label==null)
 			this.label = label;
+		else
+			throw new AotException("Attempt to relabel node "+this.label+" to "+label);
 		return this;
 	}
 
