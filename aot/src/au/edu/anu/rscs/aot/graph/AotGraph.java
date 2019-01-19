@@ -192,22 +192,14 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	private AotNode findRoot() {
-		Iterable<AotNode> roots = roots();
-		int count = 0;
-		AotNode result = null;
-		for (AotNode n : roots) {
-			result = n;
-			count++;
-			if (count > 1)
-				return null;
-		}
-		return result;
+		List<AotNode>  roots = (List<AotNode>) roots();
+		if (roots.size()==1)
+			return roots.get(0);
+		return null;
 	}
 
 	@Override
 	public AotNode root() {
-		// Can only be asked of a valid graph so when
-		// should it be set? Use lazy method but is dodgy
 		if (root == null)
 			root = findRoot();
 		return root;
