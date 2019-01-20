@@ -81,7 +81,10 @@ import fr.ens.biologie.generic.Sealable;
 // Tested OK with version 0.0.3 on 10/1/2019
 // Tested OK with version 0.0.4 on 10/1/2019
 public class AotNode extends SimpleNodeImpl 
-		implements TreeNode, ExtendablePropertyList, NamedAndLabelled, Configurable {
+		implements TreeNode,//
+		ExtendablePropertyList,//
+		NamedAndLabelled,//
+		Configurable {
 	
 	private static Logger log = Logger.getLogger(AotNode.class.getName());
 	private static String defaultLabel = "AOTNode";
