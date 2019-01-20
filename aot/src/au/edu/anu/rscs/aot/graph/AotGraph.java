@@ -31,7 +31,6 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
