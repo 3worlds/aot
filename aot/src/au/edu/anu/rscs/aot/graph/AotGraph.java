@@ -51,20 +51,31 @@ import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
 
 /**
- * <p>Re-implementation of AotGraph as a tree, a graph, a tree and graph factory, a
- * configurable graph.</p>
+ * <p>
+ * Re-implementation of AotGraph as a tree, a graph, a tree and graph factory, a
+ * configurable graph.
+ * </p>
  * 
- * <p>NOTE: This implementation assumes that every newly created node is inserted within the
- * graph (factory interfaces). </p>
- * <p>Should this class implement DynamicGraph ? it's already mutable because it is a factory...</p>
+ * <p>
+ * NOTE: This implementation assumes that every newly created node is inserted
+ * within the graph (factory interfaces).
+ * </p>
+ * <p>
+ * Should this class implement DynamicGraph ? it's already mutable because it is
+ * a factory...
+ * </p>
  * 
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
 
-public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, ConfigurableGraph,
-		NodeFactory, EdgeFactory, TreeNodeFactory  {
-	
+public class AotGraph implements Tree<AotNode>, //
+		Graph<AotNode, AotEdge>, //
+		ConfigurableGraph, //
+		NodeFactory, //
+		EdgeFactory, //
+		TreeNodeFactory {
+
 	private Logger log = Logger.getLogger(AotGraph.class.getName());
 
 	private Set<AotNode> nodes; // no duplicate nodes permitted
@@ -74,24 +85,39 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	// constructors
 	protected AotGraph() {
-		this(new ArrayList<AotNode>());
+		super();
+		this.nodes = new HashSet<>();
 	}
 
 	public AotGraph(Iterable<AotNode> list) {
-		super();
-		nodes = new HashSet<AotNode>();
-		root = null;
+		this();
 		for (AotNode n : list)
 			nodes.add(n);
-		// assumes the first element in the list is the root
-		if (list.iterator().hasNext())
-			root = list.iterator().next();
+		// order is undefined so must search?
+		root = root();
 	}
-	
-	// enables one to specify the root
-	public AotGraph(Iterable<AotNode> list, AotNode root) {
-		this(list);
+
+	/**
+	 * builds the graph from a tree root by inserting all children of the argument
+	 * 
+	 * @param root
+	 */
+	public AotGraph(AotNode root) {
+		this();
 		this.root = root;
+		insertChildren(root);
+		computeDepths(root);
+	}
+
+	private void insertChildren(TreeNode parent) {
+		for (TreeNode child : parent.getChildren()) {
+			nodes.add((AotNode) child);
+			insertChildren(child);
+		}
+	}
+
+	private void computeDepths(AotNode parent) {
+		// TODO Auto-generated method stub
 	}
 
 	public EdgeFactory getEdgeFactory() {
@@ -100,30 +126,6 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	public TreeNodeFactory getTreeFactory() {
 		return this;
-	}
-
-	/**
-	 * builds the graph from a tree root by inserting all children of the argument
-	 * @param root
-	 */
-	public AotGraph(AotNode root) {
-		this(new ArrayList<AotNode>());
-		this.root = root;
-		insertOnlyChildren(root, nodes);
-		computeDepths(root);
-	}
-
-	private void computeDepths(AotNode parent) {
-		// TODO Auto-generated method stub
-
-	}
-
-	// Bit of a mess here
-	private void insertOnlyChildren(TreeNode parent, Collection<AotNode> list) {
-		for (TreeNode child : parent.getChildren()) {
-			list.add((AotNode) child);
-			insertOnlyChildren(child, list);
-		}
 	}
 
 	@Override
@@ -164,7 +166,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	public Iterable<AotNode> roots() {
 		List<AotNode> result = new ArrayList<>(nodes.size());
 		for (AotNode n : nodes)
-			if (n.getParent()==null)
+			if (n.getParent() == null)
 				result.add(n);
 		return result;
 	}
@@ -192,8 +194,8 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	}
 
 	private AotNode findRoot() {
-		List<AotNode>  roots = (List<AotNode>) roots();
-		if (roots.size()==1)
+		List<AotNode> roots = (List<AotNode>) roots();
+		if (roots.size() == 1)
 			return roots.get(0);
 		return null;
 	}
@@ -213,113 +215,109 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 	// ---------------------- NODE FACTORY -------------------------
 
 	// This is disabled because any new node has to be inserted into the tree at the
-	// proper spot. We dont want free-floating nodes in an AOT graph because it's a tree.
+	// proper spot. We dont want free-floating nodes in an AOT graph because it's a
+	// tree.
 	@Override
 	public AotNode makeNode(String arg0, String arg1, ReadOnlyPropertyList arg2) {
 		throw new AotException("Attempt to instantiate an AotNode outside of the tree context.");
 	}
-	
+
 	// ---------------------- EDGE FACTORY -------------------------
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end) {
-		return makeEdge(start,end,null,null,null);
+		return makeEdge(start, end, null, null, null);
 	}
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end, ReadOnlyPropertyList props) {
-		return makeEdge(start,end,null,null,props);
+		return makeEdge(start, end, null, null, props);
 	}
-	
+
 	@Override
 	public AotEdge makeEdge(Node start, Node end, String label, ReadOnlyPropertyList props) {
-		return makeEdge(start,end,label,null,props);
+		return makeEdge(start, end, label, null, props);
 	}
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end, String label, String name) {
-		return makeEdge(start,end,label,name,null);
+		return makeEdge(start, end, label, name, null);
 	}
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end, String label) {
-		return makeEdge(start,end,label,null,null);
+		return makeEdge(start, end, label, null, null);
 	}
 
 	// use with caution - name+label must be unique within the graph
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String label, String name, 
-			ReadOnlyPropertyList props) {
+	public AotEdge makeEdge(Node start, Node end, String label, String name, ReadOnlyPropertyList props) {
 		AotEdge result;
-		if (props!=null)
-			result = new AotEdge(start,end,props,this);
-		else 
-			result = new AotEdge(start,end,this);
+		if (props != null)
+			result = new AotEdge(start, end, props, this);
+		else
+			result = new AotEdge(start, end, this);
 		result.setLabel(label);
 		result.setName(name);
 		return result;
 	}
 
-
 	// ----------------------TREE FACTORY -----------------------------
-	
+
 	@Override
-	public AotNode makeTreeNode(TreeNode parent,SimplePropertyList props) {
-		return makeTreeNode(parent,null,null,props);
+	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
+		return makeTreeNode(parent, null, null, props);
 	}
-	
+
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		return makeTreeNode(parent,null,null,null);
+		return makeTreeNode(parent, null, null, null);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label, String name) {
-		return makeTreeNode(parent,label,name,null);
+		return makeTreeNode(parent, label, name, null);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label) {
-		return makeTreeNode(parent,label,null,null);
+		return makeTreeNode(parent, label, null, null);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label, SimplePropertyList properties) {
-		return makeTreeNode(parent,label,null,properties);
+		return makeTreeNode(parent, label, null, properties);
 	}
 
 	/**
-	 * A node which label and name duplicates a node already in the tree will not be created
-	 * nor inserted, a warning will be issued instead.
-	 * If no label is given, the label defaults to "AOTNode".
-	 * If no label nor name are given, the name defaults to a unique ID, so that 
-	 * the node is always created.
+	 * A node which label and name duplicates a node already in the tree will not be
+	 * created nor inserted, a warning will be issued instead. If no label is given,
+	 * the label defaults to "AOTNode". If no label nor name are given, the name
+	 * defaults to a unique ID, so that the node is always created.
 	 */
 	@Override
-	public AotNode makeTreeNode(TreeNode parent, String label, String name, 
-			SimplePropertyList props) {
+	public AotNode makeTreeNode(TreeNode parent, String label, String name, SimplePropertyList props) {
 		AotNode node;
-		if (label==null)
-			if (name==null)
+		if (label == null)
+			if (name == null)
 				node = new AotNode(this);
 			else
-				node = new AotNode(name,this);
+				node = new AotNode(name, this);
 		else
-			node = new AotNode(label,name,this);
+			node = new AotNode(label, name, this);
 		if (!nodes.add(node)) {
-			log.warning(()->"Duplicate Node insertion: "+node.toDetailedString());
+			log.warning(() -> "Duplicate Node insertion: " + node.toDetailedString());
 			return null;
-		}
-		else {
+		} else {
 			node.setParent(parent);
-			if (parent!=null)
+			if (parent != null)
 				parent.addChild(node);
-			if (props!=null)
+			if (props != null)
 				node.addProperties(props);
 			return node;
 		}
 	}
-	
+
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 
 	@SuppressWarnings("unchecked")
@@ -334,11 +332,12 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 				className = (String) n.getPropertyValue("class");
 //				I dont like this, so try to remove it
 //				if (className != null && !n.getLabel().equals("defaultPropertyList")) {				
-				if (className != null) {				
+				if (className != null) {
 					AotNode newNode = n;
 					try {
 						ClassLoader c = Thread.currentThread().getContextClassLoader();
-						Class<? extends AotNode> nodeClass = (Class<? extends AotNode>) Class.forName(className,false,c);
+						Class<? extends AotNode> nodeClass = (Class<? extends AotNode>) Class.forName(className, false,
+								c);
 						Constructor<? extends AotNode> nodeConstructor = nodeClass.getConstructor();
 						// NOTE: a node constructor always has a factory as argument...
 						newNode = nodeConstructor.newInstance(this);
@@ -365,6 +364,7 @@ public class AotGraph implements Tree<AotNode>, Graph<AotNode, AotEdge>, Configu
 
 	@Override
 	public NodeExceptionList initialise() {
+		// Phew! maybe difficult to generalise 
 		NodeInitialiser initialiser = new NodeInitialiser(this);
 		initialiser.showInitialisationOrder();
 		return initialiser.initialise();

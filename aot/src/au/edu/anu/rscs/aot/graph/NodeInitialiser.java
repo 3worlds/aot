@@ -79,22 +79,27 @@ public class NodeInitialiser {
 
 	public void showInitialisationOrder(String title) {
 		int count = 0;
-		String theTitle = title;
+		 String theTitle = title;
 		if (title == null)
 			theTitle = "";
 		else
 			theTitle = " " + title;
+		final String finalTitle = theTitle;
 		log.fine("Initialisation order");
 		for (AotNode node : initialisationList) {
 			count++;
-			String msg = "  " + String.format("%05d", count) + theTitle + ": "
-					+ node.getClass().getSimpleName() + " ["
-					+ node.uniqueId() + "]" + annotationString(node);
-			log.fine(msg);
-//			this doesnt work but I dont know why ??? the lambda syntax is incorrect
-//			log.fine(() -> "  " + String.format("%05d", count) + theTitle + ": "
+			final int finalCount = count;
+//			String msg = "  " + String.format("%05d", count) + theTitle + ": "
 //					+ node.getClass().getSimpleName() + " ["
-//					+ node.uniqueId() + "]" + annotationString(node));
+//					+ node.uniqueId() + "]" + annotationString(node);
+//			log.fine(msg);
+			
+//			this doesnt work but I dont know why ??? the lambda syntax is incorrect
+			// Ian - the variables count, theTitle must be final(?)
+			// Wont work if we use logback library but there is an alternative - see doco
+			log.fine(() -> "  " + String.format("%05d", finalCount) + finalTitle + ": "
+					+ node.getClass().getSimpleName() + " ["
+					+ node.uniqueId() + "]" + annotationString(node));
 		}
 	}
 
