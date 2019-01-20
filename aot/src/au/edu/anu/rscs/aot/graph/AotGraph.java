@@ -84,7 +84,7 @@ public class AotGraph implements Tree<AotNode>, //
 	private AotNode root;
 
 	// constructors
-	protected AotGraph() {
+	public AotGraph() {
 		super();
 		this.nodes = new HashSet<>();
 	}

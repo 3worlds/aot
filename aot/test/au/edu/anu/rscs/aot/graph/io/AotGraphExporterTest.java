@@ -47,7 +47,7 @@ import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
 
 class AotGraphExporterTest {
 
-	private AotGraph g = new AotGraph(new ArrayList<AotNode>(),null);
+	private AotGraph g = new AotGraph();
 
 	// little test graph mimicking a 3w spec:
 	@BeforeEach
