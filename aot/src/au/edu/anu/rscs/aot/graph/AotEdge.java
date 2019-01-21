@@ -47,6 +47,7 @@ import fr.ens.biologie.generic.Named;
 import fr.ens.biologie.generic.NamedAndLabelled;
 import fr.ens.biologie.generic.Sealable;
 
+
 /**
  * reimplementation of AOTEdge
  * 
