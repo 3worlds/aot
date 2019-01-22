@@ -74,7 +74,7 @@ class AotGraphTokenizerTest {
 	void testTokenize() {
 		AotGraphTokenizer tk = new AotGraphTokenizer(test);
 		tk.tokenize();
-//		System.out.println(tk.toString());
+		System.out.println(tk.toString());
 		assertEquals(tk.toString(),"0 COMMENT: saved by AotGraphExporter on Mon Jan 21 11:31:07 CET 2019\n" + 
 				"\n" + 
 				"0 COMMENT: TREE\n" + 

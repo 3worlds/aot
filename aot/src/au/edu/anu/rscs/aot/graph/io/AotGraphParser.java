@@ -33,12 +33,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.AotGraph;
+import fr.cnrs.iees.OmugiException;
 import fr.cnrs.iees.graph.EdgeFactory;
-import fr.cnrs.iees.graph.MinimalGraph;
 import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.io.parsing.impl.MinimalGraphParser;
+import fr.cnrs.iees.io.parsing.impl.GraphTokenizer.graphToken;
+import fr.cnrs.iees.io.parsing.impl.TreeTokenizer.treeToken;
 
+/**
+ * 
+ * @author Jacques Gignoux - 22 janv. 2019
+ *
+ */
 public class AotGraphParser extends MinimalGraphParser {
 
 	private Logger log = Logger.getLogger(AotGraphParser.class.getName());
@@ -95,9 +103,157 @@ public class AotGraphParser extends MinimalGraphParser {
 	protected void parse() {
 		if (!tokenizer.tokenized())
 			tokenizer.tokenize();
-		lastNodes = new treeNodeSpec[tokenizer.maxDepth()+1];
+		lastNodes = new treeNodeSpec[tokenizer.treeTokenizer().maxDepth()+1];
 		lastItem = itemType.GRAPH;
-
+		// 1 analyse the tree part
+		while (tokenizer.treeTokenizer().hasNext()) {
+			treeToken tk = tokenizer.treeTokenizer().getNextToken();
+			switch (tk.type) {
+				case COMMENT:
+					break;
+				case LABEL:
+					int level = tk.level;
+					lastNodes[level] = new treeNodeSpec();
+					lastNodes[level].label = tk.value;
+					if (level>0)
+						lastNodes[level].parent = lastNodes[level-1];
+					lastItem = itemType.NODE;
+					break;
+				case LEVEL:
+					// such tokens should never be created
+					break;
+				case NAME:
+					level = tk.level;
+					lastNodes[level].name = tk.value;
+					nodeSpecs.add(lastNodes[level]);
+					break;
+				case PROPERTY_NAME:
+					lastProp = new propSpec();
+					lastProp.name = tk.value;
+					break;
+				case PROPERTY_TYPE:
+					lastProp.type = tk.value;
+					break;
+				case PROPERTY_VALUE:
+					lastProp.value = tk.value;
+					if (lastItem==itemType.GRAPH)
+						graphProps.add(lastProp);
+					else
+						lastNodes[tk.level-1].props.add(lastProp);
+					break;
+			case NODE_REF:
+				throw new OmugiException("Invalid token type for a tree");
+			default:
+				break;
+			}
+		}
+		// 2 analyse the cross-links
+		while (tokenizer.graphTokenizer().hasNext()) {
+			graphToken tk = tokenizer.graphTokenizer().getNextToken();
+			switch (tk.type) {
+				case COMMENT:
+					break;
+				case PROPERTY_NAME:
+					lastProp = new propSpec();
+					lastProp.name = tk.value;
+					break;
+				case PROPERTY_VALUE:
+					lastProp.value = tk.value;
+					switch (lastItem) {
+						case GRAPH: // this is a graph property
+							graphProps.add(lastProp);
+							break;
+						case NODE: // this is a node property
+							// this is an error - there shouldnt be any node properties left here
+							throw new AotException("There should not be any node property definition here.");
+						case EDGE: // this is an edge property
+							lastEdge.props.add(lastProp);
+							break;
+					}
+					break;
+				case PROPERTY_TYPE:	
+					lastProp.type = tk.value;
+					break;
+				case LABEL:		
+					switch (lastItem) {
+						case GRAPH:
+						case NODE:
+							throw new AotException("There should not be any node definition here.");
+						case EDGE:
+							if (lastEdge.label==null)
+								lastEdge.label = tk.value;
+							else  // this is a node label
+								throw new AotException("There should not be any node definition here.");
+							break;
+					}
+					break;
+				case NAME:			
+					switch (lastItem) {
+						case GRAPH:
+							log.severe("missing node label declaration");
+							break;
+						case NODE:
+							throw new AotException("There should not be any node definition here.");
+						case EDGE:
+							lastEdge.name = tk.value;
+					}
+					break;
+				case NODE_REF:
+					switch (lastItem) {
+						case GRAPH:
+						case NODE:
+							lastEdge = new edgeSpec();
+							lastEdge.start = tk.value;
+							lastItem = itemType.EDGE;
+							break;
+						case EDGE:
+							if (lastEdge.end==null) {
+								lastEdge.end = tk.value;
+								edgeSpecs.add(lastEdge);
+							}
+							else {
+								lastEdge = new edgeSpec();
+								lastEdge.start = tk.value;
+							}
+							break;
+					}
+					break;
+			case LEVEL:
+				throw new OmugiException("Invalid token type for a cross-link only graph");
+			default:
+				break;
+			}
+		}		
+	}
+	
+	// for debugging only
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Aot graph specification\n");
+		if (!graphProps.isEmpty())
+			sb.append("Graph properties:\n");
+		for (propSpec p:graphProps)
+			sb.append('\t').append(p.toString()).append('\n');
+		if (!nodeSpecs.isEmpty())
+			sb.append("Nodes:\n");
+		for (treeNodeSpec n:nodeSpecs) {
+			sb.append(n.toString()).append('\n');
+			for (propSpec p:n.props)
+				sb.append("\t").append(p.toString()).append('\n');
+			if (n.parent==null)
+				sb.append("\tROOT NODE\n");
+			else
+				sb.append("\tparent ").append(n.parent.toString()).append('\n');
+		}
+		if (!edgeSpecs.isEmpty())
+			sb.append("Edges:\n");
+		for (edgeSpec e:edgeSpecs) {
+			sb.append('\t').append(e.toString()).append('\n');
+			for (propSpec p:e.props)
+				sb.append("\t\t").append(p.toString()).append('\n');
+		}
+		return sb.toString();
 	}
 
 }

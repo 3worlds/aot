@@ -29,25 +29,57 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.*;
 
-import fr.cnrs.iees.graph.MinimalGraph;
-import fr.cnrs.iees.graph.io.impl.OmugiGraphImporter;
-import fr.cnrs.iees.io.parsing.Parser;
+import org.junit.jupiter.api.Test;
 
-public class AotGraphImporter extends OmugiGraphImporter {
+class AotGraphParserTest {
 
-	private AotGraphTokenizer tokenizer = null;
-	private Parser parser = null;
+	String[] test = {"aot // saved by AotGraphExporter on Mon Jan 21 11:31:07 CET 2019\n", 
+			"\n",
+			"// TREE\n", 
+			"3Worlds \n", 
+			"	ecology my model\n", 
+			"		a = java.lang.Object(null)\n", 
+			"		b = java.lang.Object(null)\n", 
+			"		category animal\n",
+			"			x = java.lang.Object(null)\n", 
+			"			y = java.lang.Object(null)\n", 
+			"			z = java.lang.Object(null)\n", 
+			"		system entity\n",
+			"			i = java.lang.Object(null)\n", 
+			"			j = java.lang.Object(null)\n", 
+			"			k = java.lang.Object(null)\n", 
+			"			l = java.lang.Object(null)\n", 
+			"		category plant\n",
+			"			x = java.lang.Object(null)\n", 
+			"			y = java.lang.Object(null)\n", 
+			"			z = java.lang.Object(null)\n", 
+			"		engine my simulator\n",
+			"		process growth\n",
+			"	codeSource \n",
+			"		function some computation\n", 
+			"			a = java.lang.Object(null)\n", 
+			"			b = java.lang.Object(null)\n", 
+			"		AOTNode D89EF3043496-000001686FF6BA12-0000\n", 
+			"	experiment my experiment\n",
+			"\n",
+			"// CROSS-LINKS\n", 
+			"[system:entity] belongsTo random name [category:animal]\n", 
+			"[process:growth] appliesTo  [category:animal]\n",
+			"[process:growth] appliesTo  [category:plant]\n", 
+			"[process:growth] function  [function:some computation]\n"};
 	
-	public AotGraphImporter(File infile) {
-		super(infile);
-//		tokenizer = ;
-//		parser = ;
+	@Test
+	void testParse() {
+		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test));
+		p.parse();
+		System.out.println(p.toString());
 	}
 
-    public MinimalGraph<?> getGraph() {
-    	return parser.graph();
-    }
+	@Test
+	void testGraph() {
+		fail("Not yet implemented");
+	}
 
 }

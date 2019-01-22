@@ -50,8 +50,16 @@ public class AotGraphTokenizer extends LineTokenizer {
 	private List<String> treeLines = new LinkedList<String>();
 	// the end of the file contains the cross links between treenodes
 	private List<String> crossLinkLines = new LinkedList<String>();
-	TreeTokenizer ttk = null;
-	GraphTokenizer gtk = null;
+	private TreeTokenizer ttk = null;
+	private GraphTokenizer gtk = null;
+	
+	protected TreeTokenizer treeTokenizer() {
+		return ttk;
+	}
+	
+	protected GraphTokenizer graphTokenizer() {
+		return gtk;
+	}
 	
 	private void splitLines() {
 		for (String s:lines)
@@ -63,7 +71,6 @@ public class AotGraphTokenizer extends LineTokenizer {
 		ttk = new TreeTokenizer(treeLines.toArray(ss));
 		gtk = new GraphTokenizer(crossLinkLines.toArray(ss));
 	}
-	
 	
 	public AotGraphTokenizer(FileTokenizer parent) {
 		super(parent);
