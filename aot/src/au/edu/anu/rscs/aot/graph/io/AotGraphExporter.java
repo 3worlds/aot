@@ -67,18 +67,18 @@ public class AotGraphExporter extends OmugiGraphExporter {
 			try {
 				PrintWriter writer = new PrintWriter(file);
 				Date now = new Date();
-				writer.println("aot "+COMMENT.prefix()+" saved by "
+				writer.println("aot "+TreeGraphTokens.COMMENT.prefix()+" saved by "
 						+AotGraphExporter.class.getSimpleName()
 						+" on "+now+"\n");
 				// 1. export tree
-				writer.print(COMMENT.prefix());
+				writer.print(TreeGraphTokens.COMMENT.prefix());
 				writer.print(' ');
 				writer.println("TREE");
 				if (g.root()!=null)
 					writeTree(g.root(),writer, 0);
 				// 2. export edge list
 				writer.println();
-				writer.print(COMMENT.prefix());
+				writer.print(TreeGraphTokens.COMMENT.prefix());
 				writer.print(' ');
 				writer.println("CROSS-LINKS");
 				exportEdges(g.edges(),writer);
