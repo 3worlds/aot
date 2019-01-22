@@ -29,7 +29,7 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import static fr.cnrs.iees.io.parsing.impl.GraphTokens.COMMENT;
+import static fr.cnrs.iees.io.parsing.impl.TreeGraphTokens.COMMENT;
 
 import java.io.File;
 import java.io.FileNotFoundException;

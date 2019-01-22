@@ -29,25 +29,75 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Logger;
 
+import au.edu.anu.rscs.aot.graph.AotGraph;
+import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.MinimalGraph;
-import fr.cnrs.iees.graph.io.impl.OmugiGraphImporter;
-import fr.cnrs.iees.io.parsing.Parser;
+import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.io.parsing.impl.MinimalGraphParser;
 
-public class AotGraphImporter extends OmugiGraphImporter {
+public class AotGraphParser extends MinimalGraphParser {
 
+	private Logger log = Logger.getLogger(AotGraphParser.class.getName());
+
+	//----------------------------------------------------
+	// which type of item is currently being constructed
+	private enum itemType {
+		GRAPH,
+		NODE,
+		EDGE
+	}
+	// the tokenizer used to read the file
 	private AotGraphTokenizer tokenizer = null;
-	private Parser parser = null;
 	
-	public AotGraphImporter(File infile) {
-		super(infile);
-		tokenizer = ;
-		parser = ;
+	// the factories used to build the graph
+	private NodeFactory nodeFactory = null;
+	private EdgeFactory edgeFactory = null;
+	
+	// the list of specifications built from the token list
+	private List<propSpec> graphProps = new LinkedList<propSpec>();
+	private List<treeNodeSpec> nodeSpecs =  new LinkedList<treeNodeSpec>();
+	private List<edgeSpec> edgeSpecs =  new LinkedList<edgeSpec>();
+	
+	// the last processed item
+	private itemType lastItem = null;
+	private propSpec lastProp = null;
+	private treeNodeSpec[] lastNodes = null;
+	private edgeSpec lastEdge = null;
+	
+	// the result of this parsing
+	private AotGraph graph = null;
+	
+	// lazy init: nothing is done before it's needed
+	public AotGraphParser(AotGraphTokenizer tokenizer) {
+		super();
+		this.tokenizer =tokenizer;
+	}
+	
+	private void buildGraph() {
+		// parse token if not yet done
+		if (lastItem==null)
+			parse();
+		
 	}
 
-    public MinimalGraph<?> getGraph() {
-    	return parser.graph();
-    }
+	@Override
+	public AotGraph graph() {
+		if (graph==null)
+			buildGraph();
+		return graph;
+	}
+
+	@Override
+	protected void parse() {
+		if (!tokenizer.tokenized())
+			tokenizer.tokenize();
+		lastNodes = new treeNodeSpec[tokenizer.maxDepth()+1];
+		lastItem = itemType.GRAPH;
+
+	}
 
 }

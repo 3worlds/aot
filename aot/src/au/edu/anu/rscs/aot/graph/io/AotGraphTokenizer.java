@@ -29,25 +29,61 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
-import fr.cnrs.iees.graph.MinimalGraph;
-import fr.cnrs.iees.graph.io.impl.OmugiGraphImporter;
-import fr.cnrs.iees.io.parsing.Parser;
+import fr.cnrs.iees.io.parsing.FileTokenizer;
+import fr.cnrs.iees.io.parsing.LineTokenizer;
+import fr.cnrs.iees.io.parsing.impl.GraphTokenizer;
+import fr.cnrs.iees.io.parsing.impl.TreeTokenizer;
 
-public class AotGraphImporter extends OmugiGraphImporter {
+/**
+ * A tokenizer for Aot graphs - first uses a tree tokenizer, then a graph tokenizer,
+ * assuming the file comes into two parts matching those.
+ * 
+ * @author Jacques Gignoux - 22 janv. 2019
+ *
+ */
+public class AotGraphTokenizer extends LineTokenizer {
 
-	private AotGraphTokenizer tokenizer = null;
-	private Parser parser = null;
+	// the top of the file contains the tree structure
+	private List<String> treeLines = new LinkedList<String>();
+	// the end of the file contains the cross links between treenodes
+	private List<String> crossLinkLines = new LinkedList<String>();
+	TreeTokenizer ttk = null;
+	GraphTokenizer gtk = null;
 	
-	public AotGraphImporter(File infile) {
-		super(infile);
-		tokenizer = ;
-		parser = ;
+	private void splitLines() {
+		for (String s:lines)
+			if (s.trim().startsWith("["))
+				crossLinkLines.add(s);
+			else
+				treeLines.add(s);
+		String[] ss = new String[0];
+		ttk = new TreeTokenizer(treeLines.toArray(ss));
+		gtk = new GraphTokenizer(crossLinkLines.toArray(ss));
+	}
+	
+	
+	public AotGraphTokenizer(FileTokenizer parent) {
+		super(parent);
+		splitLines();
+	}
+	
+	protected AotGraphTokenizer(String[] lines) {
+		super(lines);
+		splitLines();
+	}
+	
+	@Override
+	public void tokenize() {
+		ttk.tokenize();
+		gtk.tokenize();
 	}
 
-    public MinimalGraph<?> getGraph() {
-    	return parser.graph();
-    }
+	@Override
+	public String toString() {
+		return ttk.toString()+gtk.toString();
+	}
 
 }
