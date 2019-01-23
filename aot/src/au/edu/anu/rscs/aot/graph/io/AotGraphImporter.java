@@ -30,23 +30,46 @@
 package au.edu.anu.rscs.aot.graph.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.logging.Logger;
 
-import fr.cnrs.iees.graph.MinimalGraph;
-import fr.cnrs.iees.graph.io.impl.OmugiGraphImporter;
-import fr.cnrs.iees.io.parsing.Parser;
+import au.edu.anu.rscs.aot.graph.AotGraph;
+import fr.cnrs.iees.graph.io.GraphImporter;
 
-public class AotGraphImporter extends OmugiGraphImporter {
+/**
+ * An Importer for aot graphs in plain text format
+ * 
+ * @author Jacques Gignoux - 23 janv. 2019
+ *
+ */
+// tested OK with version 0.0.5 on 23/1/2019
+public class AotGraphImporter implements GraphImporter {
 
+	private Logger log = Logger.getLogger(AotGraphImporter.class.getName());
+	private List<String> lines = null;
 	private AotGraphTokenizer tokenizer = null;
-	private Parser parser = null;
+	private AotGraphParser parser = null;
 	
 	public AotGraphImporter(File infile) {
-		super(infile);
-//		tokenizer = ;
-//		parser = ;
+		super();
+		try {
+			lines = Files.readAllLines(infile.toPath());
+			String s = lines.get(0).trim();
+			String[] ss = new String[1];
+			if (s.startsWith("aot")) {
+				tokenizer = new AotGraphTokenizer(lines.toArray(ss));
+				parser = new AotGraphParser(tokenizer);
+			}
+			else
+				log.severe("unrecognized file format - unable to load file \""+infile.getName()+"\"");
+		} catch (IOException e) {
+			log.severe("file could not be read - unable to load file \""+infile.getName()+"\"");
+		}
 	}
 
-    public MinimalGraph<?> getGraph() {
+    public AotGraph getGraph() {
     	return parser.graph();
     }
 

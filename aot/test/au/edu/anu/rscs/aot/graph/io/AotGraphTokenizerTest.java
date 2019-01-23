@@ -33,6 +33,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * 
+ * @author Jacques Gignoux - 23 janv. 2019
+ *
+ */
 class AotGraphTokenizerTest {
 
 	String[] test = {"aot // saved by AotGraphExporter on Mon Jan 21 11:31:07 CET 2019\n", 

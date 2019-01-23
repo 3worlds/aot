@@ -43,6 +43,11 @@ import fr.cnrs.iees.graph.io.GraphExporter;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
 
+/**
+ * 
+ * @author Jacques Gignoux - 23 janv. 2019
+ *
+ */
 class AotGraphExporterTest {
 
 	private AotGraph g = new AotGraph();

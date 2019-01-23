@@ -48,6 +48,7 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
+import fr.ens.biologie.generic.Textable;
 
 /**
  * <p>
@@ -73,7 +74,8 @@ public class AotGraph implements Tree<AotNode>, //
 		ConfigurableGraph, //
 		NodeFactory, //
 		EdgeFactory, //
-		TreeNodeFactory {
+		TreeNodeFactory,
+		Textable {
 
 	private Logger log = Logger.getLogger(AotGraph.class.getName());
 
@@ -367,6 +369,52 @@ public class AotGraph implements Tree<AotNode>, //
 		NodeInitialiser initialiser = new NodeInitialiser(this);
 		initialiser.showInitialisationOrder();
 		return initialiser.initialise();
+	}
+	
+	// LOCAL
+
+	private int nEdges() {
+		int n=0;
+		for (Node node:nodes)
+			n += node.degree(Direction.OUT);
+		return n;
+	}
+
+	// -------------------------- Textable --------------------------
+	
+	@Override
+	public String toDetailedString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(toShortString())
+			.append(" = {");
+		int count = 0;
+		for (AotNode n:nodes) {
+			sb.append(n.toDetailedString());
+			if (count<nodes.size()-1)
+				sb.append(',');
+			count++;
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+
+	@Override
+	public String toShortString() {
+		return toUniqueString() + "(" + nodes.size() + " tree nodes / " + nEdges() + " cross-links)"; 
+	}
+
+	@Override
+	public String toUniqueString() {
+		String ptr = super.toString();
+		ptr = ptr.substring(ptr.indexOf('@'));
+		return getClass().getSimpleName()+ptr; 
+	}
+
+	// -------------------------- Object --------------------------
+	
+	@Override
+	public final String toString() {
+		return "["+toDetailedString()+"]";
 	}
 
 }

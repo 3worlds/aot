@@ -29,65 +29,32 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import static fr.cnrs.iees.io.parsing.impl.TreeGraphTokens.COMMENT;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.logging.Logger;
+
+import org.junit.jupiter.api.Test;
 
 import au.edu.anu.rscs.aot.graph.AotGraph;
-import fr.cnrs.iees.graph.MinimalGraph;
-import fr.cnrs.iees.graph.io.impl.OmugiGraphExporter;
 
 /**
- * An Exporter for aot graphs.
  * 
- * @author Jacques Gignoux - 11 janv. 2019
+ * @author Jacques Gignoux - 23 janv. 2019
  *
  */
-//tested OK with version 0.0.5 on 23/1/2019
-public class AotGraphExporter extends OmugiGraphExporter {
+class AotGraphImporterTest {
 
-	private Logger log = Logger.getLogger(AotGraphExporter.class.getName());
-
-	// Constructors
-	public AotGraphExporter(File file) {
-		super(file);
-	}
-	
-	public AotGraphExporter(String fileName) {
-		super(fileName);
-	}
-	
-	@Override
-	public void exportGraph(MinimalGraph<?> graph) {
-		if (AotGraph.class.isAssignableFrom(graph.getClass())) {
-			AotGraph g = (AotGraph) graph;
-			try {
-				PrintWriter writer = new PrintWriter(file);
-				Date now = new Date();
-				writer.println("aot "+ COMMENT.prefix()+" saved by "
-						+AotGraphExporter.class.getSimpleName()
-						+" on "+now+"\n");
-				// 1. export tree
-				writer.print(COMMENT.prefix());
-				writer.print(' ');
-				writer.println("TREE");
-				if (g.root()!=null)
-					writeTree(g.root(),writer, 0);
-				// 2. export edge list
-				writer.println();
-				writer.print(COMMENT.prefix());
-				writer.print(' ');
-				writer.println("CROSS-LINKS");
-				exportEdges(g.edges(),writer);
-				writer.close();
-			} catch (FileNotFoundException e) {
-				log.severe("cannot save AOT graph to file \""+file.getPath()+"\" - file not found");
-			}
-		}
+	@Test
+	void testGetGraph() {
+		String testfile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
+				+ File.separator + "test" 
+				+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
+				+ File.separator + "bidon.aot";		
+		File f = new File(testfile);
+		AotGraphImporter gi = new AotGraphImporter(f);
+		AotGraph g = gi.getGraph();
+		System.out.println(g);
+		assertTrue(g.toDetailedString().endsWith("(11 tree nodes / 4 cross-links) = {ecology:my model=[↑3Worlds: ↓category:animal ↓system:entity ↓category:plant ↓engine:my simulator ↓process:growth a=null b=null],codeSource:=[↑3Worlds: ↓function:some computation ↓AOTNode:D89EF3043496-000001686FF6BA12-0000],function:some computation=[↑codeSource: ←process:growth a=null b=null],category:animal=[↑ecology:my model ←system:entity ←process:growth x=null y=null z=null],system:entity=[↑ecology:my model →category:animal i=null j=null k=null l=null],experiment:my experiment=[↑3Worlds:],category:plant=[↑ecology:my model ←process:growth x=null y=null z=null],engine:my simulator=[↑ecology:my model],AOTNode:D89EF3043496-000001686FF6BA12-0000=[↑codeSource:],3Worlds:=[ROOT ↓ecology:my model ↓codeSource: ↓experiment:my experiment],process:growth=[↑ecology:my model →category:animal →category:plant →function:some computation]}"));
 	}
 
 }

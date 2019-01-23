@@ -33,6 +33,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import au.edu.anu.rscs.aot.graph.AotGraph;
+
+/**
+ * 
+ * @author Jacques Gignoux - 23 janv. 2019
+ *
+ */
 class AotGraphParserTest {
 
 	String[] test = {"aot // saved by AotGraphExporter on Mon Jan 21 11:31:07 CET 2019\n", 
@@ -74,12 +81,58 @@ class AotGraphParserTest {
 	void testParse() {
 		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test));
 		p.parse();
-		System.out.println(p.toString());
+//		System.out.println(p.toString());
+		assertEquals(p.toString(),"Aot graph specification\n" + 
+				"Nodes:\n" + 
+				"3Worlds:\n" + 
+				"	ROOT NODE\n" + 
+				"ecology:my model\n" + 
+				"	a:java.lang.Object=null\n" + 
+				"	b:java.lang.Object=null\n" + 
+				"	parent 3Worlds:\n" + 
+				"category:animal\n" + 
+				"	x:java.lang.Object=null\n" + 
+				"	y:java.lang.Object=null\n" + 
+				"	z:java.lang.Object=null\n" + 
+				"	parent ecology:my model\n" + 
+				"system:entity\n" + 
+				"	i:java.lang.Object=null\n" + 
+				"	j:java.lang.Object=null\n" + 
+				"	k:java.lang.Object=null\n" + 
+				"	l:java.lang.Object=null\n" + 
+				"	parent ecology:my model\n" + 
+				"category:plant\n" + 
+				"	x:java.lang.Object=null\n" + 
+				"	y:java.lang.Object=null\n" + 
+				"	z:java.lang.Object=null\n" + 
+				"	parent ecology:my model\n" + 
+				"engine:my simulator\n" + 
+				"	parent ecology:my model\n" + 
+				"process:growth\n" + 
+				"	parent ecology:my model\n" + 
+				"codeSource:\n" + 
+				"	parent 3Worlds:\n" + 
+				"function:some computation\n" + 
+				"	a:java.lang.Object=null\n" + 
+				"	b:java.lang.Object=null\n" + 
+				"	parent codeSource:\n" + 
+				"AOTNode:D89EF3043496-000001686FF6BA12-0000\n" + 
+				"	parent codeSource:\n" + 
+				"experiment:my experiment\n" + 
+				"	parent 3Worlds:\n" + 
+				"Edges:\n" + 
+				"	belongsTo:random name [system:entity-->category:animal]\n" + 
+				"	appliesTo: [process:growth-->category:animal]\n" + 
+				"	appliesTo: [process:growth-->category:plant]\n" + 
+				"	function: [process:growth-->function:some computation]\n");
 	}
 
 	@Test
 	void testGraph() {
-		fail("Not yet implemented");
+		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test));
+		AotGraph g = p.graph();
+//		System.out.println(g.toDetailedString());
+		assertTrue(g.toDetailedString().endsWith("(11 tree nodes / 4 cross-links) = {ecology:my model=[↑3Worlds: ↓category:animal ↓system:entity ↓category:plant ↓engine:my simulator ↓process:growth a=null b=null],codeSource:=[↑3Worlds: ↓function:some computation ↓AOTNode:D89EF3043496-000001686FF6BA12-0000],function:some computation=[↑codeSource: ←process:growth a=null b=null],category:animal=[↑ecology:my model ←system:entity ←process:growth x=null y=null z=null],system:entity=[↑ecology:my model →category:animal i=null j=null k=null l=null],experiment:my experiment=[↑3Worlds:],category:plant=[↑ecology:my model ←process:growth x=null y=null z=null],engine:my simulator=[↑ecology:my model],AOTNode:D89EF3043496-000001686FF6BA12-0000=[↑codeSource:],3Worlds:=[ROOT ↓ecology:my model ↓codeSource: ↓experiment:my experiment],process:growth=[↑ecology:my model →category:animal →category:plant →function:some computation]}"));
 	}
 
 }

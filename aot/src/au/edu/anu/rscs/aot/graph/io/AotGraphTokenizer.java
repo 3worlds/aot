@@ -44,6 +44,7 @@ import fr.cnrs.iees.io.parsing.impl.TreeTokenizer;
  * @author Jacques Gignoux - 22 janv. 2019
  *
  */
+//tested OK with version 0.0.5 on 23/1/2019
 public class AotGraphTokenizer extends LineTokenizer {
 
 	// the top of the file contains the tree structure

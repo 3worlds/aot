@@ -29,24 +29,29 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.AotGraph;
+import au.edu.anu.rscs.aot.graph.AotNode;
 import fr.cnrs.iees.OmugiException;
-import fr.cnrs.iees.graph.EdgeFactory;
-import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.impl.DefaultGraphFactory;
 import fr.cnrs.iees.io.parsing.impl.MinimalGraphParser;
 import fr.cnrs.iees.io.parsing.impl.GraphTokenizer.graphToken;
 import fr.cnrs.iees.io.parsing.impl.TreeTokenizer.treeToken;
+import fr.cnrs.iees.properties.SimplePropertyList;
 
 /**
  * 
  * @author Jacques Gignoux - 22 janv. 2019
  *
  */
+//tested OK with version 0.0.5 on 23/1/2019
 public class AotGraphParser extends MinimalGraphParser {
 
 	private Logger log = Logger.getLogger(AotGraphParser.class.getName());
@@ -61,10 +66,6 @@ public class AotGraphParser extends MinimalGraphParser {
 	// the tokenizer used to read the file
 	private AotGraphTokenizer tokenizer = null;
 	
-	// the factories used to build the graph
-	private NodeFactory nodeFactory = null;
-	private EdgeFactory edgeFactory = null;
-	
 	// the list of specifications built from the token list
 	private List<propSpec> graphProps = new LinkedList<propSpec>();
 	private List<treeNodeSpec> nodeSpecs =  new LinkedList<treeNodeSpec>();
@@ -77,6 +78,7 @@ public class AotGraphParser extends MinimalGraphParser {
 	private edgeSpec lastEdge = null;
 	
 	// the result of this parsing
+	// remind that an AotGraph is its own Node, Edge and TreeNode factory
 	private AotGraph graph = null;
 	
 	// lazy init: nothing is done before it's needed
@@ -84,12 +86,51 @@ public class AotGraphParser extends MinimalGraphParser {
 		super();
 		this.tokenizer =tokenizer;
 	}
-	
+		
+	@SuppressWarnings("unused")
 	private void buildGraph() {
 		// parse token if not yet done
 		if (lastItem==null)
 			parse();
-		
+		// do nothing with graph-level properties - see later
+		for (propSpec p:graphProps); 
+		// setup the factories
+		graph = new AotGraph();
+		propertyListFactory = new DefaultGraphFactory();
+		// make tree nodes
+		Map<String,AotNode> nodes = new HashMap<>();
+		for (treeNodeSpec ns:nodeSpecs) {
+			AotNode n = null;
+			AotNode parent = null;
+			SimplePropertyList pl = null;
+			if (!ns.props.isEmpty()) 
+				pl = makePropertyList(ns.props,log);
+			if (ns.parent!=null) 
+				// the parent has always been set before
+				parent = nodes.get(ns.parent.label.trim()+":"+ns.parent.name.trim());
+			// this puts the node in the graph
+			n = graph.makeTreeNode(parent,ns.label.trim(),ns.name.trim(),pl);
+			nodes.put(n.getLabel()+":"+n.getName(),n);
+		}
+		// make cross links
+		for (edgeSpec es:edgeSpecs) {
+			SimplePropertyList pl = null;
+			if (!es.props.isEmpty()) 
+				pl = makePropertyList(es.props,log);
+			String[] refs = es.start.split(":");
+			String ref = refs[0].trim()+":"+refs[1].trim();
+			Node start = nodes.get(ref);
+			if (start==null)
+				log.severe("start node "+ref+" not found for edge "+es.label+":"+es.name);
+			refs = es.end.split(":");
+			ref = refs[0].trim()+":"+refs[1].trim();
+			Node end = nodes.get(ref);
+			if (end==null)
+				log.severe("end node "+ref+" not found for edge "+es.label+":"+es.name);
+			if ((start!=null)&&(end!=null))
+				// this attaches the edge properly to the nodes
+				graph.makeEdge(start,end,es.label.trim(),es.name.trim(),pl);
+		}
 	}
 
 	@Override
