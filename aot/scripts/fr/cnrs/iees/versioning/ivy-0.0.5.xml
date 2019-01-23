@@ -1,5 +1,5 @@
 <!--===================================================================================
- ant and ivy scripts for project <aot> version 0.0.6 (Wed Jan 23 14:43:34 CET 2019)
+ ant and ivy scripts for project <aot> version 0.0.5 (Fri Jan 11 15:58:55 CET 2019)
  author: Jacques Gignoux <jacques.gignoux@upmc.fr>
 
  CAUTION: this file is generated - DO NOT EDIT!
@@ -12,7 +12,7 @@
 
 	<info	organisation="au.edu.anu.rscs.aot"
 			module="aot"
-			revision="0.0.6"
+			revision="0.0.5"
 			status="integration">
 		<license name="gpl3" url="https://www.gnu.org/licenses/gpl-3.0.txt"/>
 		<description>AOT is a method to generate elaborate software code from a series of independent domains of knowledge. It enables one to manage and maintain software from explicit specifications that can be translated into any programming language.</description>
