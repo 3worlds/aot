@@ -30,7 +30,6 @@
 package au.edu.anu.rscs.aot.graph;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import au.edu.anu.rscs.aot.graph.property.Property;

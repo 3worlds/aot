@@ -40,7 +40,6 @@ import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.QuickListOfLists;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.EdgeFactory;
-import fr.cnrs.iees.graph.Graph;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -69,33 +68,18 @@ import fr.ens.biologie.generic.Textable;
  *
  */
 
-public class AotGraph implements Tree<AotNode>, //
-		Graph<AotNode, AotEdge>, //
-		ConfigurableGraph, //
-		NodeFactory, //
-		EdgeFactory, //
-		TreeNodeFactory,
-		Textable {
+public class AotGraph extends TreeGraph<AotNode,AotEdge> 
+	implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
 
 	private Logger log = Logger.getLogger(AotGraph.class.getName());
-
-	private Set<AotNode> nodes; // no duplicate nodes permitted
-	private int minDepth;
-	private int maxDepth;
-	private AotNode root;
 
 	// constructors
 	public AotGraph() {
 		super();
-		this.nodes = new HashSet<>();
 	}
 
 	public AotGraph(Iterable<AotNode> list) {
-		this();
-		for (AotNode n : list)
-			nodes.add(n);
-		// order is undefined so must search?
-		root = root();
+		super(list);
 	}
 
 	/**
@@ -104,21 +88,7 @@ public class AotGraph implements Tree<AotNode>, //
 	 * @param root
 	 */
 	public AotGraph(AotNode root) {
-		this();
-		this.root = root;
-		insertChildren(root);
-		computeDepths(root);
-	}
-
-	private void insertChildren(TreeNode parent) {
-		for (TreeNode child : parent.getChildren()) {
-			nodes.add((AotNode) child);
-			insertChildren(child);
-		}
-	}
-
-	private void computeDepths(AotNode parent) {
-		// TODO Auto-generated method stub
+		super(root);
 	}
 
 	public EdgeFactory getEdgeFactory() {
@@ -127,90 +97,6 @@ public class AotGraph implements Tree<AotNode>, //
 
 	public TreeNodeFactory getTreeFactory() {
 		return this;
-	}
-
-	@Override
-	public Iterable<AotNode> leaves() {
-		List<AotNode> result = new ArrayList<>(nodes.size());
-		for (AotNode n : nodes)
-			if (n.isLeaf())
-				result.add(n);
-		return result;
-	}
-
-	@Override
-	public Iterable<AotNode> nodes() {
-		return nodes;
-	}
-
-	@Override
-	public int size() {
-		return nodes.size();
-	}
-
-	// -------------------- GRAPH <AOTNODE, AOTEDGE>
-	@Override
-	public boolean contains(AotNode n) {
-		return nodes.contains(n);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterable<AotEdge> edges() {
-		QuickListOfLists<AotEdge> edges = new QuickListOfLists<>();
-		for (AotNode n : nodes)
-			edges.addList((Iterable<AotEdge>) n.getEdges(Direction.OUT));
-		return edges;
-	}
-
-	@Override
-	public Iterable<AotNode> roots() {
-		List<AotNode> result = new ArrayList<>(nodes.size());
-		for (AotNode n : nodes)
-			if (n.getParent() == null)
-				result.add(n);
-		return result;
-	}
-
-	// ------------------ TREE -------------------------------------
-	@Override
-	public Iterable<AotNode> findNodesByReference(String reference) {
-		List<AotNode> found = new ArrayList<>(nodes.size()); // this may be a bad idea for big graphs
-		for (AotNode n : nodes)
-			if (Tree.matchesReference(n, reference))
-				found.add(n);
-		return found;
-	}
-
-	@Override
-	public int maxDepth() {
-		// TODO not implemented
-		return maxDepth;
-	}
-
-	@Override
-	public int minDepth() {
-		// TODO not implemented
-		return minDepth;
-	}
-
-	private AotNode findRoot() {
-		List<AotNode> roots = (List<AotNode>) roots();
-		if (roots.size() == 1)
-			return roots.get(0);
-		return null;
-	}
-
-	@Override
-	public AotNode root() {
-		if (root == null)
-			root = findRoot();
-		return root;
-	}
-
-	@Override
-	public Tree<AotNode> subTree(AotNode parent) {
-		return new AotGraph(parent);
 	}
 
 	// ---------------------- NODE FACTORY -------------------------
@@ -305,16 +191,10 @@ public class AotGraph implements Tree<AotNode>, //
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label, String name, SimplePropertyList props) {
 		AotNode node;
-		if (label == null)
-			if (name == null)
-				node = new AotNode(this);
-			else
-				node = new AotNode(name, this);
+		if (name==null)
+			node = new AotNode(label,this,props);
 		else
-			if (name == null)
-				node = new AotNode(label,"",this);
-			else
-				node = new AotNode(label, name, this);
+			node = new AotNode(label,name,this,props);
 		if (!nodes.add(node)) {
 			log.warning(() -> "Duplicate Node insertion: " + node.toDetailedString());
 			return null;
@@ -322,8 +202,6 @@ public class AotGraph implements Tree<AotNode>, //
 			node.setParent(parent);
 			if (parent != null)
 				parent.addChild(node);
-			if (props != null)
-				node.addProperties(props);
 			return node;
 		}
 	}
@@ -334,9 +212,9 @@ public class AotGraph implements Tree<AotNode>, //
 	@Override
 	public NodeExceptionList castNodes() {
 		NodeExceptionList castFailList = new NodeExceptionList();
-		List<AotNode> removedNodes = new ArrayList<>(nodes.size());
-		List<AotNode> addedNodes = new ArrayList<>(nodes.size());
-		for (AotNode n : nodes) {
+		List<AotNode> removedNodes = new ArrayList<>();
+		List<AotNode> addedNodes = new ArrayList<>();
+		for (AotNode n : nodes()) {
 			try {
 				String className;
 				className = (String) n.getPropertyValue("class");
@@ -381,52 +259,6 @@ public class AotGraph implements Tree<AotNode>, //
 		NodeInitialiser initialiser = new NodeInitialiser(this);
 		initialiser.showInitialisationOrder();
 		return initialiser.initialise();
-	}
-	
-	// LOCAL
-
-	private int nEdges() {
-		int n=0;
-		for (Node node:nodes)
-			n += node.degree(Direction.OUT);
-		return n;
-	}
-
-	// -------------------------- Textable --------------------------
-	
-	@Override
-	public String toDetailedString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(toShortString())
-			.append(" = {");
-		int count = 0;
-		for (AotNode n:nodes) {
-			sb.append(n.toDetailedString());
-			if (count<nodes.size()-1)
-				sb.append(',');
-			count++;
-		}
-		sb.append("}");
-		return sb.toString();
-	}
-
-	@Override
-	public String toShortString() {
-		return toUniqueString() + "(" + nodes.size() + " tree nodes / " + nEdges() + " cross-links)"; 
-	}
-
-	@Override
-	public String toUniqueString() {
-		String ptr = super.toString();
-		ptr = ptr.substring(ptr.indexOf('@'));
-		return getClass().getSimpleName()+ptr; 
-	}
-
-	// -------------------------- Object --------------------------
-	
-	@Override
-	public final String toString() {
-		return "["+toDetailedString()+"]";
 	}
 
 }

@@ -29,22 +29,14 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import au.edu.anu.rscs.aot.graph.property.Property;
-import fr.cnrs.iees.graph.Direction;
-import fr.cnrs.iees.graph.Edge;
-import fr.cnrs.iees.graph.impl.SimpleNodeImpl;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
-import fr.cnrs.iees.tree.TreeNode;
-import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
 import fr.ens.biologie.generic.Sealable;
 
 /**
@@ -75,120 +67,88 @@ import fr.ens.biologie.generic.Sealable;
  */
 // Tested OK with version 0.0.3 on 10/1/2019
 // Tested OK with version 0.0.4 on 10/1/2019
-public class AotNode extends SimpleNodeImpl 
-		implements TreeNode,//
-		ExtendablePropertyList,//
-		Configurable {
-	
-	private static Logger log = Logger.getLogger(AotNode.class.getName());
-	private static String defaultLabel = "AOTNode";
-
-	// this only holds the children and parent nodes
-	private TreeNode treenode;
-	// this holds the properties
-	private ExtendablePropertyList properties;
-	// the name
-//	private String name=null;
-	// the label - remember that label+name = uniqueID within the graph context
-	private String label=null;
+// Tested OK with version 0.0.7 on 24/1/2019
+public class AotNode extends TreeGraphNode 
+		implements 	ExtendablePropertyList,	Configurable {
 
 	// ----------------------- Constructors
 
 	// this constructor sets the name to the uniqueID
-	protected AotNode(AotGraph factory) {
-		super(factory); // this generates a name
-		label = defaultLabel;
-		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
-		this.properties = new ExtendablePropertyListImpl();
+	protected AotNode(String label, String name, AotGraph factory, ReadOnlyPropertyList props) {
+		super(label,name,factory,factory,props); 
+		ExtendablePropertyList pl = new ExtendablePropertyListImpl();
+		if (props!=null)
+			pl.addProperties(props);
+		properties = pl;
 	}
 
 	// this is the constructor to use with descendant classes
-	protected AotNode(String label, String name, AotGraph factory) {
-		super(name,factory);
-		this.label = label;
-		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
-		this.properties = new ExtendablePropertyListImpl();
-	}
-
-	// this is the constructor to use for plain aot nodes
-	protected AotNode(String name, AotGraph factory) {
-		this(defaultLabel,name,factory);
+	protected AotNode(String label, AotGraph factory, ReadOnlyPropertyList props) {
+		super(label,factory,factory,props); // this generates a name
+		ExtendablePropertyList pl = new ExtendablePropertyListImpl();
+		if (props!=null)
+			pl.addProperties(props);
+		properties = pl;
 	}
 	
-	protected AotNode(AotGraph factory, String label) {
-		this(factory);
-		this.label = label;
-	}
-	
-	// ---------------------------Identifiable (from both Node and TreeNode). 
-	@Override
-	public String classId() {
-		if (label==null)
-			return defaultLabel;
-		return label;
-	}
-
 	// -------------- ExtendablePropertyList
 	@Override
 	public ResizeablePropertyList addProperties(List<String> arg0) {
-		return properties.addProperties(arg0);
+		return ((ResizeablePropertyList) properties).addProperties(arg0);
 	}
 
 	@Override
 	public ResizeablePropertyList addProperties(String... keys) {
-		return properties.addProperties(keys);
+		return ((ResizeablePropertyList) properties).addProperties(keys);
 	}
 
 	@Override
 	public ResizeablePropertyList addProperties(ReadOnlyPropertyList list) {
-		properties.addProperties(list);
-		return properties;
+		((ResizeablePropertyList) properties).addProperties(list);
+		return (ResizeablePropertyList) properties;
 	}
 
 	@Override
 	public ResizeablePropertyList addProperty(Property property) {
-		return properties.addProperty(property);
+		return ((ResizeablePropertyList) properties).addProperty(property);
 	}
 
 	@Override
 	public ResizeablePropertyList addProperty(String key) {
-		return properties.addProperty(key);
+		return ((ResizeablePropertyList) properties).addProperty(key);
 	}
 
 	@Override
 	public ResizeablePropertyList addProperty(String key, Object value) {
-		return properties.addProperty(key, value);
+		return ((ResizeablePropertyList) properties).addProperty(key, value);
 	}
 
 	@Override
 	public Object getPropertyValue(String key, Object defaultValue) {
-		return properties.getPropertyValue(key, defaultValue);
+		return ((ResizeablePropertyList) properties).getPropertyValue(key, defaultValue);
 	}
 
 	@Override
 	public ResizeablePropertyList removeAllProperties() {
-		return properties.removeAllProperties();
+		return ((ResizeablePropertyList) properties).removeAllProperties();
 	}
 
 	@Override
 	public ResizeablePropertyList removeProperty(String key) {
-		return properties.removeProperty(key);
+		return ((ResizeablePropertyList) properties).removeProperty(key);
 	}
 	
 	// Not sure about this one - maybe it should be disabled by throwing an exception
 	// need careful checking
 	@Override
 	public AotNode clone() {
-		AotNode n = new AotNode(nodeFactory());
-		n.addProperties(this.properties);
-//		n.setLabel(label);
-//		n.setName(name);
+		AotNode n = new AotNode(label,nodeFactory(),properties);
 		return n;
 	}
 
 	@Override
 	public PropertyListSetters setProperty(String key, Object value) {
-		return properties.setProperty(key, value);
+		return ((PropertyListSetters) properties).setProperty(key, value);
 	}
 
 	@Override
@@ -213,212 +173,17 @@ public class AotNode extends SimpleNodeImpl
 
 	@Override
 	public Sealable seal() {
-		return properties.seal();
+		return ((Sealable) properties).seal();
 	}
 
 	@Override
 	public boolean isSealed() {
-		return properties.isSealed();
-	}
-
-	// ---------------- TreeNode
-
-	@Override
-	public void addChild(TreeNode child) {
-		treenode.addChild(child);
+		return ((Sealable) properties).isSealed();
 	}
 
 	@Override
-	public Iterable<TreeNode> getChildren() {
-		return treenode.getChildren();
-	}
-
-	@Override
-	public TreeNode getParent() {
-		return treenode.getParent();
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return treenode.hasChildren();
-	}
-
-	@Override
-	public void setChildren(TreeNode... children) {
-		treenode.setChildren(children);
-	}
-
-	@Override
-	public void setChildren(Iterable<TreeNode> children) {
-		treenode.setChildren(children);
-	}
-
-	@Override
-	public void setChildren(Collection<TreeNode> children) {
-		treenode.setChildren(children);
-	}
-
-	/**
-	 * CAUTION: to prevent problems, parent can only be set if it was null. It should
-	 * be set by the factory in the makeTreeNode(...) methods
-	 */
-	@Override
-	public void setParent(TreeNode parent) {
-		if (treenode.getParent()==null)
-			treenode.setParent(parent);
-	}
-
-	@Override
-	public AotGraph treeNodeFactory() {
-		return (AotGraph) nodeFactory();
-	}
-
-	@Override
-	public int nChildren() {
-		return treenode.nChildren();
-	}
-
-	// --------------- NODE
-
-	@Override
-	public AotGraph nodeFactory() {
-		return (AotGraph) super.nodeFactory();
-	}
-
-	// -------------------------- NamedAndLabelled
-
-//	@Override
-//	public String getName() {
-//		return name;
-//	}
-//
-//	/**
-//	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
-//	 * on which sets base their unicity of element constraint.
-//	 */
-//	@Override
-//	public Named setName(String name) {
-//		if (this.name==null)
-//			this.name = name;
-//		else
-//			throw new AotException("Attempt to rename node "+this.name+" to "+name);
-//
-//		return this;
-//	}
-//
-//	@Override
-//	public boolean sameName(Named item) {
-//		return this.hasName(item.getName());
-//	}
-//
-//	@Override
-//	public boolean hasName(String name) {
-//		return Objects.equals(this.name, name);
-//	}
-//
-//	@Override
-//	public String getLabel() {
-//		return label;
-//	}
-//
-//	/**
-//	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
-//	 * on which sets base their unicity of element constraint.
-//	 */
-//	@Override
-//	public Labelled setLabel(String label) {
-//		if (this.label==null)
-//			this.label = label;
-//		else
-//			throw new AotException("Attempt to relabel node "+this.label+" to "+label);
-//		return this;
-//	}
-//
-//	@Override
-//	public boolean sameLabel(Labelled item) {
-//		return hasLabel(item.getLabel());
-//	}
-//
-//	@Override
-//	public boolean hasLabel(String label) {
-//		return Objects.equals(this.label, label);
-//	}
-
-	// ------------------- Configurable
-
-	@Override
-	public AotNode initialise() {
-		log.fine(()->uniqueId()+" initialising");
+	public Configurable initialise() {
 		return this;
 	}
-	
-	// -------------------  Textable
-
-	@Override
-	public String toUniqueString() {
-		return uniqueId();
-	}
-
-	/**
-	 * Displays an AotNode as follows (on a single line):
-	 * 
-	 * <pre>
-	 * node_label:node_name=[
-	 *    ↑parent_label:parent_name      // the parent node, or ROOT if null
-	 *    ↓child_label:child_name        // child node, repeated as needed
-	 *    →out_node_label:out_node_name  // end node of outgoing edge, repeated as needed
-	 *    ←in_node_label:in_node_name    // start node of incoming edge, repeated as needed
-	 * ] 
-	 * </pre>
-	 * <p>e.g.: {@code AOTNode:=[↑AOTNode:1 ↓AOTNode:2 ←AOTNode:2 ←AOTNode: →AOTNode: →AOTNode:1]}
-	 *  (in this case, the name is missing).</p>
-	 */
-	@Override
-	public String toDetailedString() {
-		StringBuilder sb = new StringBuilder(toUniqueString());
-		sb.append("=[");
-		if (treenode.getParent()!=null)
-			sb.append("↑").append(treenode.getParent().toUniqueString());
-		else
-			sb.append("ROOT");
-		if (treenode.hasChildren()) {
-			for (TreeNode n:treenode.getChildren()) {
-				sb.append(" ↓").append(n.toUniqueString());
-			}
-		}
-		if (getEdges(Direction.IN).iterator().hasNext()) {
-			for (Edge e:getEdges(Direction.IN))
-				sb.append(" ←").append(e.startNode().toUniqueString());
-		}
-		if (getEdges(Direction.OUT).iterator().hasNext()) {
-			for (Edge e:getEdges(Direction.OUT))
-				sb.append(" →").append(e.endNode().toUniqueString());
-		}		
-		if (properties.size()>0)
-			sb.append(' ').append(properties.toString());
-		sb.append("]");
-		return sb.toString();
-	}
-	
-	// Object
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj==null)
-			return false;
-		if (!AotNode.class.isAssignableFrom(obj.getClass()))
-			return false;
-		AotNode n = (AotNode) obj;
-		return (classId().equals(n.classId()) && instanceId().equals(n.instanceId()));
-	}
-
-	// Tricky: without this, the above method wont be called and two identically labelled+named
-	// nodes are not recognized as such
-	@Override
-	public int hashCode() {
-		return toUniqueString().hashCode();
-	}
-	
-	
 	
 }

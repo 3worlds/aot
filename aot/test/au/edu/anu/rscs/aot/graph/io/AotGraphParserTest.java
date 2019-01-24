@@ -138,14 +138,14 @@ class AotGraphParserTest {
 	void testParse2() {
 		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test2));
 		p.parse();
-		System.out.println(p.toString());
+//		System.out.println(p.toString());
 	}
 
 	@Test
 	void testGraph() {
 		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test));
 		AotGraph g = p.graph();
-//		System.out.println(g.toDetailedString());
+		System.out.println(g.toDetailedString());
 		assertTrue(g.toDetailedString().endsWith("(11 tree nodes / 4 cross-links) = {ecology:my model=[↑3Worlds: ↓category:animal ↓system:entity ↓category:plant ↓engine:my simulator ↓process:growth a=null b=null],codeSource:=[↑3Worlds: ↓function:some computation ↓AOTNode:D89EF3043496-000001686FF6BA12-0000],function:some computation=[↑codeSource: ←process:growth a=null b=null],category:animal=[↑ecology:my model ←system:entity ←process:growth x=null y=null z=null],system:entity=[↑ecology:my model →category:animal i=null j=null k=null l=null],experiment:my experiment=[↑3Worlds:],category:plant=[↑ecology:my model ←process:growth x=null y=null z=null],engine:my simulator=[↑ecology:my model],AOTNode:D89EF3043496-000001686FF6BA12-0000=[↑codeSource:],3Worlds:=[ROOT ↓ecology:my model ↓codeSource: ↓experiment:my experiment],process:growth=[↑ecology:my model →category:animal →category:plant →function:some computation]}"));
 	}
 
