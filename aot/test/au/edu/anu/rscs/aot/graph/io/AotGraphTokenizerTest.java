@@ -84,8 +84,10 @@ class AotGraphTokenizerTest {
 				"\n" + 
 				"0 COMMENT: TREE\n" + 
 				"\n" + 
+				"0 LABEL:3Worlds\n" + 
+				"0 NAME:\n" + 
 				"1 LABEL:ecology\n" + 
-				"1 NAME:mymodel\n" + 
+				"1 NAME:my model\n" + 
 				"2 PROPERTY_NAME:a\n" + 
 				"2 PROPERTY_TYPE:java.lang.Object\n" + 
 				"2 PROPERTY_VALUE:null\n" + 
@@ -129,11 +131,13 @@ class AotGraphTokenizerTest {
 				"3 PROPERTY_TYPE:java.lang.Object\n" + 
 				"3 PROPERTY_VALUE:null\n" + 
 				"2 LABEL:engine\n" + 
-				"2 NAME:mysimulator\n" + 
+				"2 NAME:my simulator\n" + 
 				"2 LABEL:process\n" + 
 				"2 NAME:growth\n" + 
+				"1 LABEL:codeSource\n" + 
+				"1 NAME:\n" + 
 				"2 LABEL:function\n" + 
-				"2 NAME:somecomputation\n" + 
+				"2 NAME:some computation\n" + 
 				"3 PROPERTY_NAME:a\n" + 
 				"3 PROPERTY_TYPE:java.lang.Object\n" + 
 				"3 PROPERTY_VALUE:null\n" + 
@@ -143,12 +147,12 @@ class AotGraphTokenizerTest {
 				"2 LABEL:AOTNode\n" + 
 				"2 NAME:D89EF3043496-000001686FF6BA12-0000\n" + 
 				"1 LABEL:experiment\n" + 
-				"1 NAME:myexperiment\n" + 
+				"1 NAME:my experiment\n" + 
 				"0 COMMENT: CROSS-LINKS\n" + 
 				"\n" + 
 				"NODE_REF:system:entity\n" + 
 				"LABEL:belongsTo\n" + 
-				"NAME:randomname\n" + 
+				"NAME:random name\n" + 
 				"NODE_REF:category:animal\n" + 
 				"NODE_REF:process:growth\n" + 
 				"LABEL:appliesTo\n" + 

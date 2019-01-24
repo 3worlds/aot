@@ -58,7 +58,7 @@ class AotGraphExporterTest {
 		SimplePropertyList pl1 = new SimplePropertyListImpl("x","y","z");
 		SimplePropertyList pl2 = new SimplePropertyListImpl("a","b");
 		SimplePropertyList pl3 = new SimplePropertyListImpl("i","j","k","l");
-		AotNode tw = g.makeTreeNode(null,"3Worlds",null,null);
+		AotNode tw = g.makeTreeNode(null,"3Worlds");
 		AotNode eco = g.makeTreeNode(tw,"ecology","my model",pl2);
 		g.makeTreeNode(tw,"experiment","my experiment",null);
 		AotNode cat = g.makeTreeNode(eco,"category","animal",pl1);

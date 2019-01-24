@@ -255,11 +255,17 @@ public class AotGraph implements Tree<AotNode>, //
 	public AotEdge makeEdge(Node start, Node end, String label, String name, ReadOnlyPropertyList props) {
 		AotEdge result;
 		if (props != null)
-			result = new AotEdge(start, end, props, this);
+			if (name!=null)
+				result = new AotEdge(start, end, label, name, props, this);
+			else
+				result = new AotEdge(start, end, label, "", props, this);
 		else
-			result = new AotEdge(start, end, this);
-		result.setLabel(label);
-		result.setName(name);
+			if (name!=null)
+				result = new AotEdge(start, end, label, name, this);
+			else
+				result = new AotEdge(start, end, label, "", this);
+//		result.setLabel(label);
+//		result.setName(name);
 		return result;
 	}
 
@@ -305,7 +311,10 @@ public class AotGraph implements Tree<AotNode>, //
 			else
 				node = new AotNode(name, this);
 		else
-			node = new AotNode(label, name, this);
+			if (name == null)
+				node = new AotNode(label,"",this);
+			else
+				node = new AotNode(label, name, this);
 		if (!nodes.add(node)) {
 			log.warning(() -> "Duplicate Node insertion: " + node.toDetailedString());
 			return null;
@@ -342,8 +351,11 @@ public class AotGraph implements Tree<AotNode>, //
 						Constructor<? extends AotNode> nodeConstructor = nodeClass.getConstructor();
 						// NOTE: a node constructor always has a factory as argument...
 						newNode = nodeConstructor.newInstance(this);
-						newNode.setLabel(n.getLabel());
-						newNode.setName(n.getName());
+						
+						// TODO: possible flaw here due to removing name and label
+						
+//						newNode.setLabel(n.getLabel());
+//						newNode.setName(n.getName());
 						newNode.connectLike(n);
 						newNode.setProperties(n);
 						n.disconnect();

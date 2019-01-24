@@ -110,7 +110,7 @@ public class AotGraphParser extends MinimalGraphParser {
 				parent = nodes.get(ns.parent.label.trim()+":"+ns.parent.name.trim());
 			// this puts the node in the graph
 			n = graph.makeTreeNode(parent,ns.label.trim(),ns.name.trim(),pl);
-			nodes.put(n.getLabel()+":"+n.getName(),n);
+			nodes.put(n.classId()+":"+n.instanceId(),n);
 		}
 		// make cross links
 		for (edgeSpec es:edgeSpecs) {

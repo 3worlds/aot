@@ -31,11 +31,9 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
@@ -47,9 +45,6 @@ import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.impl.DefaultTreeFactory;
-import fr.ens.biologie.generic.Labelled;
-import fr.ens.biologie.generic.Named;
-import fr.ens.biologie.generic.NamedAndLabelled;
 import fr.ens.biologie.generic.Sealable;
 
 /**
@@ -83,7 +78,6 @@ import fr.ens.biologie.generic.Sealable;
 public class AotNode extends SimpleNodeImpl 
 		implements TreeNode,//
 		ExtendablePropertyList,//
-		NamedAndLabelled,//
 		Configurable {
 	
 	private static Logger log = Logger.getLogger(AotNode.class.getName());
@@ -94,7 +88,7 @@ public class AotNode extends SimpleNodeImpl
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
-	private String name=null;
+//	private String name=null;
 	// the label - remember that label+name = uniqueID within the graph context
 	private String label=null;
 
@@ -102,15 +96,16 @@ public class AotNode extends SimpleNodeImpl
 
 	// this constructor sets the name to the uniqueID
 	protected AotNode(AotGraph factory) {
-		this(defaultLabel,null,factory);
-		name = super.instanceId();
+		super(factory); // this generates a name
+		label = defaultLabel;
+		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
+		this.properties = new ExtendablePropertyListImpl();
 	}
 
 	// this is the constructor to use with descendant classes
 	protected AotNode(String label, String name, AotGraph factory) {
-		super(factory);
+		super(name,factory);
 		this.label = label;
-		this.name = name;
 		this.treenode = DefaultTreeFactory.makeSimpleTreeNode(null,factory);
 		this.properties = new ExtendablePropertyListImpl();
 	}
@@ -120,19 +115,17 @@ public class AotNode extends SimpleNodeImpl
 		this(defaultLabel,name,factory);
 	}
 	
+	protected AotNode(AotGraph factory, String label) {
+		this(factory);
+		this.label = label;
+	}
+	
 	// ---------------------------Identifiable (from both Node and TreeNode). 
 	@Override
 	public String classId() {
 		if (label==null)
 			return defaultLabel;
 		return label;
-	}
-
-	@Override
-	public String instanceId() {
-		if (name==null)
-			return "";
-		return name;
 	}
 
 	// -------------- ExtendablePropertyList
@@ -188,8 +181,8 @@ public class AotNode extends SimpleNodeImpl
 	public AotNode clone() {
 		AotNode n = new AotNode(nodeFactory());
 		n.addProperties(this.properties);
-		n.setLabel(label);
-		n.setName(name);
+//		n.setLabel(label);
+//		n.setName(name);
 		return n;
 	}
 
@@ -294,62 +287,62 @@ public class AotNode extends SimpleNodeImpl
 
 	// -------------------------- NamedAndLabelled
 
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
-	 * on which sets base their unicity of element constraint.
-	 */
-	@Override
-	public Named setName(String name) {
-		if (this.name==null)
-			this.name = name;
-		else
-			throw new AotException("Attempt to rename node "+this.name+" to "+name);
-
-		return this;
-	}
-
-	@Override
-	public boolean sameName(Named item) {
-		return this.hasName(item.getName());
-	}
-
-	@Override
-	public boolean hasName(String name) {
-		return Objects.equals(this.name, name);
-	}
-
-	@Override
-	public String getLabel() {
-		return label;
-	}
-
-	/**
-	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
-	 * on which sets base their unicity of element constraint.
-	 */
-	@Override
-	public Labelled setLabel(String label) {
-		if (this.label==null)
-			this.label = label;
-		else
-			throw new AotException("Attempt to relabel node "+this.label+" to "+label);
-		return this;
-	}
-
-	@Override
-	public boolean sameLabel(Labelled item) {
-		return hasLabel(item.getLabel());
-	}
-
-	@Override
-	public boolean hasLabel(String label) {
-		return Objects.equals(this.label, label);
-	}
+//	@Override
+//	public String getName() {
+//		return name;
+//	}
+//
+//	/**
+//	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
+//	 * on which sets base their unicity of element constraint.
+//	 */
+//	@Override
+//	public Named setName(String name) {
+//		if (this.name==null)
+//			this.name = name;
+//		else
+//			throw new AotException("Attempt to rename node "+this.name+" to "+name);
+//
+//		return this;
+//	}
+//
+//	@Override
+//	public boolean sameName(Named item) {
+//		return this.hasName(item.getName());
+//	}
+//
+//	@Override
+//	public boolean hasName(String name) {
+//		return Objects.equals(this.name, name);
+//	}
+//
+//	@Override
+//	public String getLabel() {
+//		return label;
+//	}
+//
+//	/**
+//	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
+//	 * on which sets base their unicity of element constraint.
+//	 */
+//	@Override
+//	public Labelled setLabel(String label) {
+//		if (this.label==null)
+//			this.label = label;
+//		else
+//			throw new AotException("Attempt to relabel node "+this.label+" to "+label);
+//		return this;
+//	}
+//
+//	@Override
+//	public boolean sameLabel(Labelled item) {
+//		return hasLabel(item.getLabel());
+//	}
+//
+//	@Override
+//	public boolean hasLabel(String label) {
+//		return Objects.equals(this.label, label);
+//	}
 
 	// ------------------- Configurable
 
@@ -416,7 +409,7 @@ public class AotNode extends SimpleNodeImpl
 		if (!AotNode.class.isAssignableFrom(obj.getClass()))
 			return false;
 		AotNode n = (AotNode) obj;
-		return (getLabel().equals(n.getLabel()) && getName().equals(n.getName()));
+		return (classId().equals(n.classId()) && instanceId().equals(n.instanceId()));
 	}
 
 	// Tricky: without this, the above method wont be called and two identically labelled+named

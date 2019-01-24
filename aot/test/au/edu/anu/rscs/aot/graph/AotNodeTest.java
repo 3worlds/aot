@@ -64,22 +64,17 @@ class AotNodeTest {
 	@BeforeEach
 	private void init() {
 		graph = new AotGraph();
-		node = new AotNode(null,graph);
+		node = new AotNode("bidon",graph);
 	}
 	
 	@BeforeEach
 	private void init2() {
 		AotGraph graph = new AotGraph();
-		node1 = new AotNode(null,graph);
-		node1.setName("1");
-		node2 = new AotNode(null,null,graph);
-		node2.setName("2");
-		node3 = new AotNode(null,null,graph);
-		node3.setName("3");
-		node4 = new AotNode(null,null,graph);
-		node4.setName("4");
-		node5 = new AotNode(null,null,graph);
-		node5.setName("5");
+		node1 = new AotNode(null,"1",graph);
+		node2 = new AotNode(null,"2",graph);
+		node3 = new AotNode(null,"3",graph);
+		node4 = new AotNode(null,"4",graph);
+		node5 = new AotNode(null,"5",graph);
 		e1 = graph.makeEdge(node1, node2);
 		e2 = graph.makeEdge(node1, node3);
 		e3 = graph.makeEdge(node3, node4);
@@ -99,9 +94,8 @@ class AotNodeTest {
 
 	@Test
 	void testInstanceId() {
-		assertEquals(node.instanceId(),"");
-		node.setName("bidon");
 		assertEquals(node.instanceId(),"bidon");
+		assertEquals(node1.instanceId(),"1");
 	}
 
 	@Test
@@ -114,7 +108,6 @@ class AotNodeTest {
 		node.setProperty("x", 1);
 		node.setProperty("y", 2);
 		node.setProperty("z", 3.0);
-		node.setName("bidon");
 //		show("testAddPropertiesListOfString",node.toDetailedString());
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT x=1 y=2 z=3.0]");
 	}
@@ -125,7 +118,6 @@ class AotNodeTest {
 		node.setProperty("x", 1);
 		node.setProperty("y", 2);
 		node.setProperty("z", 3.0);
-		node.setName("bidon");
 //		show("testAddPropertiesStringArray",node.toDetailedString());
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT x=1 y=2 z=3.0]");
 	}
@@ -137,7 +129,6 @@ class AotNodeTest {
 		pl.setProperty("b",2);
 		pl.setProperty("c",3);
 		node.addProperties(pl);
-		node.setName("bidon");
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=1 b=2 c=3]");
 	}
 
@@ -145,7 +136,6 @@ class AotNodeTest {
 	void testAddPropertyProperty() {
 		Property p = new Property("a",1);
 		node.addProperty(p);
-		node.setName("bidon");
 //		show("testAddPropertyProperty",node.toDetailedString());
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=1]");
 	}
@@ -154,14 +144,12 @@ class AotNodeTest {
 	void testAddPropertyString() {
 		node.addProperty("a");
 		node.setProperty("a",2);
-		node.setName("bidon");
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=2]");
 	}
 
 	@Test
 	void testAddPropertyStringObject() {
 		node.addProperty("a",3);
-		node.setName("bidon");
 		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT a=3]");
 	}
 
@@ -179,7 +167,7 @@ class AotNodeTest {
 		show("testRemoveAllProperties",node.toDetailedString());
 		node.removeAllProperties();
 		show("testRemoveAllProperties",node.toDetailedString());
-		assertEquals(node.toDetailedString(),"AOTNode:=[ROOT]");
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT]");
 	}
 
 	@Test
@@ -191,7 +179,7 @@ class AotNodeTest {
 		show("testRemoveProperty",node.toDetailedString());
 		node.removeProperty("y");
 		show("testRemoveProperty",node.toDetailedString());
-		assertEquals(node.toDetailedString(),"AOTNode:=[ROOT x=1 z=3.0]");
+		assertEquals(node.toDetailedString(),"AOTNode:bidon=[ROOT x=1 z=3.0]");
 	}
 
 	@Test
@@ -200,14 +188,10 @@ class AotNodeTest {
 		node.setProperty("x", 1);
 		node.setProperty("y", 2);
 		node.setProperty("z", 3.0);
-		node.setName("coucou");
-		node.setLabel("zoziau");
 		show("testClone",node.toDetailedString());
 		AotNode n = node.clone();
 		show("testClone",n.toDetailedString());
 		assertNotNull(n);
-		assertTrue(node.sameLabel(n));
-		assertFalse(node.sameName(n));
 	}
 
 	@Test
@@ -270,10 +254,8 @@ class AotNodeTest {
 
 	@Test
 	void testGetChildren() {
-		AotNode n = new AotNode(graph);
-		n.setName("1");		
-		AotNode n2 = new AotNode(graph);
-		n2.setName("2");
+		AotNode n = new AotNode("1",graph);
+		AotNode n2 = new AotNode("2",graph);
 		node.addChild(n);
 		node.addChild(n); // this should fail silently because container is a Set
 		node.addChild(n2);
@@ -304,10 +286,8 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenTreeNodeArray() {
-		AotNode n = new AotNode(graph);
-		n.setName("1");		
-		AotNode n2 = new AotNode(graph);
-		n2.setName("2");
+		AotNode n = new AotNode("1",graph);
+		AotNode n2 = new AotNode("2",graph);
 		assertFalse(node.hasChildren());
 		node.setChildren(n,n2);
 		assertTrue(node.hasChildren());
@@ -315,10 +295,8 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenIterableOfTreeNode() {
-		AotNode n = new AotNode(graph);
-		n.setName("1");		
-		AotNode n2 = new AotNode(graph);
-		n2.setName("2");
+		AotNode n = new AotNode("1",graph);
+		AotNode n2 = new AotNode("2",graph);
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
 		l.add(n2);
@@ -330,10 +308,8 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenCollectionOfTreeNode() {
-		AotNode n = new AotNode(graph);
-		n.setName("1");		
-		AotNode n2 = new AotNode(graph);
-		n2.setName("2");
+		AotNode n = new AotNode("1",graph);
+		AotNode n2 = new AotNode("2",graph);
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
 		l.add(n2);
@@ -462,68 +438,6 @@ class AotNodeTest {
 	void testnodeFactory() {
 		show("testnodeFactory",node2.nodeFactory().toString());
 		assertFalse(node.nodeFactory().equals(node1.nodeFactory()));
-	}
-
-	@Test
-	void testGetName() {
-		assertEquals(node1.getName(),"1");		
-	}
-
-	@Test
-	void testSetName() {
-		AotNode n = new AotNode(null,null,node.nodeFactory());
-		assertNull(n.getName());
-		n.setName("bidon");
-		assertEquals(n.getName(),"bidon");
-		// name can only be set once:
-		n.setName("truc");
-		show("testSetName",n.toDetailedString());
-		assertEquals(n.getName(),"bidon");
-	}
-
-	@Test
-	void testSameName() {
-		AotGraph g = new AotGraph();
-		AotNode n = new AotNode(null,null,g);
-		n.setName("2");
-		assertTrue(n.sameName(node2));
-		assertFalse(n.sameName(node1));		
-	}
-
-	@Test
-	void testHasName() {
-		AotNode n = new AotNode(null,null,node.nodeFactory());
-		assertFalse(n.hasName("bidon"));
-		n.setName("bidon");
-		assertTrue(n.hasName("bidon"));
-	}
-
-	@Test
-	void testGetLabel() {
-		assertEquals(node.getLabel(),"AOTNode");
-	}
-
-	@Test
-	void testSetLabel() {
-		AotGraph g = new AotGraph();
-		AotNode n = new AotNode(null,null,g);
-		assertNull(n.getLabel());
-		n.setLabel("bla");
-		assertEquals(n.getLabel(),"bla");
-		// label can only be set once
-		n.setLabel("bli");
-		assertEquals(n.getLabel(),"bla");
-	}
-
-	@Test
-	void testSameLabel() {
-		assertTrue(node.sameLabel(node1));
-		assertFalse(node.sameLabel(e1));
-	}
-
-	@Test
-	void testHasLabel() {
-		assertTrue(node.hasLabel("AOTNode"));
 	}
 
 	@Test

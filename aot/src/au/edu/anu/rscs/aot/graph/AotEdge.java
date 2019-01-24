@@ -42,9 +42,6 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.ResizeablePropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
-import fr.ens.biologie.generic.Labelled;
-import fr.ens.biologie.generic.Named;
-import fr.ens.biologie.generic.NamedAndLabelled;
 import fr.ens.biologie.generic.Sealable;
 
 
@@ -55,14 +52,14 @@ import fr.ens.biologie.generic.Sealable;
  *
  */
 public class AotEdge extends SimpleEdgeImpl 
-		implements ExtendablePropertyList, NamedAndLabelled {
+		implements ExtendablePropertyList {
 
 	private static String defaultLabel = "AOTEdge";
 	
 	// this holds the properties
 	private ExtendablePropertyList properties;
 	// the name
-	private String name = null;
+//	private String name = null;
 	// the label - remember that label+name = uniqueID within the graph context
 	private String label = null;
 
@@ -74,10 +71,18 @@ public class AotEdge extends SimpleEdgeImpl
 	 * @param end the end node
 	 * @param factory the AotGraph
 	 */
-	protected AotEdge(Node start, Node end, AotGraph factory) {
+	protected AotEdge(Node start, Node end, String label, String name, AotGraph factory) {
+		super(name,start,end,factory);
+		properties = new ExtendablePropertyListImpl();
+		this.label = label;
+	}
+	
+	// this one will generate a name
+	protected AotEdge(Node start, Node end, String label, AotGraph factory) {
 		super(start,end,factory);
 		properties = new ExtendablePropertyListImpl();
-	}
+		this.label = label;
+	}	
 	
 	/**
 	 * Constructor with properties
@@ -86,11 +91,17 @@ public class AotEdge extends SimpleEdgeImpl
 	 * @param properties the property list (copied)
 	 * @param factory the AotGraph
 	 */
-	protected AotEdge(Node start, Node end, ReadOnlyPropertyList properties, AotGraph factory) {
-		this(start,end,factory);
+	protected AotEdge(Node start, Node end, String label, String name, ReadOnlyPropertyList properties, AotGraph factory) {
+		this(start,end,label,name,factory);
 		this.properties.addProperties(properties);
 	}
 
+	protected AotEdge(Node start, Node end, String label, ReadOnlyPropertyList properties, AotGraph factory) {
+		this(start,end,label,factory);
+		this.properties.addProperties(properties);
+	}
+
+	
 	// -----------------------ExtendablePropertyList
 	@Override
 	public ResizeablePropertyList addProperties(List<String> keys) {
@@ -187,57 +198,57 @@ public class AotEdge extends SimpleEdgeImpl
 	}
 
 	// -----------------------------NamedAndLabelled
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
-	 * on which sets base their unicity of element constraint.
-	 */
-	@Override
-	public Named setName(String name) {	
-		if (this.name==null)
-			this.name = name;
-		return this;
-	}
-
-	@Override
-	public boolean sameName(Named item) {
-		return hasName(item.getName());
-	}
-
-	@Override
-	public boolean hasName(String name) {
-		return Objects.equals(this.name, name);
-	}
-
-	@Override
-	public String getLabel() {
-		return label;
-	}
-
-	/**
-	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
-	 * on which sets base their unicity of element constraint.
-	 */
-	@Override
-	public Labelled setLabel(String label) {
-		if (this.label==null)
-			this.label = label;
-		return this;
-	}
-
-	@Override
-	public boolean sameLabel(Labelled item) {
-		return hasLabel(item.getLabel());
-	}
-
-	@Override
-	public boolean hasLabel(String label) {
-		return Objects.equals(this.label, label);
-	}
+//	@Override
+//	public String getName() {
+//		return name;
+//	}
+//
+//	/**
+//	 * NOTE: name can only be set once, since it is used as unique ID in equality tests,
+//	 * on which sets base their unicity of element constraint.
+//	 */
+//	@Override
+//	public Named setName(String name) {	
+//		if (this.name==null)
+//			this.name = name;
+//		return this;
+//	}
+//
+//	@Override
+//	public boolean sameName(Named item) {
+//		return hasName(item.getName());
+//	}
+//
+//	@Override
+//	public boolean hasName(String name) {
+//		return Objects.equals(this.name, name);
+//	}
+//
+//	@Override
+//	public String getLabel() {
+//		return label;
+//	}
+//
+//	/**
+//	 * NOTE: label can only be set once, since it is used as unique ID in equality tests,
+//	 * on which sets base their unicity of element constraint.
+//	 */
+//	@Override
+//	public Labelled setLabel(String label) {
+//		if (this.label==null)
+//			this.label = label;
+//		return this;
+//	}
+//
+//	@Override
+//	public boolean sameLabel(Labelled item) {
+//		return hasLabel(item.getLabel());
+//	}
+//
+//	@Override
+//	public boolean hasLabel(String label) {
+//		return Objects.equals(this.label, label);
+//	}
 
 	// ---------------------------Identifiable (from both Node and TreeNode). 
 	@Override
@@ -245,13 +256,6 @@ public class AotEdge extends SimpleEdgeImpl
 		if (label==null)
 			return defaultLabel;
 		return label;
-	}
-
-	@Override
-	public String instanceId() {
-		if (name==null)
-			return "";
-		return name;
 	}
 
 }

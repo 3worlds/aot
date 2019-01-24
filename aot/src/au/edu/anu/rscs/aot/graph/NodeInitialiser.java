@@ -192,7 +192,7 @@ public class NodeInitialiser {
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_AFTER)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER))) {
 			for (AotEdge edge : uiaEdges)
-				node.nodeFactory().makeEdge(node,edge.endNode()).setLabel(DEPENDENCY);
+				node.nodeFactory().makeEdge(node,edge.endNode(),DEPENDENCY,"");
 //				node.newEdge((AotNode)edge.endNode(), DEPENDENCY);
 		}
 		for (AotNode node : nodeList.nodes()) {
@@ -201,7 +201,7 @@ public class NodeInitialiser {
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE))) {
 			for (AotEdge edge : uibEdges)
 //				((AotNode)edge.endNode()).newEdge(node, DEPENDENCY);
-				node.nodeFactory().makeEdge(edge.endNode(),node).setLabel(DEPENDENCY);
+				node.nodeFactory().makeEdge(edge.endNode(),node,DEPENDENCY,"");
 		}
 	}
 
@@ -233,7 +233,7 @@ public class NodeInitialiser {
 					for (AotNode dep : nodeList.nodes())
 						if (order(dep) > -1 && order(dep) < order)
 //							node.newEdge(dep, DEPENDENCY);
-							node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
 				}
 
 			if (hasInitialiseAfterClasses(node)) {
@@ -245,11 +245,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (afterClass.isInstance(dep))
 //								node.newEdge(dep, DEPENDENCY);
-								node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
 						} else {
-							if (afterClass.getName().equals(dep.getName()))
+							if (afterClass.getName().equals(dep.classId()))
 //								node.newEdge(dep, DEPENDENCY);
-								node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
 						}
 			}
 			if (hasInitialiseBeforeClasses(node)) {
@@ -261,11 +261,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (beforeClass.isInstance(dep))
 //								dep.newEdge(node, DEPENDENCY);
-								node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
 						} else {
-							if (beforeClass.getName().equals(dep.getName()))
+							if (beforeClass.getName().equals(dep.classId()))
 //								dep.newEdge(node, DEPENDENCY);
-								node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+								node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
 						}
 					}
 			}
@@ -275,7 +275,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							node.newEdge(dep, DEPENDENCY);
-							node.nodeFactory().makeEdge(node,dep).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
 
 			if (hasInitialiseBeforeNodesMatching(node))
 				for (String ref : beforeNodesMatching(node))
@@ -283,7 +283,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							dep.newEdge(node, DEPENDENCY);
-							node.nodeFactory().makeEdge(dep,node).setLabel(DEPENDENCY);
+							node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
 		}
 	}
 
@@ -311,7 +311,11 @@ public class NodeInitialiser {
 			for (AotEdge e : outEdges) {
 //			for (Edge e : n.getOutEdges(hasTheLabel(DEPENDENCY))) {
 				AotNode m = (AotNode) e.endNode();
-				e.setLabel(REMOVED);
+				
+				// TODO: FLAW HERE;
+				
+//				e.setLabel(REMOVED);
+				
 				List<AotEdge> inEdges = (List<AotEdge>) get(m, 
 					inEdges(),
 					selectZeroOrMany(hasTheLabel(DEPENDENCY)));
