@@ -186,66 +186,6 @@ public class AotEdge extends SimpleEdgeImpl
 		return properties.isSealed();
 	}
 
-	// ---------------- edge
-//	@Override
-//	public Element addConnectionsLike(Element element) {
-//		edge.addConnectionsLike(element);
-//		return edge;
-//	}
-//
-//	@Override
-//	public Element disconnect() {
-//		edge.disconnect();
-//		return edge;
-//	}
-//
-//	@Override
-//	public GraphElementFactory graphElementFactory() {
-//		return factory;
-//	}
-//
-//	@Override
-//	public Collection<Node> traversal(int distance) {
-//		return edge.traversal(distance);
-//	}
-//
-//	@Override
-//	public Collection<? extends Node> traversal(int distance, Direction direction) {
-//		return edge.traversal(distance, direction);
-//	}
-//
-//	@Override
-//	public String instanceId() {
-//		return edge.instanceId();
-//	}
-//
-//	@Override
-//	public Node endNode() {
-//		return edge.endNode();
-//	}
-//
-//	@Override
-//	public Node otherNode(Node other) {
-//		return edge.otherNode(other);
-//	}
-//
-//	@Override
-//	public Edge setEndNode(Node node) {
-//		edge.setEndNode(node);
-//		return edge;
-//	}
-//
-//	@Override
-//	public Edge setStartNode(Node node) {
-//		edge.setStartNode(node);
-//		return edge;
-//	}
-//
-//	@Override
-//	public Node startNode() {
-//		return edge.startNode();
-//	}
-
 	// -----------------------------NamedAndLabelled
 	@Override
 	public String getName() {
@@ -257,7 +197,7 @@ public class AotEdge extends SimpleEdgeImpl
 	 * on which sets base their unicity of element constraint.
 	 */
 	@Override
-	public Named setName(String name) {
+	public Named setName(String name) {	
 		if (this.name==null)
 			this.name = name;
 		return this;
