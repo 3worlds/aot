@@ -77,6 +77,13 @@ class AotGraphParserTest {
 			"[process:growth] appliesTo  [category:plant]\n", 
 			"[process:growth] function  [function:some computation]\n"};
 	
+	String[] test2 = {"aot // saved by AotGraphExporter on Thu Jan 24 16:25:55 AEDT 2019\n", 
+			"\n", 
+			"// TREE\n", 
+			"3Worlds myProject\n", 
+			"\n",
+			"// CROSS-LINKS"};
+	
 	@Test
 	void testParse() {
 		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test));
@@ -125,6 +132,13 @@ class AotGraphParserTest {
 				"	appliesTo: [process:growth-->category:animal]\n" + 
 				"	appliesTo: [process:growth-->category:plant]\n" + 
 				"	function: [process:growth-->function:some computation]\n");
+	}
+	
+	@Test
+	void testParse2() {
+		AotGraphParser p = new AotGraphParser(new AotGraphTokenizer(test2));
+		p.parse();
+		System.out.println(p.toString());
 	}
 
 	@Test
