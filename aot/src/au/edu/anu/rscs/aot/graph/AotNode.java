@@ -32,6 +32,7 @@ package au.edu.anu.rscs.aot.graph;
 import java.util.List;
 import java.util.Set;
 import au.edu.anu.rscs.aot.graph.property.Property;
+import fr.cnrs.iees.graph.impl.TreeGraphNode;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -142,7 +143,7 @@ public class AotNode extends TreeGraphNode
 	// need careful checking
 	@Override
 	public AotNode clone() {
-		AotNode n = new AotNode(label,nodeFactory(),properties);
+		AotNode n = new AotNode(label,(AotGraph)nodeFactory(),properties);
 		return n;
 	}
 
@@ -181,9 +182,18 @@ public class AotNode extends TreeGraphNode
 		return ((Sealable) properties).isSealed();
 	}
 
+	// Configurable
+	
 	@Override
 	public Configurable initialise() {
 		return this;
+	}
+	
+	// Node
+	
+	@Override
+	public AotGraph nodeFactory() {
+		return (AotGraph) super.nodeFactory();
 	}
 	
 }

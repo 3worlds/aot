@@ -31,20 +31,16 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
-import au.edu.anu.rscs.aot.collections.QuickListOfLists;
-import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.tree.Tree;
 import fr.cnrs.iees.tree.TreeNode;
 import fr.cnrs.iees.tree.TreeNodeFactory;
 import fr.ens.biologie.generic.Textable;
@@ -157,29 +153,34 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 
 	// ----------------------TREE FACTORY -----------------------------
 
+	// creates a node with a generated unique id as name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
 		return makeTreeNode(parent, null, null, props);
 	}
 
+	// creates a node with a generated unique id as name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
 		return makeTreeNode(parent, null, null, null);
 	}
 
+	// create a node with a name - will crash if name is null
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label, String name) {
 		return makeTreeNode(parent, label, name, null);
 	}
 
+	// creates a node with an empty name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label) {
-		return makeTreeNode(parent, label, null, null);
+		return makeTreeNode(parent, label, "", null);
 	}
 
+	// creates a node with an empty name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String label, SimplePropertyList properties) {
-		return makeTreeNode(parent, label, null, properties);
+		return makeTreeNode(parent, label, "", properties);
 	}
 
 	/**

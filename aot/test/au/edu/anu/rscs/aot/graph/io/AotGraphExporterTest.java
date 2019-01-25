@@ -66,7 +66,7 @@ class AotGraphExporterTest {
 		g.makeTreeNode(eco,"engine","my simulator",null);
 		AotNode sys = g.makeTreeNode(eco,"system","entity",pl3);
 		AotNode proc = g.makeTreeNode(eco,"process","growth",null);
-		AotNode cds = g.makeTreeNode(tw,"codeSource",null,null);
+		AotNode cds = g.makeTreeNode(tw,"codeSource","",null);
 		AotNode fu = g.makeTreeNode(cds,"function","some computation",pl2);
 		g.makeEdge(proc,cat,"appliesTo",null,null);
 		g.makeEdge(proc,cat2,"appliesTo",null,null);
