@@ -143,7 +143,7 @@ public class AotNode extends TreeGraphNode
 	// need careful checking
 	@Override
 	public AotNode clone() {
-		AotNode n = new AotNode(label,(AotGraph)nodeFactory(),properties);
+		AotNode n = new AotNode(classId(),(AotGraph)nodeFactory(),properties);
 		return n;
 	}
 
