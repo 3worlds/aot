@@ -41,8 +41,8 @@ import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.tree.TreeNode;
-import fr.cnrs.iees.tree.TreeNodeFactory;
+import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.graph.TreeNodeFactory;
 import fr.ens.biologie.generic.Textable;
 
 /**
