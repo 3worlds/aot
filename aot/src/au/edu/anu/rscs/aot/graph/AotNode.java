@@ -195,5 +195,10 @@ public class AotNode extends TreeGraphNode
 	public AotGraph nodeFactory() {
 		return (AotGraph) super.nodeFactory();
 	}
+
+	//Ok??
+	public String getLabel() {
+		return nodeFactory().nodeClassName(getClass());
+	}
 	
 }
