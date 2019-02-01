@@ -32,13 +32,14 @@ package au.edu.anu.rscs.aot.graph;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
+import java.util.Map;
 import au.edu.anu.rscs.aot.AotException;
+import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraph;
+import fr.cnrs.iees.graph.impl.TreeGraphFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.graph.TreeNode;
@@ -67,15 +68,27 @@ import fr.ens.biologie.generic.Textable;
 public class AotGraph extends TreeGraph<AotNode,AotEdge> 
 	implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
 
-	private Logger log = Logger.getLogger(AotGraph.class.getName());
+	private TreeGraphFactory factory = null;
 
 	// constructors
 	public AotGraph() {
 		super();
+		factory = new TreeGraphFactory();
 	}
 
 	public AotGraph(Iterable<AotNode> list) {
 		super(list);
+		factory = new TreeGraphFactory();
+	}
+	
+	public AotGraph(Iterable<AotNode> list,Map<String,String> labels) {
+		super(list);
+		factory = new TreeGraphFactory(labels);
+	}
+
+	public AotGraph(Map<String,String> labels) {
+		super();
+		factory = new TreeGraphFactory(labels);
 	}
 
 	/**
@@ -101,112 +114,137 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 	// proper spot. We dont want free-floating nodes in an AOT graph because it's a
 	// tree.
 	@Override
-	public AotNode makeNode(String arg0, String arg1, ReadOnlyPropertyList arg2) {
-		throw new AotException("Attempt to instantiate an AotNode outside of the tree context.");
+	public Node makeNode() {
+		throw new AotException("Use of makeNode(...) is discouraged. use makeTreeNode(...) instead.");
 	}
+
+	@Override
+	public Node makeNode(ReadOnlyPropertyList arg0) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(String arg0) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(Class<? extends Node> arg0) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(String arg0, ReadOnlyPropertyList arg1) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(Class<? extends Node> arg0, String arg1) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(Class<? extends Node> arg0, ReadOnlyPropertyList arg1) {
+		return makeNode();
+	}
+
+	@Override
+	public Node makeNode(Class<? extends Node> arg0, String arg1, ReadOnlyPropertyList arg2) {
+		return makeNode();
+	}
+
 
 	// ---------------------- EDGE FACTORY -------------------------
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end) {
-		return makeEdge(start, end, null, null, null);
+		return (AotEdge) factory.makeEdge(AotEdge.class, start, end);
 	}
 
 	@Override
 	public AotEdge makeEdge(Node start, Node end, ReadOnlyPropertyList props) {
-		return makeEdge(start, end, null, null, props);
+		return (AotEdge) factory.makeEdge(AotEdge.class, start, end, props);
 	}
 
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String label, ReadOnlyPropertyList props) {
-		return makeEdge(start, end, label, null, props);
+	public AotEdge makeEdge(Node start, Node end, String proposedId, ReadOnlyPropertyList props) {
+		return (AotEdge) factory.makeEdge(AotEdge.class, start, end, proposedId, props);
 	}
 
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String label, String name) {
-		return makeEdge(start, end, label, name, null);
+	public AotEdge makeEdge(Node start, Node end, String proposedId) {
+		return (AotEdge) factory.makeEdge(AotEdge.class, start, end, proposedId);
+	}
+	
+	@Override
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end) {
+		return  (AotEdge) factory.makeEdge(edgeClass, start, end);
 	}
 
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String label) {
-		return makeEdge(start, end, label, null, null);
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
+			String proposedId) {
+		return  (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId);
 	}
 
-	// use with caution - name+label must be unique within the graph
 	@Override
-	public AotEdge makeEdge(Node start, Node end, String label, String name, ReadOnlyPropertyList props) {
-		AotEdge result;
-		if (props != null)
-			if (name!=null)
-				result = new AotEdge(start, end, label, name, props, this);
-			else
-				result = new AotEdge(start, end, label, "", props, this);
-		else
-			if (name!=null)
-				result = new AotEdge(start, end, label, name, this);
-			else
-				result = new AotEdge(start, end, label, "", this);
-//		result.setLabel(label);
-//		result.setName(name);
-		return result;
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
+			ReadOnlyPropertyList props) {
+		return  (AotEdge) factory.makeEdge(edgeClass, start, end, props);
 	}
+
+	@Override
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
+			String proposedId, ReadOnlyPropertyList props) {
+		return  (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId, props);
+	}
+
 
 	// ----------------------TREE FACTORY -----------------------------
 
-	// creates a node with a generated unique id as name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
-		return makeTreeNode(parent, null, null, props);
+		return (AotNode) factory.makeTreeNode(AotNode.class, parent, props);
 	}
 
-	// creates a node with a generated unique id as name
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		return makeTreeNode(parent, null, null, null);
+		return (AotNode) factory.makeTreeNode(AotNode.class, parent);
 	}
 
-	// create a node with a name - will crash if name is null
 	@Override
-	public AotNode makeTreeNode(TreeNode parent, String label, String name) {
-		return makeTreeNode(parent, label, name, null);
+	public AotNode makeTreeNode(TreeNode parent, String proposedId) {
+		return (AotNode) factory.makeTreeNode(AotNode.class, parent, proposedId);
 	}
 
-	// creates a node with an empty name
 	@Override
-	public AotNode makeTreeNode(TreeNode parent, String label) {
-		return makeTreeNode(parent, label, "", null);
+	public AotNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
+		return (AotNode) factory.makeTreeNode(AotNode.class, parent,proposedId,  properties);
 	}
 
-	// creates a node with an empty name
 	@Override
-	public AotNode makeTreeNode(TreeNode parent, String label, SimplePropertyList properties) {
-		return makeTreeNode(parent, label, "", properties);
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent) {
+		return (AotNode) factory.makeTreeNode(nodeClass, parent);
 	}
 
-	/**
-	 * A node which label and name duplicates a node already in the tree will not be
-	 * created nor inserted, a warning will be issued instead. If no label is given,
-	 * the label defaults to "AOTNode". If no label nor name are given, the name
-	 * defaults to a unique ID, so that the node is always created.
-	 */
 	@Override
-	public AotNode makeTreeNode(TreeNode parent, String label, String name, SimplePropertyList props) {
-		AotNode node;
-		if (name==null)
-			node = new AotNode(label,this,props);
-		else
-			node = new AotNode(label,name,this,props);
-		if (!nodes.add(node)) {
-			log.warning(() -> "Duplicate Node insertion: " + node.toDetailedString());
-			return null;
-		} else {
-			node.setParent(parent);
-			if (parent != null)
-				parent.addChild(node);
-			return node;
-		}
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
+			SimplePropertyList properties) {
+		return (AotNode) factory.makeTreeNode(nodeClass, parent, properties);
 	}
 
+	@Override
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
+			String proposedId) {
+		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId);
+	}
+
+	@Override
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
+			String proposedId, SimplePropertyList properties) {
+		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId,  properties);
+	}
+	
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 
 	@SuppressWarnings("unchecked")

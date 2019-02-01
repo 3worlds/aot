@@ -59,24 +59,24 @@ class AotGraphExporterTest {
 		SimplePropertyList pl2 = new SimplePropertyListImpl("a","b");
 		SimplePropertyList pl3 = new SimplePropertyListImpl("i","j","k","l");
 		AotNode tw = g.makeTreeNode(null,"3Worlds");
-		AotNode eco = g.makeTreeNode(tw,"ecology","my model",pl2);
-		g.makeTreeNode(tw,"experiment","my experiment",null);
-		AotNode cat = g.makeTreeNode(eco,"category","animal",pl1);
-		AotNode cat2 = g.makeTreeNode(eco,"category","plant",pl1);
-		g.makeTreeNode(eco,"engine","my simulator",null);
-		AotNode sys = g.makeTreeNode(eco,"system","entity",pl3);
-		AotNode proc = g.makeTreeNode(eco,"process","growth",null);
-		AotNode cds = g.makeTreeNode(tw,"codeSource","",null);
-		AotNode fu = g.makeTreeNode(cds,"function","some computation",pl2);
-		g.makeEdge(proc,cat,"appliesTo",null,null);
-		g.makeEdge(proc,cat2,"appliesTo",null,null);
-		g.makeEdge(sys,cat,"belongsTo","random name",null);
-		g.makeEdge(proc,fu,"function",null,null);		
+		AotNode eco = g.makeTreeNode(tw,"ecology",pl2);
+		g.makeTreeNode(tw,"experiment",null);
+		AotNode cat = g.makeTreeNode(eco,"category_animal",pl1);
+		AotNode cat2 = g.makeTreeNode(eco,"category_plant",pl1);
+		g.makeTreeNode(eco,"engine",null);
+		AotNode sys = g.makeTreeNode(eco,"system_entity",pl3);
+		AotNode proc = g.makeTreeNode(eco,"process_growth",null);
+		AotNode cds = g.makeTreeNode(tw,"codeSource",null);
+		AotNode fu = g.makeTreeNode(cds,"function",pl2);
+		g.makeEdge(proc,cat,"appliesTo",null);
+		g.makeEdge(proc,cat2,"appliesTo",null);
+		g.makeEdge(sys,cat,"belongsTo",null);
+		g.makeEdge(proc,fu,"function",null);		
 		g.root();
 		// add a stupid node
 		g.makeTreeNode(cds);
 		// add a duplicate node - this should issue a warning and not insert the node
-		g.makeTreeNode(tw,"experiment","my experiment",null);
+		g.makeTreeNode(tw,"experiment",null);
 	}
 	
 	@Test

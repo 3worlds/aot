@@ -32,9 +32,11 @@ package au.edu.anu.rscs.aot.graph;
 import java.util.List;
 import java.util.Set;
 
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.impl.SimpleEdgeImpl;
+import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -52,15 +54,9 @@ import fr.ens.biologie.generic.Sealable;
  */
 public class AotEdge extends SimpleEdgeImpl 
 		implements ExtendablePropertyList {
-
-	private static String defaultLabel = "AOTEdge";
 	
 	// this holds the properties
 	private ExtendablePropertyList properties;
-	// the name
-//	private String name = null;
-	// the label - remember that label+name = uniqueID within the graph context
-	private String label = null;
 
 	// ----------------------------- Constructors - all protected
 	
@@ -70,18 +66,11 @@ public class AotEdge extends SimpleEdgeImpl
 	 * @param end the end node
 	 * @param factory the AotGraph
 	 */
-	protected AotEdge(Node start, Node end, String label, String name, AotGraph factory) {
-		super(name,start,end,factory);
+	protected AotEdge(Identity id, Node start, Node end, AotGraph factory) {
+		super(id,start,end,factory);
 		properties = new ExtendablePropertyListImpl();
-		this.label = label;
 	}
 	
-	// this one will generate a name
-	protected AotEdge(Node start, Node end, String label, AotGraph factory) {
-		super(start,end,factory);
-		properties = new ExtendablePropertyListImpl();
-		this.label = label;
-	}	
 	
 	/**
 	 * Constructor with properties
@@ -90,16 +79,10 @@ public class AotEdge extends SimpleEdgeImpl
 	 * @param properties the property list (copied)
 	 * @param factory the AotGraph
 	 */
-	protected AotEdge(Node start, Node end, String label, String name, ReadOnlyPropertyList properties, AotGraph factory) {
-		this(start,end,label,name,factory);
+	protected AotEdge(Identity id, Node start, Node end, ReadOnlyPropertyList properties, AotGraph factory) {
+		this(id, start,end,factory);
 		this.properties.addProperties(properties);
 	}
-
-	protected AotEdge(Node start, Node end, String label, ReadOnlyPropertyList properties, AotGraph factory) {
-		this(start,end,label,factory);
-		this.properties.addProperties(properties);
-	}
-
 	
 	// -----------------------ExtendablePropertyList
 	@Override
@@ -157,8 +140,8 @@ public class AotEdge extends SimpleEdgeImpl
 	
 	@Override
 	public SimplePropertyList clone() {
-		// TODO Auto-generated method stub
-		return null;
+		// temporary - remove this method later
+		throw new AotException("Edges are not clonable.");
 	}
 
 	@Override
@@ -248,13 +231,5 @@ public class AotEdge extends SimpleEdgeImpl
 //	public boolean hasLabel(String label) {
 //		return Objects.equals(this.label, label);
 //	}
-
-	// ---------------------------Identifiable (from both Node and TreeNode). 
-	@Override
-	public String classId() {
-		if (label==null)
-			return defaultLabel;
-		return label;
-	}
 
 }

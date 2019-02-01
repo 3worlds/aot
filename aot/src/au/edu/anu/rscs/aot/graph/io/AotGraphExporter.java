@@ -29,14 +29,7 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.io;
 
-import static fr.cnrs.iees.io.parsing.impl.TreeGraphTokens.COMMENT;
-
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.logging.Logger;
-
 import au.edu.anu.rscs.aot.graph.AotGraph;
 import fr.cnrs.iees.graph.MinimalGraph;
 import fr.cnrs.iees.graph.io.impl.OmugiGraphExporter;
@@ -50,8 +43,6 @@ import fr.cnrs.iees.graph.io.impl.OmugiGraphExporter;
 //tested OK with version 0.0.5 on 23/1/2019
 public class AotGraphExporter extends OmugiGraphExporter {
 
-	private Logger log = Logger.getLogger(AotGraphExporter.class.getName());
-
 	// Constructors
 	public AotGraphExporter(File file) {
 		super(file);
@@ -64,29 +55,8 @@ public class AotGraphExporter extends OmugiGraphExporter {
 	@Override
 	public void exportGraph(MinimalGraph<?> graph) {
 		if (AotGraph.class.isAssignableFrom(graph.getClass())) {
-			AotGraph g = (AotGraph) graph;
-			try {
-				PrintWriter writer = new PrintWriter(file);
-				Date now = new Date();
-				writer.println("aot "+ COMMENT.prefix()+" saved by "
-						+AotGraphExporter.class.getSimpleName()
-						+" on "+now+"\n");
-				// 1. export tree
-				writer.print(COMMENT.prefix());
-				writer.print(' ');
-				writer.println("TREE");
-				if (g.root()!=null)
-					writeTree(g.root(),writer, 0);
-				// 2. export edge list
-				writer.println();
-				writer.print(COMMENT.prefix());
-				writer.print(' ');
-				writer.println("CROSS-LINKS");
-				exportEdges(g.edges(),writer);
-				writer.close();
-			} catch (FileNotFoundException e) {
-				log.severe("cannot save AOT graph to file \""+file.getPath()+"\" - file not found");
-			}
+			header = "aot";
+			exportTreeGraph((AotGraph)graph);
 		}
 	}
 

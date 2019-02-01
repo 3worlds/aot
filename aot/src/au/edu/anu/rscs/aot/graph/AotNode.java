@@ -31,8 +31,11 @@ package au.edu.anu.rscs.aot.graph;
 
 import java.util.List;
 import java.util.Set;
+
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import fr.cnrs.iees.graph.impl.TreeGraphNode;
+import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -75,17 +78,8 @@ public class AotNode extends TreeGraphNode
 	// ----------------------- Constructors
 
 	// this constructor sets the name to the uniqueID
-	protected AotNode(String label, String name, AotGraph factory, ReadOnlyPropertyList props) {
-		super(label,name,factory,factory,props); 
-		ExtendablePropertyList pl = new ExtendablePropertyListImpl();
-		if (props!=null)
-			pl.addProperties(props);
-		properties = pl;
-	}
-
-	// this is the constructor to use with descendant classes
-	protected AotNode(String label, AotGraph factory, ReadOnlyPropertyList props) {
-		super(label,factory,factory,props); // this generates a name
+	protected AotNode(Identity id, AotGraph factory, ReadOnlyPropertyList props) {
+		super(id,factory,factory,props); 
 		ExtendablePropertyList pl = new ExtendablePropertyListImpl();
 		if (props!=null)
 			pl.addProperties(props);
@@ -143,8 +137,8 @@ public class AotNode extends TreeGraphNode
 	// need careful checking
 	@Override
 	public AotNode clone() {
-		AotNode n = new AotNode(classId(),(AotGraph)nodeFactory(),properties);
-		return n;
+		// temporary - remove this method later
+		throw new AotException("Nodes are not clonable.");
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.DynamicList;
 import fr.cnrs.iees.graph.Direction;
-import fr.cnrs.iees.tree.Tree;
+import fr.cnrs.iees.graph.Tree;
 
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.get;
@@ -99,7 +99,7 @@ public class NodeInitialiser {
 			// Wont work if we use logback library but there is an alternative - see doco
 			log.fine(() -> "  " + String.format("%05d", finalCount) + finalTitle + ": "
 					+ node.getClass().getSimpleName() + " ["
-					+ node.uniqueId() + "]" + annotationString(node));
+					+ node.id() + "]" + annotationString(node));
 		}
 	}
 
@@ -170,13 +170,13 @@ public class NodeInitialiser {
 //		for (Edge dep : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER)))
 		for (AotEdge dep : uiaEdges)
 			result = withComma(result, "after node '"
-					+ ((AotNode)dep.endNode()).uniqueId() + "'");			
+					+ ((AotNode)dep.endNode()).id() + "'");			
 		List<AotEdge> uibEdges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 			selectZeroOrMany(hasTheLabel(USER_INITIALISE_BEFORE)));
 //		for (Edge dep : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE)))
 		for (AotEdge dep : uibEdges)
 			result = withComma(result, "before node '"
-					+ ((AotNode)dep.endNode()).uniqueId() + "'");
+					+ ((AotNode)dep.endNode()).id() + "'");
 		if (result.length() == 0)
 			return "";
 		else
@@ -192,7 +192,7 @@ public class NodeInitialiser {
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_AFTER)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER))) {
 			for (AotEdge edge : uiaEdges)
-				node.nodeFactory().makeEdge(node,edge.endNode(),DEPENDENCY,"");
+				node.nodeFactory().makeEdge(node,edge.endNode(),DEPENDENCY);
 //				node.newEdge((AotNode)edge.endNode(), DEPENDENCY);
 		}
 		for (AotNode node : nodeList.nodes()) {
@@ -201,7 +201,7 @@ public class NodeInitialiser {
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE))) {
 			for (AotEdge edge : uibEdges)
 //				((AotNode)edge.endNode()).newEdge(node, DEPENDENCY);
-				node.nodeFactory().makeEdge(edge.endNode(),node,DEPENDENCY,"");
+				node.nodeFactory().makeEdge(edge.endNode(),node,DEPENDENCY);
 		}
 	}
 
@@ -233,7 +233,7 @@ public class NodeInitialiser {
 					for (AotNode dep : nodeList.nodes())
 						if (order(dep) > -1 && order(dep) < order)
 //							node.newEdge(dep, DEPENDENCY);
-							node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
+							node.nodeFactory().makeEdge(node,dep,DEPENDENCY);
 				}
 
 			if (hasInitialiseAfterClasses(node)) {
@@ -245,11 +245,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (afterClass.isInstance(dep))
 //								node.newEdge(dep, DEPENDENCY);
-								node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
+								node.nodeFactory().makeEdge(node,dep,DEPENDENCY);
 						} else {
 							if (afterClass.getName().equals(dep.classId()))
 //								node.newEdge(dep, DEPENDENCY);
-								node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
+								node.nodeFactory().makeEdge(node,dep,DEPENDENCY);
 						}
 			}
 			if (hasInitialiseBeforeClasses(node)) {
@@ -261,11 +261,11 @@ public class NodeInitialiser {
 						if (subClasses) {
 							if (beforeClass.isInstance(dep))
 //								dep.newEdge(node, DEPENDENCY);
-								node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
+								node.nodeFactory().makeEdge(dep,node,DEPENDENCY);
 						} else {
 							if (beforeClass.getName().equals(dep.classId()))
 //								dep.newEdge(node, DEPENDENCY);
-								node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
+								node.nodeFactory().makeEdge(dep,node,DEPENDENCY);
 						}
 					}
 			}
@@ -275,7 +275,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							node.newEdge(dep, DEPENDENCY);
-							node.nodeFactory().makeEdge(node,dep,DEPENDENCY,"");
+							node.nodeFactory().makeEdge(node,dep,DEPENDENCY);
 
 			if (hasInitialiseBeforeNodesMatching(node))
 				for (String ref : beforeNodesMatching(node))
@@ -283,7 +283,7 @@ public class NodeInitialiser {
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							dep.newEdge(node, DEPENDENCY);
-							node.nodeFactory().makeEdge(dep,node,DEPENDENCY,"");
+							node.nodeFactory().makeEdge(dep,node,DEPENDENCY);
 		}
 	}
 

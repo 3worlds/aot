@@ -46,7 +46,7 @@ import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.SimplePropertyListImpl;
-import fr.cnrs.iees.tree.TreeNode;
+import fr.cnrs.iees.graph.TreeNode;
 
 /**
  * 
@@ -64,17 +64,17 @@ class AotNodeTest {
 	@BeforeEach
 	private void init() {
 		graph = new AotGraph();
-		node = new AotNode(null,"bidon",graph,null);
+		node = graph.makeTreeNode(null,"bidon");
 	}
 	
 	@BeforeEach
 	private void init2() {
 		AotGraph graph = new AotGraph();
-		node1 = new AotNode(null,"1",graph,null);
-		node2 = new AotNode(null,"2",graph,null);
-		node3 = new AotNode(null,"3",graph,null);
-		node4 = new AotNode(null,"4",graph,null);
-		node5 = new AotNode(null,"5",graph,null);
+		node1 = graph.makeTreeNode(null,"1");
+		node2 = graph.makeTreeNode(null,"2");
+		node3 = graph.makeTreeNode(null,"3");
+		node4 = graph.makeTreeNode(null,"4");
+		node5 = graph.makeTreeNode(null,"5");
 		e1 = graph.makeEdge(node1, node2);
 		e2 = graph.makeEdge(node1, node3);
 		e3 = graph.makeEdge(node3, node4);
@@ -94,8 +94,8 @@ class AotNodeTest {
 
 	@Test
 	void testInstanceId() {
-		assertEquals(node.instanceId(),"bidon");
-		assertEquals(node1.instanceId(),"1");
+		assertEquals(node.id(),"bidon");
+		assertEquals(node1.id(),"1");
 	}
 
 	@Test
@@ -246,7 +246,7 @@ class AotNodeTest {
 
 	@Test
 	void testAddChild() {
-		AotNode n = new AotNode("bid",graph,null);
+		AotNode n = graph.makeTreeNode(null,"bid");
 		node.addChild(n);
 		assertTrue(node.hasChild(n));
 		assertFalse(n.getParent()==node);
@@ -254,8 +254,8 @@ class AotNodeTest {
 
 	@Test
 	void testGetChildren() {
-		AotNode n = new AotNode(null,"1",graph,null);
-		AotNode n2 = new AotNode(null,"2",graph,null);
+		AotNode n = graph.makeTreeNode(null,"1");
+		AotNode n2 = graph.makeTreeNode(null,"2");
 		node.addChild(n);
 		node.addChild(n); // this should fail silently because container is a Set
 		node.addChild(n2);
@@ -269,7 +269,7 @@ class AotNodeTest {
 
 	@Test
 	void testGetParent() {
-		AotNode n = new AotNode("bid",graph,null);
+		AotNode n = graph.makeTreeNode(null,"bid");
 		node.setParent(n);
 		show("testGetParent",node.toDetailedString());
 		assertTrue(node.getParent()==n);
@@ -279,15 +279,15 @@ class AotNodeTest {
 	@Test
 	void testHasChildren() {
 		assertFalse(node.hasChildren());
-		AotNode n = new AotNode("bid",graph,null);
+		AotNode n = graph.makeTreeNode(null,"bid");
 		node.addChild(n);
 		assertTrue(node.hasChildren());
 	}
 
 	@Test
 	void testSetChildrenTreeNodeArray() {
-		AotNode n = new AotNode(null,"1",graph,null);
-		AotNode n2 = new AotNode(null,"2",graph,null);
+		AotNode n = graph.makeTreeNode(null,"1");
+		AotNode n2 = graph.makeTreeNode(null,"2");
 		assertFalse(node.hasChildren());
 		node.setChildren(n,n2);
 		assertTrue(node.hasChildren());
@@ -295,8 +295,8 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenIterableOfTreeNode() {
-		AotNode n = new AotNode(null,"1",graph,null);
-		AotNode n2 = new AotNode(null,"2",graph,null);
+		AotNode n = graph.makeTreeNode(null,"1");
+		AotNode n2 = graph.makeTreeNode(null,"2");
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
 		l.add(n2);
@@ -308,8 +308,8 @@ class AotNodeTest {
 
 	@Test
 	void testSetChildrenCollectionOfTreeNode() {
-		AotNode n = new AotNode(null,"1",graph,null);
-		AotNode n2 = new AotNode(null,"2",graph,null);
+		AotNode n = graph.makeTreeNode(null,"1");
+		AotNode n2 = graph.makeTreeNode(null,"2");
 		List<TreeNode> l = new LinkedList<>();
 		l.add(n);
 		l.add(n2);
@@ -320,7 +320,7 @@ class AotNodeTest {
 
 	@Test
 	void testSetParent() {
-		AotNode n = new AotNode("bid",graph,null);
+		AotNode n = graph.makeTreeNode(null,"bid");
 		node.setParent(n);
 		assertTrue(n==node.getParent());
 		assertFalse(n.hasChild(node));
@@ -335,8 +335,8 @@ class AotNodeTest {
 	@SuppressWarnings({"unchecked" })
 	@Test
 	void testDisconnect() {
-		AotNode n = new AotNode(null,"1",node.nodeFactory(),null);
-		AotNode n2 = new AotNode(null,"2",node.nodeFactory(),null);
+		AotNode n = graph.makeTreeNode(null,"1");
+		AotNode n2 = graph.makeTreeNode(null,"2");
 		Edge ed1 = node.nodeFactory().makeEdge(node, n);
 		Edge ed2 = node.nodeFactory().makeEdge(n2, node);
 		Edge ed3 = node.nodeFactory().makeEdge(node, node);
