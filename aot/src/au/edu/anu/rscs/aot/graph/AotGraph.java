@@ -65,8 +65,8 @@ import fr.ens.biologie.generic.Textable;
  *
  */
 
-public class AotGraph extends TreeGraph<AotNode,AotEdge> 
-	implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
+public class AotGraph extends TreeGraph<AotNode, AotEdge>
+		implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
 
 	private TreeGraphFactory factory = null;
 
@@ -80,13 +80,13 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 		super(list);
 		factory = new TreeGraphFactory();
 	}
-	
-	public AotGraph(Iterable<AotNode> list,Map<String,String> labels) {
+
+	public AotGraph(Iterable<AotNode> list, Map<String, String> labels) {
 		super(list);
 		factory = new TreeGraphFactory(labels);
 	}
 
-	public AotGraph(Map<String,String> labels) {
+	public AotGraph(Map<String, String> labels) {
 		super();
 		factory = new TreeGraphFactory(labels);
 	}
@@ -153,7 +153,6 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 		return makeNode();
 	}
 
-
 	// ---------------------- EDGE FACTORY -------------------------
 
 	@Override
@@ -175,76 +174,71 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 	public AotEdge makeEdge(Node start, Node end, String proposedId) {
 		return (AotEdge) factory.makeEdge(AotEdge.class, start, end, proposedId);
 	}
-	
+
 	@Override
 	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end) {
-		return  (AotEdge) factory.makeEdge(edgeClass, start, end);
+		return (AotEdge) factory.makeEdge(edgeClass, start, end);
 	}
 
 	@Override
-	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
-			String proposedId) {
-		return  (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId);
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, String proposedId) {
+		return (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId);
 	}
 
 	@Override
-	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, ReadOnlyPropertyList props) {
+		return (AotEdge) factory.makeEdge(edgeClass, start, end, props);
+	}
+
+	@Override
+	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, String proposedId,
 			ReadOnlyPropertyList props) {
-		return  (AotEdge) factory.makeEdge(edgeClass, start, end, props);
+		return (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId, props);
 	}
-
-	@Override
-	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end, 
-			String proposedId, ReadOnlyPropertyList props) {
-		return  (AotEdge) factory.makeEdge(edgeClass, start, end, proposedId, props);
-	}
-
 
 	// ----------------------TREE FACTORY -----------------------------
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
-		return (AotNode) factory.makeTreeNode(AotNode.class, parent, props);
+		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, props));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		return (AotNode) factory.makeTreeNode(AotNode.class, parent);
+		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId) {
-		return (AotNode) factory.makeTreeNode(AotNode.class, parent, proposedId);
+		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
-		return (AotNode) factory.makeTreeNode(AotNode.class, parent,proposedId,  properties);
+		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId, properties));
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent) {
-		return (AotNode) factory.makeTreeNode(nodeClass, parent);
+		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent));
 	}
 
 	@Override
-	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, SimplePropertyList properties) {
+		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent, properties));
+	}
+
+	@Override
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId) {
+		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent, proposedId));
+	}
+
+	@Override
+	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId,
 			SimplePropertyList properties) {
-		return (AotNode) factory.makeTreeNode(nodeClass, parent, properties);
+		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent, proposedId, properties));
 	}
 
-	@Override
-	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
-			String proposedId) {
-		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId);
-	}
-
-	@Override
-	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, 
-			String proposedId, SimplePropertyList properties) {
-		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId,  properties);
-	}
-	
 	// -------------------- CONFIGURABLE GRAPH ------------------------
 
 	@SuppressWarnings("unchecked")
@@ -268,9 +262,9 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 						Constructor<? extends AotNode> nodeConstructor = nodeClass.getConstructor();
 						// NOTE: a node constructor always has a factory as argument...
 						newNode = nodeConstructor.newInstance(this);
-						
+
 						// TODO: possible flaw here due to removing name and label
-						
+
 //						newNode.setLabel(n.getLabel());
 //						newNode.setName(n.getName());
 						newNode.connectLike(n);
@@ -294,7 +288,7 @@ public class AotGraph extends TreeGraph<AotNode,AotEdge>
 
 	@Override
 	public NodeExceptionList initialise() {
-		// Phew! maybe difficult to generalise 
+		// Phew! maybe difficult to generalise
 		NodeInitialiser initialiser = new NodeInitialiser(this);
 		initialiser.showInitialisationOrder();
 		return initialiser.initialise();

@@ -34,6 +34,8 @@ import java.util.Set;
 
 import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.graph.property.Property;
+import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.graph.TreeNodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraphNode;
 import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
@@ -44,26 +46,33 @@ import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 import fr.ens.biologie.generic.Sealable;
 
 /**
- * <p>Reimplementation of AOTNode</p>
- * <p>Some important points:</p>
+ * <p>
+ * Reimplementation of AOTNode
+ * </p>
+ * <p>
+ * Some important points:
+ * </p>
  * <ul>
- * <li>The label:name pair is used to uniquely identify {@code AotNode}s in replacement for Uids.
- * This means that {@code .equals()} uses these fields to decide if {@code AotNode}s are identical.
- * This also means that {@code Set}s of {@code AotNode}s will rely on these to decide if 
- * items are duplicate. Therefore, name and label should be set at construction time, or 
- * "not too late" after that (eg when loading from a file). To prevent accidental change of 
- * name and label, the {@code setName()} and {@code setLabel()} methods have been protected:
- * name and label can only be changed if they are null, ie only once (or never if
- * a constructor with name and label arguments was used).</li>
- * <li>The {@code addEdge(...)} methods should never be used directly at runtime, because
- * linking two {@code Node}s through an {@code Edge} implies some consistency (ie the 
- * {@code Edge} startNode and endNode fields must be consistent with their respective Edge 
- * lists). In {@link NodeAdapter}, edges are stored in {@link HashSet}s so that it is impossible
- * to mistakenly add the same edge twice. {@link GraphElementFactory} edge creation methods
- * normally take care of node lists, so that an Edge is always consistently created. </li>
- * <li>The same applies to tree management: an {@code AotNode} is always created within the context of
- * a tree, so it must have a parent. {@link TreeNodeFactory} proposes methods to create 
- * a {@code TreeNode} with a parent, which take care of the connection settings.</li>
+ * <li>The label:name pair is used to uniquely identify {@code AotNode}s in
+ * replacement for Uids. This means that {@code .equals()} uses these fields to
+ * decide if {@code AotNode}s are identical. This also means that {@code Set}s
+ * of {@code AotNode}s will rely on these to decide if items are duplicate.
+ * Therefore, name and label should be set at construction time, or "not too
+ * late" after that (eg when loading from a file). To prevent accidental change
+ * of name and label, the {@code setName()} and {@code setLabel()} methods have
+ * been protected: name and label can only be changed if they are null, ie only
+ * once (or never if a constructor with name and label arguments was used).</li>
+ * <li>The {@code addEdge(...)} methods should never be used directly at
+ * runtime, because linking two {@code Node}s through an {@code Edge} implies
+ * some consistency (ie the {@code Edge} startNode and endNode fields must be
+ * consistent with their respective Edge lists). In {@link NodeAdapter}, edges
+ * are stored in {@link HashSet}s so that it is impossible to mistakenly add the
+ * same edge twice. {@link GraphElementFactory} edge creation methods normally
+ * take care of node lists, so that an Edge is always consistently created.</li>
+ * <li>The same applies to tree management: an {@code AotNode} is always created
+ * within the context of a tree, so it must have a parent.
+ * {@link TreeNodeFactory} proposes methods to create a {@code TreeNode} with a
+ * parent, which take care of the connection settings.</li>
  * </ul>
  * 
  * @author Jacques Gignoux - 21 déc. 2018
@@ -72,20 +81,25 @@ import fr.ens.biologie.generic.Sealable;
 // Tested OK with version 0.0.3 on 10/1/2019
 // Tested OK with version 0.0.4 on 10/1/2019
 // Tested OK with version 0.0.7 on 24/1/2019
-public class AotNode extends TreeGraphNode 
-		implements 	ExtendablePropertyList,	Configurable {
+public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Configurable {
 
 	// ----------------------- Constructors
 
 	// this constructor sets the name to the uniqueID
-	protected AotNode(Identity id, AotGraph factory, ReadOnlyPropertyList props) {
-		super(id,factory,factory,props); 
+	/*
+	 * THIS CONSTRUCTOR not found by TreeGraphFactory c =
+	 * nodeClass.getDeclaredConstructor(Identity.class, TreeNodeFactory.class,
+	 * NodeFactory.class,ReadOnlyPropertyList.class);
+	 */
+	public AotNode(Identity id, TreeNodeFactory tnf,  NodeFactory nf,ReadOnlyPropertyList props) {
+//	protected AotNode(Identity id, AotGraph factory,ReadOnlyPropertyList props) {
+		super(id, tnf, nf, props);
 		ExtendablePropertyList pl = new ExtendablePropertyListImpl();
-		if (props!=null)
+		if (props != null)
 			pl.addProperties(props);
 		properties = pl;
 	}
-	
+
 	// -------------- ExtendablePropertyList
 	@Override
 	public ResizeablePropertyList addProperties(List<String> arg0) {
@@ -132,8 +146,9 @@ public class AotNode extends TreeGraphNode
 	public ResizeablePropertyList removeProperty(String key) {
 		return ((ResizeablePropertyList) properties).removeProperty(key);
 	}
-	
-	// Not sure about this one - maybe it should be disabled by throwing an exception
+
+	// Not sure about this one - maybe it should be disabled by throwing an
+	// exception
 	// need careful checking
 	@Override
 	public AotNode clone() {
@@ -177,22 +192,22 @@ public class AotNode extends TreeGraphNode
 	}
 
 	// Configurable
-	
+
 	@Override
 	public Configurable initialise() {
 		return this;
 	}
-	
+
 	// Node
-	
+
 	@Override
 	public AotGraph nodeFactory() {
 		return (AotGraph) super.nodeFactory();
 	}
 
-	//Ok??
+	// Ok??
 	public String getLabel() {
 		return nodeFactory().nodeClassName(getClass());
 	}
-	
+
 }
