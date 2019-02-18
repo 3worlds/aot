@@ -115,6 +115,13 @@ public class VersionManager {
 		{"au.edu.anu.rscs.aot", "omugi", "+"},
 		{"au.edu.anu.rscs.aot", "qgraph", "+"}
 	};
+	
+	/** The name of the main class to put in the jar manifest, if any. This enables users to
+	 * run the jar using this class as the entry point. Of course this must be a fully qualified
+	 * valid java class name found in the jar. 
+	 */
+	private static String MAINCLASS = null;
+	
 	// ============================================================================================
 	
 	// This shouldnt be changed ===================================================================
@@ -125,6 +132,7 @@ public class VersionManager {
 	private static String headComment1 = 
 	"<!--===================================================================================\n"+
 	" ant and ivy scripts for project <" + MODULE +"> version ";
+	// here comes the version number
 	private static String headComment2 = 
 	" (" + new Date() +")\n" +
 	" author: Jacques Gignoux <jacques.gignoux@upmc.fr>\n\n" +
@@ -179,7 +187,22 @@ public class VersionManager {
 	"\t\t<ivy:retrieve pattern=\"${ivy.retrieve.pattern}\" conf=\"${ivy.configurations}\"/>\n" +
 	"\t</target>\n\n" +
 	"\t<target name=\"makeJar\" description=\"pack as a jar library\" depends=\"makeArtifactDir,resolve\">\n" +
-	"\t\t<jar destfile=\"${jarlib}/${project}.jar\" basedir=\"bin\" excludes=\"**/VersionManager.*,**/LicenseManager.*,**/current-version.txt\"/>\n" +
+	"\t\t<jar destfile=\"${jarlib}/${project}.jar\">\n" + 
+	"\t\t\t<fileset dir=\"bin\" \n" + 
+	"\t\t\t\texcludes=\"**/VersionManager.*,**/LicenseManager.*,**/current-version.txt,**/*.xml\"/>\n" + 
+	"\t\t\t<fileset dir=\"src\"/>\n" + 
+	"\t\t\t<manifest>\n" + 
+	"\t\t\t\t<attribute name=\"Implementation-Vendor\" value=\"CNRS/ANU\"/>\n" + 
+	"\t\t\t\t<attribute name=\"Implementation-Title\" value=\"" + ORG + "\"/>\n" + 
+	"\t\t\t\t<attribute name=\"Implementation-Version\" value=\"";
+	// here comes the version number
+	private static String build2 = "\"/>\n" + 
+	"\t\t\t\t<attribute name=\"Built-By\" value=\"${user.name}\"/>\n ";
+	// here comes the main class, if not null
+	// Nb in the future there may be a classpath attribute: Class-Path: .3w/tw-dep.jar .3w/threeWorlds.jar
+	private static String build3 =
+	"\t\t\t</manifest>\n" + 
+	"\t\t</jar>\n" + 
 	"\t</target>\n\n" +
 	"\t<target name=\"publishJar\" description=\"make jar library available to others\" depends=\"makeJar\">\n" +
 	"\t\t<ivy:publish resolver=\"local\" overwrite=\"true\"  forcedeliver=\"true\">\n" +
@@ -187,6 +210,10 @@ public class VersionManager {
 	"\t\t</ivy:publish>\n" +
 	"\t</target>\n\n" +
 	"</project>\n";
+	
+	// NB: to add a main class entry point into the manifest can be done by adding this line in
+	// the manifest entries (as an example) :
+	// <attribute name="Main-Class" value="com.acme.checksites.Main"/>
 	
 	private static String buildDependencyList() {
 		if (DEPS.length>0) {
@@ -308,7 +335,10 @@ public class VersionManager {
 		File ivyFile = Paths.get(workDir, "ivy.xml").toFile();
 		try {
 			BufferedWriter fw = new BufferedWriter(new FileWriter(ivyFile));
-			fw.write(headComment1+version.toString()+headComment2+ivy1+version.toString()+ivy2+buildDependencyList()+ivy3);
+			fw.write(headComment1+version.toString()+
+				headComment2+ivy1+version.toString()+
+				ivy2+buildDependencyList()+
+				ivy3);
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -318,7 +348,13 @@ public class VersionManager {
 		File antFile = Paths.get(workDir, "build.xml").toFile();
 		try {
 			BufferedWriter fw = new BufferedWriter(new FileWriter(antFile));
-			fw.write(headComment1+version.toString()+headComment2+build1);
+			String mainClass =""; 
+			if (MAINCLASS!=null) 
+				mainClass = "\t\t\t\t<attribute name=\"Main-Class\" value=\"" + MAINCLASS + "\"/>\n";
+			fw.write(headComment1+version.toString()+
+				headComment2+build1+version.toString()+
+				build2+mainClass+
+				build3);
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
