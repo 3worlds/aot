@@ -200,10 +200,11 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 
 	// Node
 
-	@Override
-	public AotGraph nodeFactory() {
-		return (AotGraph) super.nodeFactory();
-	}
+	// THIS FAILS - its not an AOTGraph but a TreeNodeFactory.
+//	@Override
+//	public AotGraph nodeFactory() {
+//		return (AotGraph) super.nodeFactory();
+//	}
 
 	// Ok??
 	public String getLabel() {
