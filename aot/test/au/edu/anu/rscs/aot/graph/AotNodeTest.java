@@ -337,9 +337,9 @@ class AotNodeTest {
 	void testDisconnect() {
 		AotNode n = graph.makeTreeNode(null,"1");
 		AotNode n2 = graph.makeTreeNode(null,"2");
-		Edge ed1 = node.nodeFactory().makeEdge(node, n);
-		Edge ed2 = node.nodeFactory().makeEdge(n2, node);
-		Edge ed3 = node.nodeFactory().makeEdge(node, node);
+		Edge ed1 = graph.makeEdge(node, n);
+		Edge ed2 = graph.makeEdge(n2, node);
+		Edge ed3 = graph.makeEdge(node, node);
 		node.setParent(n);
 		node.addChild(n2);
 		show("testDisconnect",node.toDetailedString());
