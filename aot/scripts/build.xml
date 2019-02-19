@@ -41,7 +41,6 @@
 				<attribute name="Implementation-Title" value="au.edu.anu.rscs.aot"/>
 				<attribute name="Implementation-Version" value="0.0.9"/>
 				<attribute name="Built-By" value="${user.name}"/>
- 				<attribute name="Main-Class" value="BLAH"/>
 			</manifest>
 		</jar>
 	</target>

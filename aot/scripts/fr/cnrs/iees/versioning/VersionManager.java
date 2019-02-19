@@ -211,10 +211,6 @@ public class VersionManager {
 	"\t</target>\n\n" +
 	"</project>\n";
 	
-	// NB: to add a main class entry point into the manifest can be done by adding this line in
-	// the manifest entries (as an example) :
-	// <attribute name="Main-Class" value="com.acme.checksites.Main"/>
-	
 	private static String buildDependencyList() {
 		if (DEPS.length>0) {
 			StringBuilder sb = new StringBuilder();
