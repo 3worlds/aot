@@ -208,15 +208,17 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 
 	// Ok??
 	public String getLabel() {
-		return nodeFactory().nodeClassName(getClass());
+		return super.treeNodeFactory().treeNodeClassName(getClass());
+//		return nodeFactory().nodeClassName(getClass());
 	}
 
-	// These do the same thing - return the graph
+	// These do the same thing - return the graph - CASTING CRASH!
 	@Override
 	public AotGraph treeNodeFactory() {
 		return (AotGraph) super.treeNodeFactory();
 	}
 
+	// CASTING CRASH!
 	@Override
 	public AotGraph nodeFactory() {
 		return (AotGraph) super.treeNodeFactory();

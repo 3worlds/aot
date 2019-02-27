@@ -105,7 +105,8 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 	}
 
 	public TreeNodeFactory getTreeFactory() {
-		return this;
+		return factory;
+//		return this;
 	}
 
 	// ---------------------- NODE FACTORY -------------------------
@@ -200,43 +201,43 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
-		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, props));
+		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, props);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent));
+		return  (AotNode)factory.makeTreeNode(AotNode.class, parent);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId) {
-		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId));
+		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId);
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
-		return  addNode((AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId, properties));
+		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId, properties);
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent) {
-		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent));
+		return  (AotNode)factory.makeTreeNode(nodeClass, parent);
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, SimplePropertyList properties) {
-		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent, properties));
+		return  (AotNode)factory.makeTreeNode(nodeClass, parent, properties);
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId) {
-		return  addNode((AotNode)factory.makeTreeNode(nodeClass, parent, proposedId));
+		return  (AotNode)factory.makeTreeNode(nodeClass, parent, proposedId);
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId,
 			SimplePropertyList properties) {
-		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent, proposedId, properties));
+		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId, properties);
 	}
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------
