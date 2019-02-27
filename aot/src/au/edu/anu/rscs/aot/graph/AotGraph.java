@@ -67,8 +67,11 @@ import fr.ens.biologie.generic.Textable;
 
 public class AotGraph extends TreeGraph<AotNode, AotEdge>
 		implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
+	// NodeFactory is only here because AotNodes must implement NodeFactory - if we
+	// change the element hierarchy this would be unnecessary. See getLabel for the
+	// confusion this causes.
 
-	private TreeGraphFactory factory = null;
+	private TreeGraphFactory factory;
 
 	// constructors
 	public AotGraph() {
@@ -106,7 +109,7 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 
 	public TreeNodeFactory getTreeFactory() {
 		return factory;
-//		return this;
+		// return this;
 	}
 
 	// ---------------------- NODE FACTORY -------------------------
@@ -199,45 +202,52 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 
 	// ----------------------TREE FACTORY -----------------------------
 
+	private AotNode addNode(AotNode node) {
+		if (nodes.add(node))
+			return node;
+		else
+			throw new AotException("Attempt to add duplicate node:" + node.toString());
+	}
+
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, SimplePropertyList props) {
-		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, props);
+		return addNode((AotNode) factory.makeTreeNode(AotNode.class, parent, props));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent) {
-		return  (AotNode)factory.makeTreeNode(AotNode.class, parent);
+		return addNode((AotNode) factory.makeTreeNode(AotNode.class, parent));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId) {
-		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId);
+		return addNode((AotNode) factory.makeTreeNode(AotNode.class, parent, proposedId));
 	}
 
 	@Override
 	public AotNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
-		return  (AotNode)factory.makeTreeNode(AotNode.class, parent, proposedId, properties);
+		return addNode((AotNode) factory.makeTreeNode(AotNode.class, parent, proposedId, properties));
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent) {
-		return  (AotNode)factory.makeTreeNode(nodeClass, parent);
+		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent));
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, SimplePropertyList properties) {
-		return  (AotNode)factory.makeTreeNode(nodeClass, parent, properties);
+		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent, properties));
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId) {
-		return  (AotNode)factory.makeTreeNode(nodeClass, parent, proposedId);
+		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent, proposedId));
 	}
 
 	@Override
 	public AotNode makeTreeNode(Class<? extends TreeNode> nodeClass, TreeNode parent, String proposedId,
 			SimplePropertyList properties) {
-		return (AotNode) factory.makeTreeNode(nodeClass, parent, proposedId, properties);
+		return addNode((AotNode) factory.makeTreeNode(nodeClass, parent, proposedId, properties));
 	}
 
 	// -------------------- CONFIGURABLE GRAPH ------------------------
@@ -252,8 +262,8 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 			try {
 				String className;
 				className = (String) n.getPropertyValue("class");
-//				I dont like this, so try to remove it
-//				if (className != null && !n.getLabel().equals("defaultPropertyList")) {				
+				// I dont like this, so try to remove it
+				// if (className != null && !n.getLabel().equals("defaultPropertyList")) {
 				if (className != null) {
 					AotNode newNode = n;
 					try {
@@ -266,8 +276,8 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 
 						// TODO: possible flaw here due to removing name and label
 
-//						newNode.setLabel(n.getLabel());
-//						newNode.setName(n.getName());
+						// newNode.setLabel(n.getLabel());
+						// newNode.setName(n.getName());
 						newNode.connectLike(n);
 						newNode.setProperties(n);
 						n.disconnect();
@@ -279,7 +289,7 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 				}
 			} catch (Exception e) {
 				castFailList.add(n, e);
-//				log.warning("AotGraph: Node " + n + " could not be cast.", e);
+				// log.warning("AotGraph: Node " + n + " could not be cast.", e);
 			}
 		}
 		nodes.removeAll(removedNodes);

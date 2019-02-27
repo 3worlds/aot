@@ -215,13 +215,15 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 	// These do the same thing - return the graph - CASTING CRASH!
 	@Override
 	public AotGraph treeNodeFactory() {
-		return (AotGraph) super.treeNodeFactory();
+		return null;
+//		return (AotGraph) super.treeNodeFactory();
 	}
 
 	// CASTING CRASH!
 	@Override
 	public AotGraph nodeFactory() {
-		return (AotGraph) super.treeNodeFactory();
+		return null;
+//		return (AotGraph) super.treeNodeFactory();
 	}
 
 }
