@@ -21,7 +21,7 @@ class AotGraphTest {
 		String codeSrcLabel = "codeSrc";
 		labels.put(rootLabel, plainNode);
 		labels.put(codeSrcLabel, plainNode);
-		 // Wrong: once class can have many names!
+		 // Wrong: one class can have many names!
 		AotGraph graph = new AotGraph(labels);
 
 		String name = "test";
@@ -29,7 +29,7 @@ class AotGraphTest {
 		AotNode parentNode = graph.makeTreeNode(null, rootId);
 		assertTrue(parentNode != null);
 		// Previously a typecast error here
-		// Fails: once class can have many names!
+		// Fails: one class can have many names!
 		assertTrue(parentNode.getLabel().equals(rootLabel));
 		
 		String srcId = codeSrcLabel + PairIdentity.LABEL_NAME_STR_SEPARATOR + name;
