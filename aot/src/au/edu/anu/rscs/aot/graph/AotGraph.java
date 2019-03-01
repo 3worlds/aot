@@ -38,12 +38,12 @@ import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.graph.TreeNodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.graph.impl.TreeGraphFactory;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.graph.TreeNodeFactory;
 import fr.ens.biologie.generic.Textable;
 
 /**
@@ -178,6 +178,7 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 	public AotEdge makeEdge(Node start, Node end, String proposedId) {
 		return (AotEdge) factory.makeEdge(AotEdge.class, start, end, proposedId);
 	}
+
 
 	@Override
 	public AotEdge makeEdge(Class<? extends Edge> edgeClass, Node start, Node end) {
