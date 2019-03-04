@@ -209,10 +209,11 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 
 	// Ok??
 	public String getLabel() {
-		String result =super.treeNodeFactory().treeNodeClassName(getClass());
-		if (result!=null)
-			return result;
+		// make static method of PairIdentity???
 		return id().split(PairIdentity.LABEL_NAME_STR_SEPARATOR)[0];
+//		String result =super.treeNodeFactory().treeNodeClassName(getClass());
+//		if (result!=null)
+//			return result;
 //		return nodeFactory().nodeClassName(getClass());
 	}
 
