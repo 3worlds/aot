@@ -14,29 +14,34 @@ class AotGraphTest {
 
 	@Test
 	void test() {
-		String plainNode = "au.edu.anu.rscs.aot.graph.AotNode";
 		// we need a function to obtain all Node class names from the archetype
-		Map<String, String> labels = new HashMap<>();
+		//Map<String, String> labels = new HashMap<>();
 		String rootLabel = "3Worlds";
 		String codeSrcLabel = "codeSrc";
-		labels.put(rootLabel, plainNode);
-		labels.put(codeSrcLabel, plainNode);
-		 // Wrong: one class can have many names!
-		AotGraph graph = new AotGraph(labels);
+		
+		AotGraph graph = new AotGraph();
 
 		String name = "test";
+		
 		String rootId = rootLabel + PairIdentity.LABEL_NAME_STR_SEPARATOR + name;
 		AotNode parentNode = graph.makeTreeNode(null, rootId);
 		assertTrue(parentNode != null);
-		// Previously a typecast error here
-		// Fails: one class can have many names!
+		// Previously a typecast error here in getLabel when typecasting TreeGraphFactory instance as AotGraph
 		assertTrue(parentNode.getLabel().equals(rootLabel));
 		
 		String srcId = codeSrcLabel + PairIdentity.LABEL_NAME_STR_SEPARATOR + name;
 		AotNode childNode = graph.makeTreeNode(parentNode,srcId);
 		assertTrue(childNode.getLabel().equals(codeSrcLabel));
+		assertTrue(childNode.getParent().equals(parentNode));
 		
-
+		AotNode childNode1 = graph.makeTreeNode(parentNode,srcId);
+		
+		String srcId1 = childNode1.id();
+		assertTrue(childNode1.getLabel().equals(codeSrcLabel));
+		assertTrue(childNode1.getParent().equals(parentNode));
+		assertTrue(srcId1.split(PairIdentity.LABEL_NAME_STR_SEPARATOR )[1].equals("test1"));
+		
+	
 		/*
 		 * Adding node to graph.nodes() - seems to be missing - can't be done outside
 		 * graph as nodes() returns an iterator - you can't add to an iterator therefore

@@ -38,6 +38,7 @@ import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.TreeNodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraphNode;
 import fr.cnrs.iees.identity.Identity;
+import fr.cnrs.iees.identity.impl.PairIdentity;
 import fr.cnrs.iees.properties.ExtendablePropertyList;
 import fr.cnrs.iees.properties.PropertyListSetters;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -208,7 +209,10 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 
 	// Ok??
 	public String getLabel() {
-		return super.treeNodeFactory().treeNodeClassName(getClass());
+		String result =super.treeNodeFactory().treeNodeClassName(getClass());
+		if (result!=null)
+			return result;
+		return id().split(PairIdentity.LABEL_NAME_STR_SEPARATOR)[0];
 //		return nodeFactory().nodeClassName(getClass());
 	}
 
