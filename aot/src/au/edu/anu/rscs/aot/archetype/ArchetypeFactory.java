@@ -51,8 +51,11 @@ public class ArchetypeFactory implements TreeNodeFactory {
 				Class.forName("au.edu.anu.rscs.aot.archetype.PropertySpec",false,cl));
 			labelMappings.put("hasEdge", (Class<? extends TreeNode>) 
 				Class.forName("au.edu.anu.rscs.aot.archetype.EdgeSpec",false,cl));
+			labelMappings.put("mustSatisfyQuery", (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.ConstraintSpec",false,cl));
+			labelMappings.put("hasEdge", (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec",false,cl));
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -89,13 +92,8 @@ public class ArchetypeFactory implements TreeNodeFactory {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Class<? extends TreeNode> treeNodeClass(String label) {
-		try {
-			return (Class<? extends TreeNode>) Class.forName("fr.cnrs.iees.graph.impl."+label,false,OmugiClassLoader.getClassLoader());
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+		return labelMappings.get(label);
 	}
 
 	
