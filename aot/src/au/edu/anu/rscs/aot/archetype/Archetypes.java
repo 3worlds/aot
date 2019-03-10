@@ -43,7 +43,7 @@ import fr.cnrs.iees.io.FileImporter;
  */
 public class Archetypes {
 	
-	private Tree<? extends TreeNode> archetypeArchetype = null;
+	private Tree<? extends TreeNode> archetypeArchetype;
 	
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
