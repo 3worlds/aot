@@ -55,8 +55,15 @@ public class Archetypes {
 		File file = new File(archetypefile);
 		FileImporter fi = new FileImporter(file);
 		archetypeArchetype  = (Tree<? extends TreeNode>) fi.getGraph();
+		// doesn't work
+//		TreeNode n = archetypeArchetype.findNodeByReference("ArchetypeRootSpec:hasRootNode");
+//		TreeNode n = archetypeArchetype.findNodeByReference("hasRootNode");
+//		if (n!=null)
+//			System.out.println(n.toDetailedString());
+		// you can't know what the id is because its fabricated by the system: hasProperty7 etc
 		for (TreeNode tn:archetypeArchetype.nodes())
-			System.out.println(tn.toDetailedString());
+			System.out.println(tn.id());
+//			System.out.println(tn.toDetailedString());
 	}
 	
 	public void checkArchetype(Tree<? extends TreeNode> archetype) {
