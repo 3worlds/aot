@@ -53,7 +53,7 @@ public class ArchetypeFactory implements TreeNodeFactory {
 				Class.forName("au.edu.anu.rscs.aot.archetype.EdgeSpec",false,cl));
 			labelMappings.put("mustSatisfyQuery", (Class<? extends TreeNode>) 
 				Class.forName("au.edu.anu.rscs.aot.archetype.ConstraintSpec",false,cl));
-			labelMappings.put("hasEdge", (Class<? extends TreeNode>) 
+			labelMappings.put("archetype", (Class<? extends TreeNode>) 
 				Class.forName("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec",false,cl)); // same label two classes!!
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

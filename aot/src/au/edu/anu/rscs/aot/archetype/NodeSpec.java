@@ -39,9 +39,9 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
  * @author Jacques Gignoux - 7 mars 2019
  *
  */
-public class HasNode extends DataTreeNodeImpl {
+public class NodeSpec extends DataTreeNodeImpl {
 
-	protected HasNode(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
+	protected NodeSpec(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
 		super(id, props, factory);
 	}
 
