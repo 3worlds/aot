@@ -10,9 +10,9 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
  * @author gignoux 20/3/2019
  *
  */
-public class ArchetyeRootSpec extends DataTreeNodeImpl {
+public class ArchetypeRootSpec extends DataTreeNodeImpl {
 
-	protected ArchetyeRootSpec(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
+	protected ArchetypeRootSpec(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
 		super(id, props, factory);
 	}
 
