@@ -93,7 +93,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		// a constraint spec uses a Query class descendant
 		//-------------------------------------------------------
-		ConstraintClassSpec hasProperty
+		hasProperty ConstraintClassSpec 
 			hasName = String("className")
 			type = String("String") 
 			multiplicity = String("1..1")

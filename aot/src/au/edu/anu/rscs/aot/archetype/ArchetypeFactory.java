@@ -32,15 +32,20 @@ package au.edu.anu.rscs.aot.archetype;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.edu.anu.rscs.aot.AotException;
 import fr.cnrs.iees.OmugiClassLoader;
+import fr.cnrs.iees.graph.DataTreeNode;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.TreeNodeFactory;
+import fr.cnrs.iees.identity.IdentityScope;
+import fr.cnrs.iees.identity.impl.LocalScope;
 import fr.cnrs.iees.properties.SimplePropertyList;
 
 @SuppressWarnings("unchecked")
 public class ArchetypeFactory implements TreeNodeFactory {
 	
 	private static Map<String,Class<? extends TreeNode>> labelMappings = new HashMap<>();
+	private IdentityScope scope;
 
 	static {
 		try {
@@ -60,36 +65,53 @@ public class ArchetypeFactory implements TreeNodeFactory {
 		}
 	}
 	
+	public ArchetypeFactory() {
+		super();
+		scope = new LocalScope("AOT-archetype");
+	}
+	
 	@Override
 	public TreeNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new AotException("Unknown node type for archetype factory");
 	}
 
 	@Override
 	public TreeNode makeTreeNode(Class<? extends TreeNode> treeNodeClass, TreeNode parent) {
-		// TODO Auto-generated method stub
-		return null;
+		return makeTreeNode(treeNodeClass,parent,null,null);
 	}
 
 	@Override
 	public TreeNode makeTreeNode(Class<? extends TreeNode> treeNodeClass, TreeNode parent,
 			SimplePropertyList properties) {
-		// TODO Auto-generated method stub
-		return null;
+		return makeTreeNode(treeNodeClass,parent,null,properties);
 	}
 
 	@Override
 	public TreeNode makeTreeNode(Class<? extends TreeNode> treeNodeClass, TreeNode parent, String proposedId) {
-		// TODO Auto-generated method stub
-		return null;
+		return makeTreeNode(treeNodeClass,parent,proposedId,null);
 	}
 
 	@Override
-	public TreeNode makeTreeNode(Class<? extends TreeNode> treeNodeClass, TreeNode parent, String proposedId,
+	public TreeNode makeTreeNode(Class<? extends TreeNode> treeNodeClass, 
+			TreeNode parent, 
+			String proposedId,
 			SimplePropertyList properties) {
-		// TODO Auto-generated method stub
-		return null;
+		DataTreeNode result = null;
+		if (NodeSpec.class.isAssignableFrom(treeNodeClass))
+			result = new NodeSpec(scope.newId(proposedId),properties,this);
+		else if (EdgeSpec.class.isAssignableFrom(treeNodeClass))
+			result = new EdgeSpec(scope.newId(proposedId),properties,this);
+		else if (ConstraintSpec.class.isAssignableFrom(treeNodeClass))
+			result = new ConstraintSpec(scope.newId(proposedId),properties,this);
+		else if (PropertySpec.class.isAssignableFrom(treeNodeClass))
+			result = new PropertySpec(scope.newId(proposedId),properties,this);
+		else if (ArchetypeRootSpec.class.isAssignableFrom(treeNodeClass))
+			result = new ArchetypeRootSpec(scope.newId(proposedId),properties,this);
+		if (parent!=null) {
+			result.setParent(parent);
+			parent.addChild(result);
+		}
+		return result;
 	}
 
 	public Class<? extends TreeNode> treeNodeClass(String label) {

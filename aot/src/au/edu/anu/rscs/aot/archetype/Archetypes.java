@@ -61,13 +61,15 @@ public class Archetypes {
 //		if (n!=null)
 //			System.out.println(n.toDetailedString());
 		// you can't know what the id is because its fabricated by the system: hasProperty7 etc
-		for (TreeNode tn:archetypeArchetype.nodes())
-			System.out.println(tn.id());
-//			System.out.println(tn.toDetailedString());
 	}
 	
 	public void checkArchetype(Tree<? extends TreeNode> archetype) {
 		
+	}
+	
+	// temporary, for debugging
+	public String toString() {
+		return archetypeArchetype.toString();
 	}
 
 }

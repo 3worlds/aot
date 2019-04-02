@@ -38,7 +38,8 @@ class ArchetypesTest {
 	@Test
 	void testArchetypes() {
 		Archetypes arch = new Archetypes();
-		assertNotNull(arch);
+		System.out.println(arch.toString());
+		assertNotNull(arch);		
 	}
 
 	@Test
