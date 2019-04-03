@@ -30,20 +30,46 @@
 package au.edu.anu.rscs.aot.archetype;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Logger;
 
+import au.edu.anu.rscs.aot.AotException;
+import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.rscs.aot.util.IntegerRange;
+import fr.cnrs.iees.graph.MinimalGraph;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 
 /**
- * Just a test class for the moment -
+ * <p>This code was initially developed by Shayne Flint as the core of Aspect-Oriented Thinking 
+ * (AOT) and has been deeply refactored by J. Gignoux.</p> 
+ * <p>It checks that a graph (a {@linkplain TreeGraph}, actually, i.e. a tree with cross-links) complies with
+ * an <em>archetype</em> describing how graphs should look like. In other words, it is a tool
+ * for checking that specifications or configurations comply with requirements. The archetype
+ * describes the requirements. Notice that the first check that is provided here is to check
+ * that an archetype... is an archetype, i.e. complies with the requirements needed to call 
+ * a graph an archetype.</p>
+ * <p>There are two sets of methods here: the <em>check(...)</em> methods perform the checks and
+ * capture all errors (as exceptions) in a list. the <em>complies(...)</em> methods perform a check
+ * and return false if an Exception was found during the checking process.</p>
+ * <p>NB: an archetype is a {@linkplain Tree}, but a configuration/specification graph is a 
+ * {@linkplain TreeGraph}.</p>
  * 
  * @author Jacques Gignoux - 6 mars 2019
+ * @author Shayne Flint - looong ago		
  *
  */
 public class Archetypes {
 	
-	private Tree<? extends TreeNode> archetypeArchetype;
+	/** The universal archetype - the archetype for archetypes */
+	private Tree<? extends TreeNode> archetypeArchetype = null;
+	
+	private Logger log = Logger.getLogger(Archetypes.class.getName());
+	
+	private List<Exception> checkFailList = new LinkedList<Exception>();
 	
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
@@ -55,15 +81,111 @@ public class Archetypes {
 		File file = new File(archetypefile);
 		FileImporter fi = new FileImporter(file);
 		archetypeArchetype  = (Tree<? extends TreeNode>) fi.getGraph();
-		// doesn't work
-//		TreeNode n = archetypeArchetype.findNodeByReference("ArchetypeRootSpec:hasRootNode");
-//		TreeNode n = archetypeArchetype.findNodeByReference("hasRootNode");
-//		if (n!=null)
-//			System.out.println(n.toDetailedString());
-		// you can't know what the id is because its fabricated by the system: hasProperty7 etc
 	}
 	
-	public void checkArchetype(Tree<? extends TreeNode> archetype) {
+	/**
+	 * checks that an archetype is an archetype (= check it against archetypeArchetype)
+	 * @param archetype the archetype to check
+	 */
+	public void checkArchetype(Tree<? extends TreeNode> graphToCheck) {		
+		if (archetypeArchetype!=null)
+			check(graphToCheck,archetypeArchetype);
+		else
+			log.warning("Archetype for archetypes not found - no check performed");
+	}
+	
+	/**
+	 * checks that an archetype is an archetype and returns true if it complies.
+	 * @param graphToCheck
+	 * @return
+	 */
+	public boolean isArchetype(Tree<? extends TreeNode> graphToCheck) {
+		checkArchetype(graphToCheck);
+		if (checkFailList.isEmpty())
+			return true;
+		else
+			return false;
+	}
+	
+	/**
+	 * checks that <strong>graphToCheck</strong> complies with <strong>archetype</strong>.
+	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
+	 * @param archetype the archetype tree to check against
+	 */
+	public void check(MinimalGraph<?> graphToCheck, Tree<? extends TreeNode> archetype) {
+		for (TreeNode arch: archetype.nodes()) 
+			if (ArchetypeRootSpec.class.isAssignableFrom(arch.getClass()))
+				check(graphToCheck,(ArchetypeRootSpec)arch);
+	}
+	
+	private boolean matchesParent(TreeNode child, StringTable parentList) {
+		// TODO: check parent match
+		return false;
+	}
+	
+	private boolean matchesId(TreeNode node, String requiredId) {
+		// TODO: check id match
+		return false;
+	}
+	
+	/**
+	 * checks that <strong>graphToCheck</strong> complies with <strong>archetype</strong>.
+	 * Here, <strong>archetype</strong> is the root node of an archetype tree.
+	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
+	 * @param archetype  the archetype root node to check against
+	 */
+	@SuppressWarnings("unchecked")
+	public void check(MinimalGraph<?> graphToCheck, ArchetypeRootSpec archetype) {
+		checkFailList.clear();
+		log.info("Checking against archetype: " + archetype);
+		// first, check that the graph to check is a tree or a treegraph
+		Tree<? extends TreeNode> treeToCheck = null;
+		try {
+			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
+		} catch (ClassCastException e) {
+			checkFailList.add(e);
+		}
+		if (treeToCheck!=null) {
+			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
+			int complyCount = 0;
+			for (TreeNode tn:archetype.getChildren())
+				if (NodeSpec.class.isAssignableFrom(tn.getClass())) {
+					NodeSpec hasNode = (NodeSpec) tn;
+					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
+					String requiredId = (String) hasNode.properties().getPropertyValue("hasId");
+					int count = 0;
+					for (TreeNode n:treeToCheck.nodes()) 
+						if (matchesId(n,requiredId) && matchesParent(n,parentList)) {
+							log.info("checking node: " + n.toUniqueString());
+							check(n,hasNode,treeToCheck);
+							count++;
+							complyCount++;
+					}
+					IntegerRange range = null;
+					if (hasNode.properties().hasProperty("multiplicity"))
+						// TODO: fix IntegerRange properties in graphs
+						range = (IntegerRange) hasNode.properties().getPropertyValue("multiplicity");
+					else
+						range = new IntegerRange(0, Integer.MAX_VALUE);
+					if (!range.inRange(count)) {
+						String message = "Expected " + range 
+							+ " nodes with parents '" + parentList 
+							+ "' (got " + count
+							+ ") archetype=" + hasNode.toUniqueString();
+						checkFailList.add(new AotException(message));
+				}
+			}
+			if (exclusive && complyCount != treeToCheck.size()) {
+				checkFailList.add(new AotException("Expected all nodes to comply (got " 
+					+ (treeToCheck.size() - complyCount)
+					+ " nodes which didn't comply)"));
+			}
+		}
+	}
+	
+	private void check(TreeNode nodeToCheck, 
+			NodeSpec hasNode, 
+			Tree<? extends TreeNode> treeToCheck) {
 		
 	}
 	

@@ -31,7 +31,13 @@ package au.edu.anu.rscs.aot.archetype;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Test;
+
+import fr.cnrs.iees.graph.Tree;
+import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.io.FileImporter;
 
 class ArchetypesTest {
 
@@ -44,8 +50,15 @@ class ArchetypesTest {
 
 	@Test
 	void testCheckArchetype() {
-		
-		//fail("Not yet implemented");
+		Archetypes arch = new Archetypes();
+		String archetypefile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
+			+ File.separator + "src" 
+			+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
+			+ File.separator + "ArchetypeArchetype.ugt";
+		File file = new File(archetypefile);
+		FileImporter fi = new FileImporter(file);
+		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
+		arch.checkArchetype(graph);
 	}
 
 }
