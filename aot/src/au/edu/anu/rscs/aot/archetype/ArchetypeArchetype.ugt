@@ -23,7 +23,7 @@ archetype ArchetypeForArchetypes
 	// an archetype starts with a root node with id (=name) *archetype*
 	//-------------------------------------------------------
 	hasNode ArchetypeRootSpec
-		hasId = String("archetype")
+		isOfClass = String("archetype")
 		multiplicity = String("1..1")
 
 		//-------------------------------------------------------
@@ -42,17 +42,17 @@ archetype ArchetypeForArchetypes
 	// a node with any class (=label), with id *hasNode*, and child of *archetype*
 	//-------------------------------------------------------
 	hasNode NodeSpec
-		hasId = String("hasNode")
+		isOfClass = String("hasNode")
 		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]"archetype"))
 		multiplicity = String("0..*")
 
 		//-------------------------------------------------------
 		// a node spec must specify the node id (formerly name)
 		//-------------------------------------------------------
-		hasProperty NodeIdSpec
-			hasName = String("hasId")
-			type = String("String")
-			multiplicity = String("1..1")
+		//hasProperty NodeIdSpec
+		//	hasName = String("hasId")
+		//	type = String("String")
+		//	multiplicity = String("1..1")
 
 		//-------------------------------------------------------
 		// a node spec may specify the node class (formerly label)
@@ -60,9 +60,9 @@ archetype ArchetypeForArchetypes
 		// be lost during the tree import process
 		//-------------------------------------------------------
 		hasProperty NodeClassSpec
-			hasName = String("hasClass")
+			hasName = String("isOfClass")
 			type = String("String")
-			multiplicity = String("0..1")
+			multiplicity = String("1..1")
 
 		//-------------------------------------------------------
 		// a node spec must specify a list of valid parents for the node
@@ -86,7 +86,7 @@ archetype ArchetypeForArchetypes
 	// constraints can apply to node, edge or property specifications
 	//-------------------------------------------------------
 	hasNode ConstraintSpec
-		hasId = String("mustSatisfyQuery")
+		isOfClass = String("mustSatisfyQuery")
 		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([3]"hasNode","hasProperty","hasEdge"))
 		multiplicity = String("0..*")
 
@@ -103,7 +103,7 @@ archetype ArchetypeForArchetypes
 	// properties apply to node or edge specifications
 	//-------------------------------------------------------
 	hasNode PropertySpec
-		hasId = String("hasProperty")
+		isOfClass = String("hasProperty")
 		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([2]"hasNode","hasEdge"))
 		multiplicity = String("0..*")
 
@@ -136,17 +136,17 @@ archetype ArchetypeForArchetypes
 	// specification for edge specifications
 	//-------------------------------------------------------
 	hasNode EdgeSpec
-		hasId = String("hasEdge")
+		isOfClass = String("hasEdge")
 		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]"hasNode"))
 		multiplicity = String("0..*")
 
 		//-------------------------------------------------------
 		// an edge spec must specify the edge id (formerly name)
 		//-------------------------------------------------------
-		hasProperty EdgeIdSpec
-			hasName = String("hasId")
-			type = String("String")
-			multiplicity = String("1..1")
+		//hasProperty EdgeIdSpec
+		//	hasName = String("hasId")
+		//	type = String("String")
+		//	multiplicity = String("1..1")
 
 		//-------------------------------------------------------
 		// an edge spec may specify the edge class (formerly label)
@@ -154,7 +154,7 @@ archetype ArchetypeForArchetypes
 		// be lost during the tree import process
 		//-------------------------------------------------------
 		hasProperty EdgeClassSpec
-			hasName = String("hasClass")
+			hasName = String("isOfClass")
 			type = String("String")
 			multiplicity = String("0..1")
 

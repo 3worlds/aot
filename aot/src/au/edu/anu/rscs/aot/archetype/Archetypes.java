@@ -123,7 +123,7 @@ public class Archetypes {
 		return false;
 	}
 	
-	private boolean matchesId(TreeNode node, String requiredId) {
+	private boolean matchesClass(TreeNode node, String requiredClass) {
 		// TODO: check id match
 		return false;
 	}
@@ -152,10 +152,10 @@ public class Archetypes {
 				if (NodeSpec.class.isAssignableFrom(tn.getClass())) {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
-					String requiredId = (String) hasNode.properties().getPropertyValue("hasId");
+					String requiredClass = (String) hasNode.properties().getPropertyValue("isOfClass");
 					int count = 0;
 					for (TreeNode n:treeToCheck.nodes()) 
-						if (matchesId(n,requiredId) && matchesParent(n,parentList)) {
+						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
 							log.info("checking node: " + n.toUniqueString());
 							check(n,hasNode,treeToCheck);
 							count++;
