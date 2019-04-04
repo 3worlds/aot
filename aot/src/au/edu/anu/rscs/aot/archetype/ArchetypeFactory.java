@@ -32,34 +32,53 @@ package au.edu.anu.rscs.aot.archetype;
 import java.util.HashMap;
 import java.util.Map;
 
-import au.edu.anu.rscs.aot.AotException;
 import fr.cnrs.iees.OmugiClassLoader;
-import fr.cnrs.iees.graph.DataTreeNode;
 import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.graph.TreeNodeFactory;
+import fr.cnrs.iees.graph.impl.DefaultTreeFactory;
+//import fr.cnrs.iees.graph.impl.DefaultTreeFactory;
 import fr.cnrs.iees.identity.IdentityScope;
 import fr.cnrs.iees.identity.impl.LocalScope;
 import fr.cnrs.iees.properties.SimplePropertyList;
 
+/**
+ * TODO : update w.r. to new code in factories
+ * 
+ * 
+ * @author Jacques Gignoux - 4 avr. 2019
+ *
+ */
 @SuppressWarnings("unchecked")
-public class ArchetypeFactory implements TreeNodeFactory {
+public class ArchetypeFactory extends DefaultTreeFactory {
 	
+	// mapping of labels to classes
 	private static Map<String,Class<? extends TreeNode>> labelMappings = new HashMap<>();
+	// mapping of classes to labels
+	private static Map<Class<? extends TreeNode>,String> classMappings = new HashMap<>();
 	private IdentityScope scope;
 
 	static {
 		try {
 			ClassLoader cl = OmugiClassLoader.getClassLoader();
-			labelMappings.put("hasNode", (Class<? extends TreeNode>) 
-				Class.forName("au.edu.anu.rscs.aot.archetype.NodeSpec",false,cl));
-			labelMappings.put("hasProperty", (Class<? extends TreeNode>) 
-				Class.forName("au.edu.anu.rscs.aot.archetype.PropertySpec",false,cl));
-			labelMappings.put("hasEdge", (Class<? extends TreeNode>) 
-				Class.forName("au.edu.anu.rscs.aot.archetype.EdgeSpec",false,cl));
-			labelMappings.put("mustSatisfyQuery", (Class<? extends TreeNode>) 
-				Class.forName("au.edu.anu.rscs.aot.archetype.ConstraintSpec",false,cl));
-			labelMappings.put("archetype", (Class<? extends TreeNode>) 
-				Class.forName("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec",false,cl)); // same label two classes!!
+			Class<? extends TreeNode> c = (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.NodeSpec",false,cl);
+			labelMappings.put("hasNode",c);
+			classMappings.put(c,"hasNode");
+			c = (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.PropertySpec",false,cl);
+			labelMappings.put("hasProperty",c);
+			classMappings.put(c,"hasProperty");
+			c = (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.EdgeSpec",false,cl);
+			labelMappings.put("hasEdge",c);
+			classMappings.put(c,"hasEdge");
+			c = (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.ConstraintSpec",false,cl);
+			labelMappings.put("mustSatisfyQuery",c);
+			classMappings.put(c,"mustSatisfyQuery");
+			c = (Class<? extends TreeNode>) 
+				Class.forName("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec",false,cl);
+			labelMappings.put("archetype",c);
+			classMappings.put(c,"archetype");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -72,7 +91,8 @@ public class ArchetypeFactory implements TreeNodeFactory {
 	
 	@Override
 	public TreeNode makeTreeNode(TreeNode parent, String proposedId, SimplePropertyList properties) {
-		throw new AotException("Unknown node type for archetype factory");
+		// TODO !
+		return null;
 	}
 
 	@Override
@@ -96,8 +116,23 @@ public class ArchetypeFactory implements TreeNodeFactory {
 			TreeNode parent, 
 			String proposedId,
 			SimplePropertyList properties) {
-		DataTreeNode result = null;
-		if (NodeSpec.class.isAssignableFrom(treeNodeClass))
+		TreeNode result = null;
+		// this occurs when the label is not recognized - in this case a default node type is used
+		if (treeNodeClass==null) {
+			if (proposedId==null) {
+				if (properties==null)
+					result = makeTreeNode(parent);
+				else
+					result = makeTreeNode(parent,properties);
+			}
+			else {
+				if (properties==null)
+					result = makeTreeNode(parent,proposedId);
+				else
+					result = makeTreeNode(parent,proposedId,properties);
+			}
+		}
+		else if (NodeSpec.class.isAssignableFrom(treeNodeClass))
 			result = new NodeSpec(scope.newId(proposedId),properties,this);
 		else if (EdgeSpec.class.isAssignableFrom(treeNodeClass))
 			result = new EdgeSpec(scope.newId(proposedId),properties,this);
@@ -114,9 +149,22 @@ public class ArchetypeFactory implements TreeNodeFactory {
 		return result;
 	}
 
+	/**
+	 * returns the class type matching a label, null if the label is not recognized
+	 */
 	public Class<? extends TreeNode> treeNodeClass(String label) {
 		return labelMappings.get(label);
 	}
 
+	/**
+	 * returns the label matching a class type, or the class name if the label is not recognized
+	 */
+	public String treeNodeClassName(Class<? extends TreeNode> nodeClass) {
+		String result = classMappings.get(nodeClass);
+		if (result==null)
+			return nodeClass.getName();
+		else
+			return result;
+	}
 	
 }

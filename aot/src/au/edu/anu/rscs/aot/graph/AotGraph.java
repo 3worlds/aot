@@ -37,11 +37,14 @@ import au.edu.anu.rscs.aot.AotException;
 import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.TreeNodeFactory;
+import fr.cnrs.iees.graph.impl.DefaultEdgeFactory;
+import fr.cnrs.iees.graph.impl.DefaultNodeFactory;
+import fr.cnrs.iees.graph.impl.DefaultTreeNodeFactory;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.graph.impl.TreeGraphFactory;
+import fr.cnrs.iees.identity.IdentityScope;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.ens.biologie.generic.Textable;
@@ -61,12 +64,17 @@ import fr.ens.biologie.generic.Textable;
  * a factory...
  * </p>
  * 
+ * CAUTION: this class is broken, the scope() method returns null !
+ * 
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
 
 public class AotGraph extends TreeGraph<AotNode, AotEdge>
-		implements ConfigurableGraph, NodeFactory, EdgeFactory, TreeNodeFactory, Textable {
+		implements ConfigurableGraph, 
+			DefaultNodeFactory, 
+			DefaultEdgeFactory, 
+			DefaultTreeNodeFactory, Textable {
 	// NodeFactory is only here because AotNodes must implement NodeFactory - if we
 	// change the element hierarchy this would be unnecessary. See getLabel for the
 	// confusion this causes.
@@ -304,6 +312,12 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 		NodeInitialiser initialiser = new NodeInitialiser(this);
 		initialiser.showInitialisationOrder();
 		return initialiser.initialise();
+	}
+
+	@Override
+	public IdentityScope scope() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
