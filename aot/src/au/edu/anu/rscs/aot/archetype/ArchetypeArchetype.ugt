@@ -88,6 +88,7 @@ archetype ArchetypeForArchetypes
 	//-------------------------------------------------------
 	hasNode ConstraintSpec
 		isOfClass = String("mustSatisfyQuery")
+		// would be nicer to have: hasParent = StringTable(([3]"hasNode","hasProperty","hasEdge"))
 		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([3]"hasNode","hasProperty","hasEdge"))
 		multiplicity = IntegerRange("0..*")
 
