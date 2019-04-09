@@ -94,12 +94,12 @@ public class AotGraph extends TreeGraph<AotNode, AotEdge>
 
 	public AotGraph(Iterable<AotNode> list, Map<String, String> labels) {
 		super(list);
-		factory = new TreeGraphFactory(labels);
+		factory = new TreeGraphFactory("AotGraph",labels);
 	}
 
 	public AotGraph(Map<String, String> labels) {
 		super();
-		factory = new TreeGraphFactory(labels);
+		factory = new TreeGraphFactory("AotGraph",labels);
 	}
 
 	/**

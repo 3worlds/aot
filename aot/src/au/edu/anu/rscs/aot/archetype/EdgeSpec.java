@@ -12,7 +12,9 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
  */
 public class EdgeSpec extends DataTreeNodeImpl {
 
-	protected EdgeSpec(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
+	// NOTE: the constructor must be made public for the TreeFactory to find it as the TreeFactory
+	// belongs to package fr.cnrs.iees.graph.impl
+	public EdgeSpec(Identity id, ReadOnlyPropertyList props, TreeNodeFactory factory) {
 		super(id, props, factory);
 	}
 
