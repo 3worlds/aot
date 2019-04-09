@@ -119,13 +119,23 @@ public class Archetypes {
 	}
 	
 	private boolean matchesParent(TreeNode child, StringTable parentList) {
-		// TODO: check parent match
+		// no parent required and root node
+		if ((parentList==null) && (child.getParent()==null))
+			return true;
+		if ((parentList.size()==0) && (child.getParent()==null))
+			return true;
+		// parent exists, must match at least one id of parentList
+		if (child.getParent()!=null) {
+			String pid = child.getParent().id().toString();
+			for (int i=0; i<parentList.size(); i++)
+				if (pid.equals(parentList.getWithFlatIndex(i)))
+					return true;
+		}
 		return false;
 	}
 	
 	private boolean matchesClass(TreeNode node, String requiredClass) {
-		// TODO: check id match
-		return false;
+		return node.classId().equals(requiredClass);
 	}
 	
 	/**
@@ -163,7 +173,6 @@ public class Archetypes {
 					}
 					IntegerRange range = null;
 					if (hasNode.properties().hasProperty("multiplicity"))
-						// TODO: fix IntegerRange properties in graphs
 						range = (IntegerRange) hasNode.properties().getPropertyValue("multiplicity");
 					else
 						range = new IntegerRange(0, Integer.MAX_VALUE);
@@ -186,7 +195,7 @@ public class Archetypes {
 	private void check(TreeNode nodeToCheck, 
 			NodeSpec hasNode, 
 			Tree<? extends TreeNode> treeToCheck) {
-		
+		// TODO: code this
 	}
 	
 	// temporary, for debugging
