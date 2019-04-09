@@ -34,7 +34,7 @@ import java.util.Map;
 
 import fr.cnrs.iees.OmugiClassLoader;
 import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.graph.impl.DefaultTreeFactory;
+import fr.cnrs.iees.graph.impl.TreeFactory;
 //import fr.cnrs.iees.graph.impl.DefaultTreeFactory;
 import fr.cnrs.iees.identity.IdentityScope;
 import fr.cnrs.iees.identity.impl.LocalScope;
@@ -42,19 +42,18 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 
 /**
  * TODO : update w.r. to new code in factories
- * 
+ * NB this class is now useless - DefaultTreeFactory should do the job.
  * 
  * @author Jacques Gignoux - 4 avr. 2019
  *
  */
 @SuppressWarnings("unchecked")
-public class ArchetypeFactory extends DefaultTreeFactory {
+public class ArchetypeFactory extends TreeFactory {
 	
 	// mapping of labels to classes
 	private static Map<String,Class<? extends TreeNode>> labelMappings = new HashMap<>();
 	// mapping of classes to labels
 	private static Map<Class<? extends TreeNode>,String> classMappings = new HashMap<>();
-	private IdentityScope scope;
 
 	static {
 		try {
@@ -85,8 +84,7 @@ public class ArchetypeFactory extends DefaultTreeFactory {
 	}
 	
 	public ArchetypeFactory() {
-		super();
-		scope = new LocalScope("AOT-archetype");
+		super("AOT-archetype",labelMappings);
 	}
 	
 	@Override

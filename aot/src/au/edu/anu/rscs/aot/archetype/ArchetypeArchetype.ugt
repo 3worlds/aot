@@ -5,8 +5,14 @@ tree // Archetype for all archetypes - an archetype is a tree!
 // disastrous consequences may follow any change           //
 //=========================================================//
 
-	// the factory used to read archetype files
-	tree_factory = String("au.edu.anu.rscs.aot.archetype.ArchetypeFactory")
+	// the scope for node ids coming from this file
+	scope =            String("AOT-archetype")
+	// labels used in this file
+	hasNode =          String("au.edu.anu.rscs.aot.archetype.NodeSpec")
+	hasProperty =      String("au.edu.anu.rscs.aot.archetype.PropertySpec")
+	hasEdge =          String("au.edu.anu.rscs.aot.archetype.EdgeSpec")
+	mustSatisfyQuery = String("au.edu.anu.rscs.aot.archetype.ConstraintSpec")
+	archetype =        String("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec")
 
 //-------------------------------------------------------
 // this is an archetype
