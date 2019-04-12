@@ -30,18 +30,33 @@
 package au.edu.anu.rscs.aot.archetype;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
+import au.edu.anu.rscs.aot.QGraphException;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.rscs.aot.graph.property.Property;
+import au.edu.anu.rscs.aot.queries.Query;
+
+import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import au.edu.anu.rscs.aot.util.IntegerRange;
+import fr.cnrs.iees.graph.DataTreeNode;
 import fr.cnrs.iees.graph.MinimalGraph;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
+import fr.cnrs.iees.properties.ReadOnlyPropertyList;
+
+import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
 /**
  * <p>This code was initially developed by Shayne Flint as the core of Aspect-Oriented Thinking 
@@ -69,7 +84,7 @@ public class Archetypes {
 	
 	private Logger log = Logger.getLogger(Archetypes.class.getName());
 	
-	private List<Exception> checkFailList = new LinkedList<Exception>();
+	private Map<Exception,Object> checkFailList = new HashMap<Exception,Object>();
 	
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
@@ -118,6 +133,8 @@ public class Archetypes {
 				check(graphToCheck,(ArchetypeRootSpec)arch);
 	}
 	
+	// returns true if the parent label (=class name) of 'child' matches one of 
+	// the names passed in 'parentlist' OR if parentList=null and child is the root node
 	private boolean matchesParent(TreeNode child, StringTable parentList) {
 		// no parent required and root node
 		if ((parentList==null) && (child.getParent()==null))
@@ -147,13 +164,13 @@ public class Archetypes {
 	@SuppressWarnings("unchecked")
 	public void check(MinimalGraph<?> graphToCheck, ArchetypeRootSpec archetype) {
 		checkFailList.clear();
-		log.info("Checking against archetype: " + archetype);
+		log.info("Checking against archetype: " + archetype.id());
 		// first, check that the graph to check is a tree or a treegraph
 		Tree<? extends TreeNode> treeToCheck = null;
 		try {
 			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
 		} catch (ClassCastException e) {
-			checkFailList.add(e);
+			checkFailList.put(e,treeToCheck);
 		}
 		if (treeToCheck!=null) {
 			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
@@ -181,13 +198,92 @@ public class Archetypes {
 							+ " nodes with parents '" + parentList 
 							+ "' (got " + count
 							+ ") archetype=" + hasNode.toUniqueString();
-						checkFailList.add(new AotException(message));
+						checkFailList.put(new AotException(message),hasNode);
 				}
 			}
 			if (exclusive && complyCount != treeToCheck.size()) {
-				checkFailList.add(new AotException("Expected all nodes to comply (got " 
+				checkFailList.put(new AotException("Expected all nodes to comply (got " 
 					+ (treeToCheck.size() - complyCount)
-					+ " nodes which didn't comply)"));
+					+ " nodes which didn't comply)"),treeToCheck);
+			}
+		}
+	}
+	
+	// returns the list of property names possible for a given archetype node
+	@SuppressWarnings("unchecked")
+	private Set<String> getArchetypePropertyList(String archetypeNodeLabel) {
+		Set<String> result = new HashSet<String>();
+		TreeNode an = (TreeNode) get(archetypeArchetype.root(),
+			children(),
+			selectOne(hasTheName(archetypeNodeLabel)));
+		for (TreeNode prop: (List<TreeNode>) get(an,
+			children(),
+			selectZeroOrMany(hasTheLabel("hasProperty"))))
+			if (DataTreeNode.class.isAssignableFrom(prop.getClass()))
+				result.add((String)((DataTreeNode)prop).properties().getPropertyValue("hasName"));
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void checkQuery(Object item, NodeSpec hasNode) {
+		// get the 'mustSatisfyQuery' label from the archetype factory
+		String qLabel = hasNode.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
+		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(hasNode, 
+			children(), 
+			selectZeroOrMany(hasTheLabel(qLabel)))) {
+			ReadOnlyPropertyList queryProps = queryNode.properties();
+			String queryClassName = (String) queryProps.getPropertyValue("className");
+			log.info("checking query: " + queryClassName);	
+			// default properties: potential list
+			Set<String> defaultProps = getArchetypePropertyList("ConstraintSpec");
+			// find the default props that are effectively present in the above list and count them 
+			int defaultPropCount = 0;
+			for (String key:queryProps.getKeysAsSet())
+				if (defaultProps.contains(key))
+					defaultPropCount += 1;
+			int parameterCount = queryProps.size() - defaultPropCount;
+			String[] parameterNames = new String[parameterCount];
+			Class<?>[] parameterTypes = new Class[parameterCount];
+			Object[] parameterValues = new Object[parameterCount];
+			int cnt = 0;
+			for (String key : queryProps.getKeysAsSet()) {
+				Property property = queryProps.getProperty(key);
+				if (!defaultProps.contains(key)) {
+					parameterNames[cnt] = property.getKey();
+					try {
+						parameterTypes[cnt] = Class.forName(property.getClassName());
+					} catch (ClassNotFoundException e) {
+//						e.printStackTrace();
+						checkFailList.put(e,queryNode);
+						log.severe("Cannot get class for archetype check property" + queryNode);
+					}
+					parameterValues[cnt] = property.getValue();
+					cnt++;
+				}
+			}
+			Query query;
+			Class<? extends Query> queryClass;
+			try {
+				queryClass = (Class<? extends Query>) Class.forName(queryClassName);
+				// BUG: FLAW here - properties come in any order, hence the constructor
+				// signature may not be correct
+				// it will only work with single-argument constructors...
+				// I think the only way to fix this is to impose a unique ObjectTable as an
+				// entry, with properly ordered parameters
+				Constructor<? extends Query> queryConstructor;
+				queryConstructor = queryClass.getConstructor(parameterTypes);
+				query = (Query) queryConstructor.newInstance(parameterValues);
+				query.check(item);
+			// this is bad. means there is an error in query name
+			// NB: should it crash ? if not, group it with next catch block
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | 
+					InstantiationException | IllegalAccessException | IllegalArgumentException |
+					InvocationTargetException e) {
+				log.severe("cannot instantiate Query '"+queryClassName+"'");
+				e.printStackTrace();
+			// this only means the query failed
+			} catch (QGraphException e) {
+				checkFailList.put(e,queryNode);
 			}
 		}
 	}
@@ -195,7 +291,10 @@ public class Archetypes {
 	private void check(TreeNode nodeToCheck, 
 			NodeSpec hasNode, 
 			Tree<? extends TreeNode> treeToCheck) {
-		// TODO: code this
+		int toNodeCount = 0;
+		int fromNodeCount = 0;
+		checkQuery(nodeToCheck, hasNode);
+// crashes on the Trees Query because Trees is using the old system with _CHILD edges - have to fix this first.
 	}
 	
 	// temporary, for debugging
