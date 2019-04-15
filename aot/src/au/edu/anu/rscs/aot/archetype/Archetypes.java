@@ -34,7 +34,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -228,11 +227,6 @@ public class Archetypes {
 	private void checkQuery(Object item, NodeSpec hasNode) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
 		String qLabel = hasNode.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
-		
-		List<ConstraintSpec> debug = (List<ConstraintSpec>) get(hasNode, 
-				children(), 
-				selectZeroOrMany(hasTheLabel(qLabel)));
-		
 		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(hasNode, 
 			children(), 
 			selectZeroOrMany(hasTheLabel(qLabel)))) {
@@ -280,7 +274,7 @@ public class Archetypes {
 				query = (Query) queryConstructor.newInstance(parameterValues);
 				query.check(item);
 			// this is bad. means there is an error in query name
-			// NB: should it crash ? if not, group it with next catch block
+			// it should crash because archetypes are not supposed to be written by hand
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | 
 					InstantiationException | IllegalAccessException | IllegalArgumentException |
 					InvocationTargetException e) {
@@ -299,6 +293,10 @@ public class Archetypes {
 		int toNodeCount = 0;
 		int fromNodeCount = 0;
 		checkQuery(nodeToCheck, hasNode);
+		
+		// temporary for debugging - to be removed or logged.
+		if (checkFailList.isEmpty())
+			System.out.println("Archetype check: no errors");
 		for (Exception e:checkFailList.keySet())
 			System.out.println(checkFailList.get(e)+ " ::: "+ e);
 	}

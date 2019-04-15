@@ -48,6 +48,7 @@ class ArchetypesTest {
 		assertNotNull(arch);		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void testCheckArchetype() {
 		Archetypes arch = new Archetypes();
