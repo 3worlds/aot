@@ -228,6 +228,11 @@ public class Archetypes {
 	private void checkQuery(Object item, NodeSpec hasNode) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
 		String qLabel = hasNode.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
+		
+		List<ConstraintSpec> debug = (List<ConstraintSpec>) get(hasNode, 
+				children(), 
+				selectZeroOrMany(hasTheLabel(qLabel)));
+		
 		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(hasNode, 
 			children(), 
 			selectZeroOrMany(hasTheLabel(qLabel)))) {
@@ -294,7 +299,8 @@ public class Archetypes {
 		int toNodeCount = 0;
 		int fromNodeCount = 0;
 		checkQuery(nodeToCheck, hasNode);
-// crashes on the Trees Query because Trees is using the old system with _CHILD edges - have to fix this first.
+		for (Exception e:checkFailList.keySet())
+			System.out.println(checkFailList.get(e)+ " ::: "+ e);
 	}
 	
 	// temporary, for debugging
