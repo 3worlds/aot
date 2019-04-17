@@ -34,6 +34,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,12 +49,16 @@ import au.edu.anu.rscs.aot.queries.Query;
 import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.DataTreeNode;
+import fr.cnrs.iees.graph.Direction;
+import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.MinimalGraph;
+import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
+import fr.cnrs.iees.properties.SimplePropertyList;
 
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
@@ -224,10 +229,10 @@ public class Archetypes {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void checkQuery(Object item, NodeSpec hasNode) {
+	private void checkQuery(Object item, TreeNode spec) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
-		String qLabel = hasNode.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
-		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(hasNode, 
+		String qLabel = spec.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
+		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(spec, 
 			children(), 
 			selectZeroOrMany(hasTheLabel(qLabel)))) {
 			ReadOnlyPropertyList queryProps = queryNode.properties();
@@ -252,9 +257,9 @@ public class Archetypes {
 					try {
 						parameterTypes[cnt] = Class.forName(property.getClassName());
 					} catch (ClassNotFoundException e) {
-//						e.printStackTrace();
 						checkFailList.put(e,queryNode);
-						log.severe("Cannot get class for archetype check property" + queryNode);
+//						log.severe("Cannot get class for archetype check property" + queryNode);
+//						e.printStackTrace();
 					}
 					parameterValues[cnt] = property.getValue();
 					cnt++;
@@ -264,11 +269,11 @@ public class Archetypes {
 			Class<? extends Query> queryClass;
 			try {
 				queryClass = (Class<? extends Query>) Class.forName(queryClassName);
-				// BUG: FLAW here - properties come in any order, hence the constructor
-				// signature may not be correct
-				// it will only work with single-argument constructors...
-				// I think the only way to fix this is to impose a unique ObjectTable as an
-				// entry, with properly ordered parameters
+				// Caution here: since properties can come in any order, the Query constructors
+				// have to be able to handle changes in argument order. This means
+				// there must be a constructor for every possible argument order.
+				// cf issue #4 in aot
+				// if argument order matters ObjectTable should be used as a unique argument
 				Constructor<? extends Query> queryConstructor;
 				queryConstructor = queryClass.getConstructor(parameterTypes);
 				query = (Query) queryConstructor.newInstance(parameterValues);
@@ -280,19 +285,129 @@ public class Archetypes {
 					InvocationTargetException e) {
 				log.severe("cannot instantiate Query '"+queryClassName+"'");
 				e.printStackTrace();
-			// this only means the query failed
+			// this only means the query failed and it should be reported to the user
 			} catch (QGraphException e) {
 				checkFailList.put(e,queryNode);
 			}
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void check(TreeNode nodeToCheck, 
 			NodeSpec hasNode, 
 			Tree<? extends TreeNode> treeToCheck) {
 		int toNodeCount = 0;
-		int fromNodeCount = 0;
+//		int fromNodeCount = 0; // fromNode disabled for the moment
+		// check constraints on nodeToCheck
 		checkQuery(nodeToCheck, hasNode);
+		// check Edge specifications for nodeToCheck
+		// get the 'hasEdge' label from the archetype factory
+		String eLabel = hasNode.treeNodeFactory().treeNodeClassName(EdgeSpec.class);
+		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
+				children(),
+				selectZeroOrMany(hasTheLabel(eLabel)))) {
+			SimplePropertyList eprops = edgeSpec.properties();
+			// edge spec toNode
+			String toNodeRef = null;
+			if (eprops.hasProperty("toNode"))
+				toNodeRef = (String) eprops.getPropertyValue("toNode");
+			else { // this is an error, an edge spec must have a toNode property
+				Exception e = new QGraphException("'toNode' property missing for edge specification "+ edgeSpec);
+				checkFailList.put(e, edgeSpec);
+			}
+			// edge spec multiplicity
+			IntegerRange edgeMult = new IntegerRange(1, 1);
+			if (eprops.hasProperty("multiplicity"))
+				edgeMult = (IntegerRange) eprops.getPropertyValue("multiplicity");
+			// edge spec label
+			String edgeLabel = null; // valid default value ???
+			if (eprops.hasProperty("isOfClass"))
+				edgeLabel = (String) eprops.getPropertyValue("isOfClass");
+			// edge spec id
+			String edgeId = null;
+			if (eprops.hasProperty("hasId"))
+				edgeId = (String) eprops.getPropertyValue("hasId");
+			// search for edges that point to nodes types or names listed in the spec
+			List<Node> toNodes = new LinkedList<Node>();
+			// for nodeToCheck to have edges, it must be a subclass of Node
+			if (nodeToCheck instanceof Node) {
+				Node node = (Node) nodeToCheck;
+				for (Edge ed:node.getEdges(Direction.OUT))
+//					if () // TODO: match for node reference --> we need references finally 
+					{
+					boolean ok = true;
+					// check edge label
+					if (edgeLabel!=null)
+						if (!ed.classId().equals(edgeLabel)) {
+							Exception e = new QGraphException("Edge "+ed+" should be of class ["+
+								edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
+							checkFailList.put(e, ed);
+							ok = false;
+					}
+					// check edge id
+					if (edgeId!=null)
+						if (!ed.id().equals(edgeId)) {
+							Exception e = new QGraphException("Edge "+ed+" should have id ["+
+								edgeId+"]. Id ["+ed.id()+"] found instead.");
+							checkFailList.put(e, ed);
+							ok = false;
+					}
+					// check queries on edge
+					int nprobs = checkFailList.size();
+					checkQuery(ed,edgeSpec);
+					if (checkFailList.size()>nprobs)
+						ok = false;
+					if (ok) {
+						toNodeCount++;
+						toNodes.add(node); // what's the use of this list now ?
+					}
+				}
+				// check edge multiplicity
+				try {
+					edgeMult.check(toNodeCount);
+				} catch (Exception e) {
+					checkFailList.put(e, node);
+				}
+			}
+			// else error ? we must have a Node here ?
+			
+			// NB here 'node' is 'nodeToCheck'
+//			AotList<AotNode> toNodes = new AotList<AotNode>();
+//			try {
+//				// Note: I made the "hasEdge" label optional since it's causing a lot of trouble
+//				// if (edgeLabel == null || edgeLabel.length() == 0)
+//				if (edgeLabel == null || edgeLabel.length() == 0 || edgeLabel.equals(Trees.CHILD_LABEL))
+//					toNodes = (AotList<AotNode>) SequenceQuery.get(node.getEdges(Direction.OUT),
+//							edgeListEndNodes(), selectZeroOrMany(CoreQueries.matchesRef(toNodeRef)));
+//				else {
+//					toNodes = (AotList<AotNode>) SequenceQuery.get(node.getEdges(Direction.OUT),
+//							selectZeroOrMany(hasTheLabel(edgeLabel)), edgeListEndNodes(),
+//							selectZeroOrMany(CoreQueries.matchesRef(toNodeRef)));
+//				}
+//				edgeMult.check(toNodes.size());
+//				toNodeCount = toNodeCount + toNodes.size();
+//
+//				// check the edges against queries
+//				//
+//				for (AotEdge edge : (List<AotEdge>) node.getEdges(Direction.OUT)) {
+//					// if (edge.endNode().matchesRef(toNodeRef))
+//					if (NodeReference.matchesRef((AotNode) edge.endNode(), toNodeRef))
+//						checkQuery(edge, edgeSpec);
+//				}
+//			} catch (Exception e) {
+//				recordError("Expected " + node + " to have " + edgeMult + " out edge(s) to nodes that match ["
+//						+ toNodeRef + "] (found " + toNodes.size() + ") ", node, e);
+
+			
+		}
+		// check Property specifications for nodeToCheck
+		// get the 'hasProperty' label from the archetype factory
+		String pLabel = hasNode.treeNodeFactory().treeNodeClassName(PropertySpec.class);
+		for (PropertySpec pspec: (List<PropertySpec>) get(hasNode,
+				children(),
+				selectZeroOrMany(hasTheLabel(pLabel)))) {
+			
+		}
 		
 		// temporary for debugging - to be removed or logged.
 		if (checkFailList.isEmpty())
