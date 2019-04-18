@@ -53,12 +53,15 @@ import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.MinimalGraph;
 import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.ReadOnlyDataElement;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
+import fr.cnrs.iees.io.parsing.impl.NodeReference;
 
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
@@ -133,7 +136,7 @@ public class Archetypes {
 	 */
 	public void check(MinimalGraph<?> graphToCheck, Tree<? extends TreeNode> archetype) {
 		for (TreeNode arch: archetype.nodes()) 
-			if (ArchetypeRootSpec.class.isAssignableFrom(arch.getClass()))
+			if (arch instanceof ArchetypeRootSpec)
 				check(graphToCheck,(ArchetypeRootSpec)arch);
 	}
 	
@@ -147,7 +150,7 @@ public class Archetypes {
 			return true;
 		// parent exists, must match at least one id of parentList
 		if (child.getParent()!=null) {
-			String pid = child.getParent().id().toString();
+			String pid = child.getParent().classId();
 			for (int i=0; i<parentList.size(); i++)
 				if (pid.equals(parentList.getWithFlatIndex(i)))
 					return true;
@@ -180,15 +183,16 @@ public class Archetypes {
 			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
 			int complyCount = 0;
 			for (TreeNode tn:archetype.getChildren())
-				if (NodeSpec.class.isAssignableFrom(tn.getClass())) {
+//				if (NodeSpec.class.isAssignableFrom(tn.getClass())) {
+				if (tn instanceof NodeSpec) {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
 					String requiredClass = (String) hasNode.properties().getPropertyValue("isOfClass");
 					int count = 0;
-					for (TreeNode n:treeToCheck.nodes()) 
+					for (TreeNode n:treeToCheck.nodes())
 						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
 							log.info("checking node: " + n.toUniqueString());
-							check(n,hasNode,treeToCheck);
+							check(n,hasNode);
 							count++;
 							complyCount++;
 					}
@@ -229,7 +233,7 @@ public class Archetypes {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void checkQuery(Object item, TreeNode spec) {
+	private void checkConstraints(Object item, TreeNode spec) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
 		String qLabel = spec.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
 		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(spec, 
@@ -293,16 +297,11 @@ public class Archetypes {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void check(TreeNode nodeToCheck, 
-			NodeSpec hasNode, 
-			Tree<? extends TreeNode> treeToCheck) {
-		int toNodeCount = 0;
-//		int fromNodeCount = 0; // fromNode disabled for the moment
-		// check constraints on nodeToCheck
-		checkQuery(nodeToCheck, hasNode);
-		// check Edge specifications for nodeToCheck
+	private void checkEdges(TreeNode nodeToCheck, NodeSpec hasNode) {
 		// get the 'hasEdge' label from the archetype factory
 		String eLabel = hasNode.treeNodeFactory().treeNodeClassName(EdgeSpec.class);
+		int toNodeCount = 0;
+//		int fromNodeCount = 0; // fromNode disabled for the moment
 		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
 				children(),
 				selectZeroOrMany(hasTheLabel(eLabel)))) {
@@ -333,34 +332,33 @@ public class Archetypes {
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
 				for (Edge ed:node.getEdges(Direction.OUT))
-//					if () // TODO: match for node reference --> we need references finally 
-					{
-					boolean ok = true;
-					// check edge label
-					if (edgeLabel!=null)
-						if (!ed.classId().equals(edgeLabel)) {
-							Exception e = new QGraphException("Edge "+ed+" should be of class ["+
-								edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
-							checkFailList.put(e, ed);
+					if (NodeReference.matchesRef(nodeToCheck,toNodeRef)) {
+						boolean ok = true;
+						// check edge label
+						if (edgeLabel!=null)
+							if (!ed.classId().equals(edgeLabel)) {
+								Exception e = new QGraphException("Edge "+ed+" should be of class ["+
+									edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
+								checkFailList.put(e, ed);
+								ok = false;
+						}
+						// check edge id
+						if (edgeId!=null)
+							if (!ed.id().equals(edgeId)) {
+								Exception e = new QGraphException("Edge "+ed+" should have id ["+
+									edgeId+"]. Id ["+ed.id()+"] found instead.");
+								checkFailList.put(e, ed);
+								ok = false;
+						}
+						// check queries on edge
+						int nprobs = checkFailList.size();
+						checkConstraints(ed,edgeSpec);
+						if (checkFailList.size()>nprobs)
 							ok = false;
-					}
-					// check edge id
-					if (edgeId!=null)
-						if (!ed.id().equals(edgeId)) {
-							Exception e = new QGraphException("Edge "+ed+" should have id ["+
-								edgeId+"]. Id ["+ed.id()+"] found instead.");
-							checkFailList.put(e, ed);
-							ok = false;
-					}
-					// check queries on edge
-					int nprobs = checkFailList.size();
-					checkQuery(ed,edgeSpec);
-					if (checkFailList.size()>nprobs)
-						ok = false;
-					if (ok) {
-						toNodeCount++;
-						toNodes.add(node); // what's the use of this list now ?
-					}
+						if (ok) {
+							toNodeCount++;
+							toNodes.add(node); // what's the use of this list now ?
+						}
 				}
 				// check edge multiplicity
 				try {
@@ -370,45 +368,101 @@ public class Archetypes {
 				}
 			}
 			// else error ? we must have a Node here ?
+			// edges specified but object is not a node ???
 			
-			// NB here 'node' is 'nodeToCheck'
-//			AotList<AotNode> toNodes = new AotList<AotNode>();
-//			try {
-//				// Note: I made the "hasEdge" label optional since it's causing a lot of trouble
-//				// if (edgeLabel == null || edgeLabel.length() == 0)
-//				if (edgeLabel == null || edgeLabel.length() == 0 || edgeLabel.equals(Trees.CHILD_LABEL))
-//					toNodes = (AotList<AotNode>) SequenceQuery.get(node.getEdges(Direction.OUT),
-//							edgeListEndNodes(), selectZeroOrMany(CoreQueries.matchesRef(toNodeRef)));
-//				else {
-//					toNodes = (AotList<AotNode>) SequenceQuery.get(node.getEdges(Direction.OUT),
-//							selectZeroOrMany(hasTheLabel(edgeLabel)), edgeListEndNodes(),
-//							selectZeroOrMany(CoreQueries.matchesRef(toNodeRef)));
-//				}
-//				edgeMult.check(toNodes.size());
-//				toNodeCount = toNodeCount + toNodes.size();
-//
-//				// check the edges against queries
-//				//
-//				for (AotEdge edge : (List<AotEdge>) node.getEdges(Direction.OUT)) {
-//					// if (edge.endNode().matchesRef(toNodeRef))
-//					if (NodeReference.matchesRef((AotNode) edge.endNode(), toNodeRef))
-//						checkQuery(edge, edgeSpec);
-//				}
-//			} catch (Exception e) {
-//				recordError("Expected " + node + " to have " + edgeMult + " out edge(s) to nodes that match ["
-//						+ toNodeRef + "] (found " + toNodes.size() + ") ", node, e);
+		} // loop on EdgeSpecs 
 
-			
-		}
-		// check Property specifications for nodeToCheck
+		// I havent put this code in (from Shayne's Archetype class) because I suspect its useless
+		// I copy it here just to remember we may need it one day
+// check other edge counts
+//
+//		int otherOutCount = node.degree(Direction.OUT) - toNodeCount;
+//		if (!otherOutEdges.inRange(otherOutCount)) {
+//			recordError("Expected " + otherOutEdges + " other out edges from node '" + node.toShortString()
+//					+ "' referenced by [" + ref + "] (found " + otherOutCount + ")", node);
+//		}
+//
+//		int otherInCount = node.degree(Direction.IN) - fromNodeCount;
+//		if (!otherInEdges.inRange(otherInCount)) {
+//			recordError("Expected " + otherInEdges + " other in edges from node '" + node.toShortString()
+//					+ "' referenced by [" + ref + "] (found " + otherInCount + ")", node);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void checkProperties(Object element, NodeSpec hasNode) {
 		// get the 'hasProperty' label from the archetype factory
 		String pLabel = hasNode.treeNodeFactory().treeNodeClassName(PropertySpec.class);
-		for (PropertySpec pspec: (List<PropertySpec>) get(hasNode,
+		for (PropertySpec propertyArchetype: (List<PropertySpec>) get(hasNode,
 				children(),
 				selectZeroOrMany(hasTheLabel(pLabel)))) {
-			
-		}
-		
+			SimplePropertyList pprops = propertyArchetype.properties();
+			// property spec name
+			String key = null;
+			if (pprops.hasProperty("hasName"))
+				key = (String) pprops.getPropertyValue("hasName");
+			else { // this is an error, a property must have a name
+				Exception e = new QGraphException("'hasName' property missing for property specification "+ propertyArchetype);
+				checkFailList.put(e, propertyArchetype);
+			}
+			// property spec type
+			String typeName = null;
+			if (pprops.hasProperty("type"))
+				typeName = (String) pprops.getPropertyValue("type");
+			else { // this is an error, a property must have a name
+				Exception e = new QGraphException("'type' property missing for property specification "+ propertyArchetype);
+				checkFailList.put(e, propertyArchetype);
+			}
+			// property spec multiplicity
+			IntegerRange multiplicity = new IntegerRange(1, 1);
+			if (pprops.hasProperty("multiplicity"))
+				multiplicity = (IntegerRange) pprops.getPropertyValue("multiplicity");
+			else { // this is an error, a property must have a name
+				Exception e = new QGraphException("'multiplicity' property missing for property specification "+ propertyArchetype);
+				checkFailList.put(e, propertyArchetype);
+			}
+			if (element instanceof ReadOnlyDataElement) {
+				ReadOnlyPropertyList nprops = ((ReadOnlyDataElement)element).properties(); 
+				if (!nprops.hasProperty(key)) { // property not found
+					if (multiplicity.inRange(0)) { // this is an error, this property should be there!
+						Exception e = new QGraphException("Required property '"+key+"' missing for element "+ element);
+						checkFailList.put(e, element);
+					}
+				}
+				else { // property is here
+					Property prop = nprops.getProperty(key);
+					Object pvalue = prop.getValue();
+					String ptype = null;
+					// will this work if value is null ?
+					ptype = ValidPropertyTypes.typeOf(pvalue);
+					if (ptype==null) { // the property type is not in the valid property type list
+						Exception e = new QGraphException("Unknown property type for property '"+key
+							+"' in element "+ element);
+						checkFailList.put(e, element);
+					}
+					else if (!ptype.equals(typeName)) { // the property type is not the one required
+						Exception e = new QGraphException("Property '"+key
+							+"' in element '"+ element 
+							+"' is not of the required type '" + typeName
+							+"' (type '"+ptype
+							+"' found instead)");
+						checkFailList.put(e, element);
+					}
+					checkConstraints(prop,propertyArchetype);
+				}
+			}
+			else {
+				// properties specified but object has no property list
+				Exception e = new QGraphException("Element '"+element+"' has no property list");
+				checkFailList.put(e, element);
+			}
+		} // loop on PropertySpecs
+	}
+	
+	private void check(TreeNode nodeToCheck, 
+			NodeSpec hasNode) {
+		checkConstraints(nodeToCheck, hasNode);
+		checkEdges(nodeToCheck, hasNode);
+		checkProperties(nodeToCheck,hasNode);
 		// temporary for debugging - to be removed or logged.
 		if (checkFailList.isEmpty())
 			System.out.println("Archetype check: no errors");

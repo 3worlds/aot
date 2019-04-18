@@ -61,16 +61,16 @@ class ArchetypesTest {
 		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
 		arch.checkArchetype(graph);
 		String indent = "";
-		printTree(graph.root(),indent);
+//		printTree(graph.root(),indent);
 		
 	}
+	
 	private void printTree(TreeNode parent,String indent) {
 		if (parent.getParent()!=null)
 			System.out.println(indent+parent.getParent().id()+"->"+parent.classId()+":"+parent.id());
 		else
 			System.out.println(indent+parent.classId()+":"+parent.id());
 		for (TreeNode child:parent.getChildren())
-			printTree(child,indent+"  ");
-		
+			printTree(child,indent+"  ");		
 	}
 }
