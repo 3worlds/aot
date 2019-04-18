@@ -65,6 +65,8 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		// a node spec must specify a list of valid parents for the node
 		// for the root node, write hasParent=StringTable(null)
+		// single-level Node references can be used, e.g. NodeClass:NodeId
+		// or NodeClass: or :NodeId
 		//-------------------------------------------------------
 		hasProperty NodeParentSpec
 			hasName = String("hasParent")

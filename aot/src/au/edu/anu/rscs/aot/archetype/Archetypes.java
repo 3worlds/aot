@@ -150,9 +150,10 @@ public class Archetypes {
 			return true;
 		// parent exists, must match at least one id of parentList
 		if (child.getParent()!=null) {
-			String pid = child.getParent().classId();
+//			String pid = child.getParent().classId();
 			for (int i=0; i<parentList.size(); i++)
-				if (pid.equals(parentList.getWithFlatIndex(i)))
+				if (NodeReference.matchesRef(child.getParent(),parentList.getWithFlatIndex(i)))
+//				if (pid.equals(parentList.getWithFlatIndex(i)))
 					return true;
 		}
 		return false;
