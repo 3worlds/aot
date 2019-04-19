@@ -30,6 +30,7 @@ archetype ArchetypeForArchetypes
 	hasNode ArchetypeRootSpec
 		isOfClass = String("archetype")
 		multiplicity = IntegerRange("1..1")
+		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]null))
 
 		//-------------------------------------------------------
 		// the "archetype" node has an *exclusive* property
@@ -140,7 +141,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		hasProperty PropertyMultiplicitySpec
 			hasName = String("multiplicity")
-			type = String("String") 
+			type = String("IntegerRange") 
 			multiplicity = IntegerRange("1..1")
 
 	//-------------------------------------------------------

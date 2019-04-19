@@ -59,6 +59,7 @@ import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.ens.biologie.generic.Textable;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
 
@@ -423,7 +424,7 @@ public class Archetypes {
 			if (element instanceof ReadOnlyDataElement) {
 				ReadOnlyPropertyList nprops = ((ReadOnlyDataElement)element).properties(); 
 				if (!nprops.hasProperty(key)) { // property not found
-					if (multiplicity.inRange(0)) { // this is an error, this property should be there!
+					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						Exception e = new AotException("Required property '"+key+"' missing for element "+ element);
 						checkFailList.put(e, element);
 					}
@@ -432,8 +433,8 @@ public class Archetypes {
 					Property prop = nprops.getProperty(key);
 					Object pvalue = prop.getValue();
 					String ptype = null;
-					// will this work if value is null ?
-					ptype = ValidPropertyTypes.typeOf(pvalue);
+					if (pvalue!=null)
+						ptype = ValidPropertyTypes.typeOf(pvalue);
 					if (ptype==null) { // the property type is not in the valid property type list
 						Exception e = new AotException("Unknown property type for property '"+key
 							+"' in element "+ element);
@@ -466,8 +467,13 @@ public class Archetypes {
 		// temporary for debugging - to be removed or logged.
 		if (checkFailList.isEmpty())
 			System.out.println("Archetype check: no errors");
-		for (Exception e:checkFailList.keySet())
-			System.out.println(checkFailList.get(e)+ " ::: "+ e);
+		for (Exception e:checkFailList.keySet()) {
+			Object o = checkFailList.get(e);
+			if (o instanceof Textable)
+				System.out.println(((Textable)o).toShortString()+ " ::: "+ e);
+			else
+				System.out.println(o+ " ::: "+ e);
+		}
 	}
 	
 	// temporary, for debugging
