@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
-import au.edu.anu.rscs.aot.QGraphException;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import au.edu.anu.rscs.aot.queries.Query;
@@ -291,7 +290,7 @@ public class Archetypes {
 				log.severe("cannot instantiate Query '"+queryClassName+"'");
 				e.printStackTrace();
 			// this only means the query failed and it should be reported to the user
-			} catch (QGraphException e) {
+			} catch (AotException e) {
 				checkFailList.put(e,queryNode);
 			}
 		}
@@ -312,7 +311,7 @@ public class Archetypes {
 			if (eprops.hasProperty("toNode"))
 				toNodeRef = (String) eprops.getPropertyValue("toNode");
 			else { // this is an error, an edge spec must have a toNode property
-				Exception e = new QGraphException("'toNode' property missing for edge specification "+ edgeSpec);
+				Exception e = new AotException("'toNode' property missing for edge specification "+ edgeSpec);
 				checkFailList.put(e, edgeSpec);
 			}
 			// edge spec multiplicity
@@ -338,7 +337,7 @@ public class Archetypes {
 						// check edge label
 						if (edgeLabel!=null)
 							if (!ed.classId().equals(edgeLabel)) {
-								Exception e = new QGraphException("Edge "+ed+" should be of class ["+
+								Exception e = new AotException("Edge "+ed+" should be of class ["+
 									edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
 								checkFailList.put(e, ed);
 								ok = false;
@@ -346,7 +345,7 @@ public class Archetypes {
 						// check edge id
 						if (edgeId!=null)
 							if (!ed.id().equals(edgeId)) {
-								Exception e = new QGraphException("Edge "+ed+" should have id ["+
+								Exception e = new AotException("Edge "+ed+" should have id ["+
 									edgeId+"]. Id ["+ed.id()+"] found instead.");
 								checkFailList.put(e, ed);
 								ok = false;
@@ -402,7 +401,7 @@ public class Archetypes {
 			if (pprops.hasProperty("hasName"))
 				key = (String) pprops.getPropertyValue("hasName");
 			else { // this is an error, a property must have a name
-				Exception e = new QGraphException("'hasName' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'hasName' property missing for property specification "+ propertyArchetype);
 				checkFailList.put(e, propertyArchetype);
 			}
 			// property spec type
@@ -410,7 +409,7 @@ public class Archetypes {
 			if (pprops.hasProperty("type"))
 				typeName = (String) pprops.getPropertyValue("type");
 			else { // this is an error, a property must have a name
-				Exception e = new QGraphException("'type' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'type' property missing for property specification "+ propertyArchetype);
 				checkFailList.put(e, propertyArchetype);
 			}
 			// property spec multiplicity
@@ -418,14 +417,14 @@ public class Archetypes {
 			if (pprops.hasProperty("multiplicity"))
 				multiplicity = (IntegerRange) pprops.getPropertyValue("multiplicity");
 			else { // this is an error, a property must have a name
-				Exception e = new QGraphException("'multiplicity' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'multiplicity' property missing for property specification "+ propertyArchetype);
 				checkFailList.put(e, propertyArchetype);
 			}
 			if (element instanceof ReadOnlyDataElement) {
 				ReadOnlyPropertyList nprops = ((ReadOnlyDataElement)element).properties(); 
 				if (!nprops.hasProperty(key)) { // property not found
 					if (multiplicity.inRange(0)) { // this is an error, this property should be there!
-						Exception e = new QGraphException("Required property '"+key+"' missing for element "+ element);
+						Exception e = new AotException("Required property '"+key+"' missing for element "+ element);
 						checkFailList.put(e, element);
 					}
 				}
@@ -436,12 +435,12 @@ public class Archetypes {
 					// will this work if value is null ?
 					ptype = ValidPropertyTypes.typeOf(pvalue);
 					if (ptype==null) { // the property type is not in the valid property type list
-						Exception e = new QGraphException("Unknown property type for property '"+key
+						Exception e = new AotException("Unknown property type for property '"+key
 							+"' in element "+ element);
 						checkFailList.put(e, element);
 					}
 					else if (!ptype.equals(typeName)) { // the property type is not the one required
-						Exception e = new QGraphException("Property '"+key
+						Exception e = new AotException("Property '"+key
 							+"' in element '"+ element 
 							+"' is not of the required type '" + typeName
 							+"' (type '"+ptype
@@ -453,7 +452,7 @@ public class Archetypes {
 			}
 			else {
 				// properties specified but object has no property list
-				Exception e = new QGraphException("Element '"+element+"' has no property list");
+				Exception e = new AotException("Element '"+element+"' has no property list");
 				checkFailList.put(e, element);
 			}
 		} // loop on PropertySpecs
