@@ -143,13 +143,19 @@ public class Archetypes {
 	// returns true if the parent label (=class name) of 'child' matches one of 
 	// the names passed in 'parentlist' OR if parentList=null and child is the root node
 	private boolean matchesParent(TreeNode child, StringTable parentList) {
-		// no parent required and root node
-		if ((parentList==null) && (child.getParent()==null))
-			return true;
-		if ((parentList.size()==0) && (child.getParent()==null))
-			return true;
+		// root node - has no parent
+		if (child.getParent()==null ) {
+			if (parentList==null)
+				return true;
+			if (parentList.size()==0)
+				return true;
+			for (int i=0; i<parentList.size(); i++)
+				if ((parentList.getWithFlatIndex(i)==null)||(parentList.getWithFlatIndex(i).length()==0))
+					return true;	
+			return false;
+		}
 		// parent exists, must match at least one id of parentList
-		if (child.getParent()!=null) {
+		else  {
 //			String pid = child.getParent().classId();
 			for (int i=0; i<parentList.size(); i++)
 				if (NodeReference.matchesRef(child.getParent(),parentList.getWithFlatIndex(i)))

@@ -15,25 +15,25 @@ tree // Archetype for all archetypes - an archetype is a tree!
 	archetype =        String("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec")
 
 //-------------------------------------------------------
-// this is an archetype
+// 1 this is an archetype
 //-------------------------------------------------------
 archetype ArchetypeForArchetypes 
 
 	//-------------------------------------------------------
-	// this archetype does not accept any other specification
+	// 2 this archetype does not accept any other specification
 	//-------------------------------------------------------
 	exclusive = Boolean(true)
 
 	//-------------------------------------------------------
-	// an archetype starts with a root node of class *archetype*
+	// 3 an archetype starts with a root node of class *archetype*
 	//-------------------------------------------------------
 	hasNode ArchetypeRootSpec
 		isOfClass = String("archetype")
 		multiplicity = IntegerRange("1..1")
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]null))
+		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]""))
 
 		//-------------------------------------------------------
-		// the "archetype" node has an *exclusive* property
+		// 4 the "archetype" node has an *exclusive* property
 		// which tells if other definitions than those contained in the tree
 		// are acceptable or not
 		// absence of the property means non-exclusive archetype
@@ -44,7 +44,7 @@ archetype ArchetypeForArchetypes
 			type = String("Boolean")
 
 	//-------------------------------------------------------
-	// specification for node specifications:
+	// 5 specification for node specifications:
 	// a node with class *hasNode*, child of *archetype*
 	//-------------------------------------------------------
 	hasNode NodeSpec
@@ -53,7 +53,7 @@ archetype ArchetypeForArchetypes
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
-		// a node spec may specify the node class (formerly label)
+		// 6 a node spec may specify the node class (formerly label)
 		// if not present then any label is suitable and will be
 		// be lost during the tree import process, a default 
 		// class (eg TreeNode) will be used to instantiate the node
@@ -64,8 +64,8 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("0..1")
 
 		//-------------------------------------------------------
-		// a node spec must specify a list of valid parents for the node
-		// for the root node, write hasParent=StringTable(null)
+		// 7 a node spec must specify a list of valid parents for the node
+		// for the root node, write hasParent=StringTable(([1]""))
 		// single-level Node references can be used, e.g. NodeClass:NodeId
 		// or NodeClass: or :NodeId
 		//-------------------------------------------------------
@@ -75,7 +75,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
-		// a node spec may specify the node id (formerly name)
+		// 8 a node spec may specify the node id (formerly name)
 		//-------------------------------------------------------
 		hasProperty NodeIdSpec
 			hasName = String("hasId")
@@ -83,7 +83,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("0..1")
 
 		//-------------------------------------------------------
-		// a node spec optionally has a *multiplicity*  property
+		// 9 a node spec optionally has a *multiplicity*  property
 		// defaults to 0..* if not set
 		//-------------------------------------------------------
 		hasProperty NodeMultiplicitySpec 
@@ -92,7 +92,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("0..1")
 
 	//-------------------------------------------------------
-	// specification for constraint specifications
+	// 10 specification for constraint specifications
 	// constraints can apply to node, edge or property specifications
 	//-------------------------------------------------------
 	hasNode ConstraintSpec
@@ -102,7 +102,7 @@ archetype ArchetypeForArchetypes
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
-		// a constraint spec uses a Query class descendant
+		// 11 a constraint spec uses a Query class descendant
 		// which fully qualified name must be provided here
 		//-------------------------------------------------------
 		hasProperty ConstraintClassSpec 
@@ -111,7 +111,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 	//-------------------------------------------------------
-	// specification for property specifications
+	// 12 specification for property specifications
 	// properties apply to node or edge specifications
 	//-------------------------------------------------------
 	hasNode PropertySpec
@@ -120,7 +120,7 @@ archetype ArchetypeForArchetypes
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
-		// a property spec must specify a name for the property
+		// 13 a property spec must specify a name for the property
 		//-------------------------------------------------------
 		hasProperty PropertyNameSpec
 			hasName = String("hasName")
@@ -128,7 +128,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
-		// a property spec must specify a type for the property
+		// 14 a property spec must specify a type for the property
 		//-------------------------------------------------------
 		hasProperty PropertyTypeSpec
 			hasName = String("type")
@@ -136,7 +136,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
-		// a property spec must specify a multiplicity for the property
+		// 15 a property spec must specify a multiplicity for the property
 		// NB valid values are 0..1 and 1..1
 		//-------------------------------------------------------
 		hasProperty PropertyMultiplicitySpec
@@ -145,7 +145,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 	//-------------------------------------------------------
-	// specification for edge specifications
+	// 16 specification for edge specifications
 	//-------------------------------------------------------
 	hasNode EdgeSpec
 		isOfClass = String("hasEdge")
@@ -153,7 +153,7 @@ archetype ArchetypeForArchetypes
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
-		// an edge spec may specify the edge id (formerly name)
+		// 17 an edge spec may specify the edge id (formerly name)
 		//-------------------------------------------------------
 		hasProperty EdgeIdSpec
 			hasName = String("hasId")
@@ -161,7 +161,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("0..1")
 
 		//-------------------------------------------------------
-		// an edge spec may specify the edge class (formerly label)
+		// 18 an edge spec may specify the edge class (formerly label)
 		// if not present then any label is suitable and will be
 		// be lost during the tree import process, a default 
 		// class (eg Edge) will be used to instantiate the edge
@@ -172,7 +172,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("0..1")
 
 		//-------------------------------------------------------
-		// an edge spec must specify an end node (the start node is
+		// 19 an edge spec must specify an end node (the start node is
 		// its parent node specification)
 		//-------------------------------------------------------
 		hasProperty EdgeEndNodeSpec
@@ -181,7 +181,7 @@ archetype ArchetypeForArchetypes
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
-		// an edge spec optionally has a *multiplicity*  property
+		// 20 an edge spec optionally has a *multiplicity*  property
 		// defaults to 0..* if not set
 		//-------------------------------------------------------
 		hasProperty EdgeMultiplicitySpec 
