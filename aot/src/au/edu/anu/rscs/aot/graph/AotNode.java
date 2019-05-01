@@ -217,18 +217,18 @@ public class AotNode extends TreeGraphNode implements ExtendablePropertyList, Co
 //		return nodeFactory().nodeClassName(getClass());
 	}
 
-	// These do the same thing - return the graph - CASTING CRASH!
-	@Override
-	public AotGraph treeNodeFactory() {
-		return null;
-//		return (AotGraph) super.treeNodeFactory();
-	}
-
-	// CASTING CRASH!
-	@Override
-	public AotGraph nodeFactory() {
-		return null;
-//		return (AotGraph) super.treeNodeFactory();
-	}
+//	// These do the same thing - return the graph - CASTING CRASH!
+//	@Override
+//	public AotGraph treeNodeFactory() {
+//		return null;
+////		return (AotGraph) super.treeNodeFactory();
+//	}
+//
+//	// CASTING CRASH!
+//	@Override
+//	public AotGraph nodeFactory() {
+//		return null;
+////		return (AotGraph) super.treeNodeFactory();
+//	}
 
 }
