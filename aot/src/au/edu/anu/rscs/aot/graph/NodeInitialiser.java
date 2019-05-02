@@ -192,7 +192,7 @@ public class NodeInitialiser {
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_AFTER)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER))) {
 			for (AotEdge edge : uiaEdges)
-				node.nodeFactory().makeEdge(node,edge.endNode(),DEPENDENCY);
+				edge.edgeFactory().makeEdge(node,edge.endNode(),DEPENDENCY);
 //				node.newEdge((AotNode)edge.endNode(), DEPENDENCY);
 		}
 		for (AotNode node : nodeList.nodes()) {
@@ -201,7 +201,7 @@ public class NodeInitialiser {
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE))) {
 			for (AotEdge edge : uibEdges)
 //				((AotNode)edge.endNode()).newEdge(node, DEPENDENCY);
-				node.nodeFactory().makeEdge(edge.endNode(),node,DEPENDENCY);
+				edge.edgeFactory().makeEdge(edge.endNode(),node,DEPENDENCY);
 		}
 	}
 
