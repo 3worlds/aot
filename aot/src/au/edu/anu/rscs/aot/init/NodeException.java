@@ -1,4 +1,4 @@
-package au.edu.anu.rscs.aot.graph;
+package au.edu.anu.rscs.aot.init;
 
 import fr.cnrs.iees.graph.Node;
 

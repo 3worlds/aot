@@ -1,4 +1,4 @@
-package au.edu.anu.rscs.aot.graph;
+package au.edu.anu.rscs.aot.init;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface InitialiseBeforeNodesMatching {
+public @interface InitialiseAtOrder{
 
-	String[] value(); // initialise before all nodes which match the specified refs
+	int value(); // initialise before all nodes which match the specified refs
 }

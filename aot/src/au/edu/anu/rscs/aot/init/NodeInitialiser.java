@@ -1,4 +1,4 @@
-package au.edu.anu.rscs.aot.graph;
+package au.edu.anu.rscs.aot.init;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class NodeInitialiser {
 
 	private AotGraph nodeList;
 
-	private DynamicList<AotNode> initialisationList = new DynamicList<AotNode>();
+	private DynamicList<Initialisable> initialisationList = new DynamicList<Initialisable>();
 
 	public NodeInitialiser(AotGraph aotGraph) {
 		this.nodeList = new AotGraph(aotGraph.nodes()); // make a local copy
@@ -35,7 +35,7 @@ public class NodeInitialiser {
 		cleanUpNodeList();
 	}
 
-	public DynamicList<AotNode> getInitialisationList() {
+	public DynamicList<Initialisable> getInitialisationList() {
 		return initialisationList;
 	}
 
@@ -52,7 +52,7 @@ public class NodeInitialiser {
 
 	public NodeExceptionList initialise() {
 		initialisationFailList = new NodeExceptionList();
-		for (AotNode node : initialisationList)
+		for (Initialisable node : initialisationList)
 			try {
 				// uncomment to check init order
 //				if (hasInitialiseAtOrder(node))
@@ -86,7 +86,7 @@ public class NodeInitialiser {
 			theTitle = " " + title;
 		final String finalTitle = theTitle;
 		log.fine("Initialisation order");
-		for (AotNode node : initialisationList) {
+		for (Initialisable node : initialisationList) {
 			count++;
 			final int finalCount = count;
 //			String msg = "  " + String.format("%05d", count) + theTitle + ": "
@@ -122,7 +122,7 @@ public class NodeInitialiser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String annotationString(AotNode node) {
+	private String annotationString(Initialisable node) {
 		String result = "";
 		if (hasInitialiseAtOrder(node))
 			result = withComma(result, "after nodes with order < "
@@ -136,7 +136,7 @@ public class NodeInitialiser {
 						+ "after nodes of class(es) and subclass(es) of '";
 			else
 				result = result + "after nodes of class(es) '";
-			for (Class<? extends AotNode> afterClass : afterClasses(node))
+			for (Class<? extends Initialisable> afterClass : afterClasses(node))
 				result = withComma(result, afterClass.getName());
 			result = endWith(result, "'");
 		}
@@ -149,7 +149,7 @@ public class NodeInitialiser {
 						+ "before nodes of class(es) and subclass(es) of '";
 			else
 				result = result + "before nodes of class(es) '";
-			for (Class<? extends AotNode> beforeClass : beforeClasses(node))
+			for (Class<? extends Initialisable> beforeClass : beforeClasses(node))
 				result = withComma(result, beforeClass.getName());
 			result = endWith(result, "'");
 		}
@@ -170,13 +170,13 @@ public class NodeInitialiser {
 //		for (Edge dep : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER)))
 		for (AotEdge dep : uiaEdges)
 			result = withComma(result, "after node '"
-					+ ((AotNode)dep.endNode()).id() + "'");			
+					+ ((Initialisable)dep.endNode()).id() + "'");			
 		List<AotEdge> uibEdges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 			selectZeroOrMany(hasTheLabel(USER_INITIALISE_BEFORE)));
 //		for (Edge dep : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE)))
 		for (AotEdge dep : uibEdges)
 			result = withComma(result, "before node '"
-					+ ((AotNode)dep.endNode()).id() + "'");
+					+ ((Initialisable)dep.endNode()).id() + "'");
 		if (result.length() == 0)
 			return "";
 		else
@@ -187,34 +187,34 @@ public class NodeInitialiser {
 	private void processInitialisationEdges() {
 		// Add dependency edges for user specified initialisation dependencies
 		//
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> uiaEdges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_AFTER)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_AFTER))) {
 			for (AotEdge edge : uiaEdges)
 				edge.edgeFactory().makeEdge(node,edge.endNode(),DEPENDENCY);
-//				node.newEdge((AotNode)edge.endNode(), DEPENDENCY);
+//				node.newEdge((Configurable)edge.endNode(), DEPENDENCY);
 		}
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> uibEdges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(USER_INITIALISE_BEFORE)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(USER_INITIALISE_BEFORE))) {
 			for (AotEdge edge : uibEdges)
-//				((AotNode)edge.endNode()).newEdge(node, DEPENDENCY);
+//				((Configurable)edge.endNode()).newEdge(node, DEPENDENCY);
 				edge.edgeFactory().makeEdge(edge.endNode(),node,DEPENDENCY);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private void cleanUpNodeList() {
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> edges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(DEPENDENCY)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(DEPENDENCY))) {
 			for (AotEdge edge : edges)
 				edge.disconnect();
 		}
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> edges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(REMOVED)));
 //			for (Edge edge : node.getOutEdges(hasTheLabel(REMOVED))) {
@@ -226,11 +226,11 @@ public class NodeInitialiser {
 	private void processInitialisationAnnotations() {
 
 		// convert
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			if (hasInitialiseAtOrder(node))
 				if (order(node) > -1) {
 					int order = order(node);
-					for (AotNode dep : nodeList.nodes())
+					for (Initialisable dep : nodeList.nodes())
 						if (order(dep) > -1 && order(dep) < order)
 //							node.newEdge(dep, DEPENDENCY);
 							node.nodeFactory().makeEdge(node,dep,DEPENDENCY);
@@ -240,8 +240,8 @@ public class NodeInitialiser {
 				boolean subClasses = node.getClass()
 						.getAnnotation(InitialiseAfterClass.class)
 						.includeSubclasses();
-				for (Class<? extends AotNode> afterClass : afterClasses(node))
-					for (AotNode dep : nodeList.nodes())
+				for (Class<? extends Initialisable> afterClass : afterClasses(node))
+					for (Initialisable dep : nodeList.nodes())
 						if (subClasses) {
 							if (afterClass.isInstance(dep))
 //								node.newEdge(dep, DEPENDENCY);
@@ -256,8 +256,8 @@ public class NodeInitialiser {
 				boolean subClasses = node.getClass()
 						.getAnnotation(InitialiseBeforeClass.class)
 						.includeSubclasses();
-				for (Class<? extends AotNode> beforeClass : beforeClasses(node))
-					for (AotNode dep : nodeList.nodes()) {
+				for (Class<? extends Initialisable> beforeClass : beforeClasses(node))
+					for (Initialisable dep : nodeList.nodes()) {
 						if (subClasses) {
 							if (beforeClass.isInstance(dep))
 //								dep.newEdge(node, DEPENDENCY);
@@ -271,7 +271,7 @@ public class NodeInitialiser {
 			}
 			if (hasInitialiseAfterNodesMatching(node))
 				for (String ref : afterNodesMatching(node))
-					for (AotNode dep : nodeList.nodes())
+					for (Initialisable dep : nodeList.nodes())
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							node.newEdge(dep, DEPENDENCY);
@@ -279,7 +279,7 @@ public class NodeInitialiser {
 
 			if (hasInitialiseBeforeNodesMatching(node))
 				for (String ref : beforeNodesMatching(node))
-					for (AotNode dep : nodeList.nodes())
+					for (Initialisable dep : nodeList.nodes())
 						if (Tree.matchesReference(dep,ref))
 //						if (dep.matchesRef(ref))
 //							dep.newEdge(node, DEPENDENCY);
@@ -292,10 +292,10 @@ public class NodeInitialiser {
 
 		// based on http://en.wikipedia.org/wiki/Topological_sorting
 		//
-		DynamicList<AotNode> l = new DynamicList<AotNode>();
-		DynamicList<AotNode> s = new DynamicList<AotNode>();
+		DynamicList<Initialisable> l = new DynamicList<Initialisable>();
+		DynamicList<Initialisable> s = new DynamicList<Initialisable>();
 
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> inEdges = (List<AotEdge>) get(node,
 				inEdges(),
 				selectZeroOrMany(hasTheLabel(DEPENDENCY)));
@@ -304,13 +304,13 @@ public class NodeInitialiser {
 				s.add(node);
 		}
 		while (s.size() != 0) {
-			AotNode n = s.removeLast();
+			Initialisable n = s.removeLast();
 			l.add(n);
 			List<AotEdge> outEdges = (List<AotEdge>) get(n.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(DEPENDENCY)));
 			for (AotEdge e : outEdges) {
 //			for (Edge e : n.getOutEdges(hasTheLabel(DEPENDENCY))) {
-				AotNode m = (AotNode) e.endNode();
+				Initialisable m = (Initialisable) e.endNode();
 				
 				// TODO: FLAW HERE;
 				
@@ -324,7 +324,7 @@ public class NodeInitialiser {
 					s.add(m);
 			}
 		}
-		for (AotNode node : nodeList.nodes()) {
+		for (Initialisable node : nodeList.nodes()) {
 			List<AotEdge> edges = (List<AotEdge>) get(node.getEdges(Direction.OUT),
 				selectZeroOrMany(hasTheLabel(DEPENDENCY)));
 //			if (node.getOutEdges(hasTheLabel(DEPENDENCY)).size() > 0)
@@ -332,38 +332,38 @@ public class NodeInitialiser {
 				throw new AotException("Cyclic initialisation dependency to node " 
 					+ node + " detected in NodeList " + nodeList);
 		}
-		LinkedList<AotNode> stack = new LinkedList<AotNode>();
+		LinkedList<Initialisable> stack = new LinkedList<Initialisable>();
 
-		for (AotNode node : l)
+		for (Initialisable node : l)
 			stack.push(node);
 		while (!stack.isEmpty())
 			initialisationList.add(stack.pop());
 
 	}
 
-	private boolean hasInitialiseAtOrder(AotNode node) {
+	private boolean hasInitialiseAtOrder(Initialisable node) {
 		return node.getClass().getAnnotation(InitialiseAtOrder.class) != null;
 	}
 
-	private boolean hasInitialiseAfterClasses(AotNode node) {
+	private boolean hasInitialiseAfterClasses(Initialisable node) {
 		return node.getClass().getAnnotation(InitialiseAfterClass.class) != null;
 	}
 
-	private boolean hasInitialiseBeforeClasses(AotNode node) {
+	private boolean hasInitialiseBeforeClasses(Initialisable node) {
 		return node.getClass().getAnnotation(InitialiseBeforeClass.class) != null;
 	}
 
-	private boolean hasInitialiseAfterNodesMatching(AotNode node) {
+	private boolean hasInitialiseAfterNodesMatching(Initialisable node) {
 		return node.getClass()
 				.getAnnotation(InitialiseAfterNodesMatching.class) != null;
 	}
 
-	private boolean hasInitialiseBeforeNodesMatching(AotNode node) {
+	private boolean hasInitialiseBeforeNodesMatching(Initialisable node) {
 		return node.getClass().getAnnotation(
 				InitialiseBeforeNodesMatching.class) != null;
 	}
 
-	private int order(AotNode node) {
+	private int order(Initialisable node) {
 		if (hasInitialiseAtOrder(node))
 			return node.getClass().getAnnotation(InitialiseAtOrder.class)
 					.value();
@@ -371,22 +371,22 @@ public class NodeInitialiser {
 			return -1;
 	}
 
-	private Class<? extends AotNode>[] afterClasses(AotNode node) {
+	private Class<? extends Initialisable>[] afterClasses(Initialisable node) {
 		return node.getClass().getAnnotation(InitialiseAfterClass.class)
 				.value();
 	}
 
-	private Class<? extends AotNode>[] beforeClasses(AotNode node) {
+	private Class<? extends Initialisable>[] beforeClasses(Initialisable node) {
 		return node.getClass().getAnnotation(InitialiseBeforeClass.class)
 				.value();
 	}
 
-	private String[] afterNodesMatching(AotNode node) {
+	private String[] afterNodesMatching(Initialisable node) {
 		return node.getClass()
 				.getAnnotation(InitialiseAfterNodesMatching.class).value();
 	}
 
-	private String[] beforeNodesMatching(AotNode node) {
+	private String[] beforeNodesMatching(Initialisable node) {
 		return node.getClass()
 				.getAnnotation(InitialiseBeforeNodesMatching.class).value();
 	}

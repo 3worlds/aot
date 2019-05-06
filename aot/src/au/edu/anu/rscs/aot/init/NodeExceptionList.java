@@ -1,4 +1,4 @@
-package au.edu.anu.rscs.aot.graph;
+package au.edu.anu.rscs.aot.init;
 
 import au.edu.anu.rscs.aot.collections.DynamicList;
 import fr.cnrs.iees.graph.Node;

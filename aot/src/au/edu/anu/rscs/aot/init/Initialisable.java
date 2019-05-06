@@ -27,15 +27,15 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.graph;
+package au.edu.anu.rscs.aot.init;
 
 /**
  * 
  * @author Jacques Gignoux - 21 déc. 2018
  *
  */
-public interface Configurable {
+public interface Initialisable {
 
-	public Configurable initialise();
+	public Initialisable initialise();
 	
 }
