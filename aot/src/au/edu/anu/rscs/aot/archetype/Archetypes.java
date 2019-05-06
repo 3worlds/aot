@@ -32,11 +32,9 @@ package au.edu.anu.rscs.aot.archetype;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -59,7 +57,6 @@ import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.ens.biologie.generic.Textable;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
 
@@ -77,8 +74,13 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * <p>There are two sets of methods here: the <em>check(...)</em> methods perform the checks and
  * capture all errors (as exceptions) in a list. the <em>complies(...)</em> methods perform a check
  * and return false if an Exception was found during the checking process.</p>
+ * <p>Afer a call to {@linkp check()}, {@link checkList()} may be called to retrieve all
+ * checking errors.</p>
  * <p>NB: an archetype is a {@linkplain Tree}, but a configuration/specification graph is a 
  * {@linkplain TreeGraph}.</p>
+ * <p>NOTE: by default this class spits a lot of log messages. These are logged at the
+ * INFO level (="debugging"), so if you want to get rid of them just set the log level to
+ * WARNING.</p>
  * 
  * @author Jacques Gignoux - 6 mars 2019
  * @author Shayne Flint - looong ago		
@@ -91,7 +93,7 @@ public class Archetypes {
 	
 	private Logger log = Logger.getLogger(Archetypes.class.getName());
 	
-	private Map<Exception,Object> checkFailList = new HashMap<Exception,Object>();
+	private List<CheckMessage> checkFailList = new LinkedList<CheckMessage>();
 	
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
@@ -118,8 +120,8 @@ public class Archetypes {
 	
 	/**
 	 * checks that an archetype is an archetype and returns true if it complies.
-	 * @param graphToCheck
-	 * @return
+	 * @param graphToCheck the tree to check
+	 * @return true if graphToCheck is a valid archetype
 	 */
 	public boolean isArchetype(Tree<? extends TreeNode> graphToCheck) {
 		checkArchetype(graphToCheck);
@@ -184,7 +186,7 @@ public class Archetypes {
 		try {
 			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
 		} catch (ClassCastException e) {
-			checkFailList.put(e,treeToCheck);
+			checkFailList.add(new CheckMessage(treeToCheck,e,null));
 		}
 		if (treeToCheck!=null) {
 			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
@@ -213,13 +215,14 @@ public class Archetypes {
 							+ " nodes with parents '" + parentList 
 							+ "' (got " + count
 							+ ") archetype=" + hasNode.toUniqueString();
-						checkFailList.put(new AotException(message),hasNode);
+						checkFailList.add(new CheckMessage(treeToCheck,new AotException(message),hasNode));
 				}
 			}
 			if (exclusive && complyCount != treeToCheck.size()) {
-				checkFailList.put(new AotException("Expected all nodes to comply (got " 
-					+ (treeToCheck.size() - complyCount)
-					+ " nodes which didn't comply)"),treeToCheck);
+				checkFailList.add(new CheckMessage(treeToCheck,
+					new AotException("Expected all nodes to comply (got " 
+						+ (treeToCheck.size() - complyCount)
+						+ " nodes which didn't comply)"),null));
 			}
 		}
 	}
@@ -268,7 +271,7 @@ public class Archetypes {
 					try {
 						parameterTypes[cnt] = Class.forName(property.getClassName());
 					} catch (ClassNotFoundException e) {
-						checkFailList.put(e,queryNode);
+						checkFailList.add(new CheckMessage(queryNode,e,null));
 //						log.severe("Cannot get class for archetype check property" + queryNode);
 //						e.printStackTrace();
 					}
@@ -298,7 +301,7 @@ public class Archetypes {
 				e.printStackTrace();
 			// this only means the query failed and it should be reported to the user
 			} catch (AotException e) {
-				checkFailList.put(e,queryNode);
+				checkFailList.add(new CheckMessage(item,e,queryNode));
 			}
 		}
 	}
@@ -312,6 +315,7 @@ public class Archetypes {
 		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
 				children(),
 				selectZeroOrMany(hasTheLabel(eLabel)))) {
+			log.info("checking edge spec: " + edgeSpec.toUniqueString());
 			SimplePropertyList eprops = edgeSpec.properties();
 			// edge spec toNode
 			String toNodeRef = null;
@@ -319,7 +323,7 @@ public class Archetypes {
 				toNodeRef = (String) eprops.getPropertyValue("toNode");
 			else { // this is an error, an edge spec must have a toNode property
 				Exception e = new AotException("'toNode' property missing for edge specification "+ edgeSpec);
-				checkFailList.put(e, edgeSpec);
+				checkFailList.add(new CheckMessage(edgeSpec,e,null));
 			}
 			// edge spec multiplicity
 			IntegerRange edgeMult = new IntegerRange(1, 1);
@@ -346,7 +350,7 @@ public class Archetypes {
 							if (!ed.classId().equals(edgeLabel)) {
 								Exception e = new AotException("Edge "+ed+" should be of class ["+
 									edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
-								checkFailList.put(e, ed);
+								checkFailList.add(new CheckMessage(ed, e, edgeSpec));
 								ok = false;
 						}
 						// check edge id
@@ -354,7 +358,7 @@ public class Archetypes {
 							if (!ed.id().equals(edgeId)) {
 								Exception e = new AotException("Edge "+ed+" should have id ["+
 									edgeId+"]. Id ["+ed.id()+"] found instead.");
-								checkFailList.put(e, ed);
+								checkFailList.add(new CheckMessage(ed, e, edgeSpec));
 								ok = false;
 						}
 						// check queries on edge
@@ -371,7 +375,7 @@ public class Archetypes {
 				try {
 					edgeMult.check(toNodeCount);
 				} catch (Exception e) {
-					checkFailList.put(e, node);
+					checkFailList.add(new CheckMessage(node, e, edgeSpec));
 				}
 			}
 			// else error ? we must have a Node here ?
@@ -402,6 +406,7 @@ public class Archetypes {
 		for (PropertySpec propertyArchetype: (List<PropertySpec>) get(hasNode,
 				children(),
 				selectZeroOrMany(hasTheLabel(pLabel)))) {
+			log.info("checking property spec: " + propertyArchetype.toUniqueString());
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
 			String key = null;
@@ -409,7 +414,7 @@ public class Archetypes {
 				key = (String) pprops.getPropertyValue("hasName");
 			else { // this is an error, a property must have a name
 				Exception e = new AotException("'hasName' property missing for property specification "+ propertyArchetype);
-				checkFailList.put(e, propertyArchetype);
+				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			// property spec type
 			String typeName = null;
@@ -417,7 +422,7 @@ public class Archetypes {
 				typeName = (String) pprops.getPropertyValue("type");
 			else { // this is an error, a property must have a name
 				Exception e = new AotException("'type' property missing for property specification "+ propertyArchetype);
-				checkFailList.put(e, propertyArchetype);
+				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			// property spec multiplicity
 			IntegerRange multiplicity = new IntegerRange(1, 1);
@@ -425,14 +430,14 @@ public class Archetypes {
 				multiplicity = (IntegerRange) pprops.getPropertyValue("multiplicity");
 			else { // this is an error, a property must have a name
 				Exception e = new AotException("'multiplicity' property missing for property specification "+ propertyArchetype);
-				checkFailList.put(e, propertyArchetype);
+				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			if (element instanceof ReadOnlyDataElement) {
 				ReadOnlyPropertyList nprops = ((ReadOnlyDataElement)element).properties(); 
 				if (!nprops.hasProperty(key)) { // property not found
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						Exception e = new AotException("Required property '"+key+"' missing for element "+ element);
-						checkFailList.put(e, element);
+						checkFailList.add(new CheckMessage(element, e, propertyArchetype));
 					}
 				}
 				else { // property is here
@@ -444,7 +449,7 @@ public class Archetypes {
 					if (ptype==null) { // the property type is not in the valid property type list
 						Exception e = new AotException("Unknown property type for property '"+key
 							+"' in element "+ element);
-						checkFailList.put(e, element);
+						checkFailList.add(new CheckMessage(element, e, propertyArchetype));
 					}
 					else if (!ptype.equals(typeName)) { // the property type is not the one required
 						Exception e = new AotException("Property '"+key
@@ -452,7 +457,7 @@ public class Archetypes {
 							+"' is not of the required type '" + typeName
 							+"' (type '"+ptype
 							+"' found instead)");
-						checkFailList.put(e, element);
+						checkFailList.add(new CheckMessage(element,e,propertyArchetype));
 					}
 					checkConstraints(prop,propertyArchetype);
 				}
@@ -460,7 +465,7 @@ public class Archetypes {
 			else {
 				// properties specified but object has no property list
 				Exception e = new AotException("Element '"+element+"' has no property list");
-				checkFailList.put(e, element);
+				checkFailList.add(new CheckMessage(element,e,propertyArchetype));
 			}
 		} // loop on PropertySpecs
 	}
@@ -470,16 +475,17 @@ public class Archetypes {
 		checkConstraints(nodeToCheck, hasNode);
 		checkEdges(nodeToCheck, hasNode);
 		checkProperties(nodeToCheck,hasNode);
-		// temporary for debugging - to be removed or logged.
+	}
+	
+	/**
+	 * Get the checking errors.
+	 * @return null if no checking errors, the (read-only) list of errors otherwise
+	 */
+	public Iterable<CheckMessage> checkList() {
 		if (checkFailList.isEmpty())
-			System.out.println("Archetype check: no errors");
-		for (Exception e:checkFailList.keySet()) {
-			Object o = checkFailList.get(e);
-			if (o instanceof Textable)
-				System.out.println(((Textable)o).toShortString()+ " ::: "+ e);
-			else
-				System.out.println(o+ " ::: "+ e);
-		}
+			return null;
+		else
+			return checkFailList;
 	}
 	
 	// temporary, for debugging
