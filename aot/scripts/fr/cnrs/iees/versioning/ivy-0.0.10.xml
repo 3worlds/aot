@@ -1,5 +1,5 @@
 <!--===================================================================================
- ant and ivy scripts for project <aot> version 0.1.0 (Mon May 06 14:54:52 CEST 2019)
+ ant and ivy scripts for project <aot> version 0.0.10 (Mon May 06 11:13:56 CEST 2019)
  author: Jacques Gignoux <jacques.gignoux@upmc.fr>
 
  CAUTION: this file is generated - DO NOT EDIT!
@@ -13,7 +13,7 @@
 
 	<info	organisation="au.edu.anu.rscs.aot"
 			module="aot"
-			revision="0.1.0"
+			revision="0.0.10"
 			status="integration">
 		<license name="gpl3" url="https://www.gnu.org/licenses/gpl-3.0.txt"/>
 		<description>AOT is a method to generate elaborate software code from a series of independent domains of knowledge. It enables one to manage and maintain software from explicit specifications that can be translated into any programming language.</description>
@@ -30,8 +30,8 @@
 	</publications>
 
 	<dependencies>
-		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="[0.1.0,)"/>
-		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.1.0,)"/>
+		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="[0.0.14,)"/>
+		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.0.8,)"/>
 	</dependencies>
 
 </ivy-module>

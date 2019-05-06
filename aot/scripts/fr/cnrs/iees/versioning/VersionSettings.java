@@ -46,8 +46,8 @@ public class VersionSettings {
 	 */
 	protected static String[][] DEPS = { 
 //		{"fr.ens.biologie", "generics", "+"},
-		{"au.edu.anu.rscs.aot", "omugi", "[0.0.14,)", null},
-		{"au.edu.anu.rscs.aot", "qgraph", "[0.0.8,)", null}
+		{"au.edu.anu.rscs.aot", "omugi", "[0.1.0,)", null},
+		{"au.edu.anu.rscs.aot", "qgraph", "[0.1.0,)", null}
 	};
 	
 	/** The name of the main class to put in the jar manifest, if any. This enables users to

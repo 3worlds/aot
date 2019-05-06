@@ -61,7 +61,7 @@ class ArchetypesTest {
 		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
 		arch.checkArchetype(graph);
 		String indent = "";
-//		printTree(graph.root(),indent);
+		printTree(graph.root(),indent);
 		
 	}
 	
