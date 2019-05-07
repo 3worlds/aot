@@ -27,27 +27,15 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.init;
+package au.edu.anu.rscs.aot.init.old;
 
 /**
  * 
- * @author Jacques Gignoux - 7 mai 2019
+ * @author Jacques Gignoux - 21 déc. 2018
  *
  */
 public interface Initialisable {
 
-	/**
-	 * An object which can be initialise must have this method, which will be called
-	 * by initialisers.
-	 */
-	public void initialise();
+	public Initialisable initialise();
 	
-	/**
-	 * This is used to decide in which order objects must be initialised. They will be
-	 * initialised from the lowest to the highest priority. The use case is to set this
-	 * as a class constant.
-	 * @return the priority level for the object to initialise.
-	 */
-	public int initPriority();
-
 }

@@ -27,27 +27,24 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.init;
+package au.edu.anu.rscs.aot.init.old;
+
+import fr.cnrs.iees.graph.EdgeFactory;
+import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.impl.SimpleEdgeImpl;
+import fr.cnrs.iees.identity.Identity;
 
 /**
  * 
  * @author Jacques Gignoux - 7 mai 2019
  *
  */
-public interface Initialisable {
+public class EdgeDependency extends SimpleEdgeImpl {
 
-	/**
-	 * An object which can be initialise must have this method, which will be called
-	 * by initialisers.
-	 */
-	public void initialise();
-	
-	/**
-	 * This is used to decide in which order objects must be initialised. They will be
-	 * initialised from the lowest to the highest priority. The use case is to set this
-	 * as a class constant.
-	 * @return the priority level for the object to initialise.
-	 */
-	public int initPriority();
+	// NOTE: the constructor must be made public for the TreeFactory to find it as the 
+	// TreeGraphFactory belongs to package fr.cnrs.iees.graph.impl
+	public EdgeDependency(Identity id, Node start, Node end, EdgeFactory factory) {
+		super(id, start, end, factory);
+	}
 
 }

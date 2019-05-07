@@ -481,7 +481,7 @@ public class Archetypes {
 	 * Get the checking errors.
 	 * @return null if no checking errors, the (read-only) list of errors otherwise
 	 */
-	public Iterable<CheckMessage> checkList() {
+	public Iterable<CheckMessage> errorList() {
 		if (checkFailList.isEmpty())
 			return null;
 		else

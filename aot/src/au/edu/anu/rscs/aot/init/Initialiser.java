@@ -29,25 +29,65 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.init;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 /**
- * 
+ * A new version of Shayne's initialiser - much, much simpler.
  * @author Jacques Gignoux - 7 mai 2019
  *
  */
-public interface Initialisable {
+public class Initialiser {
+	
+	private SortedSet<Integer> priorities = new TreeSet<Integer>();
+	private Map<Integer,List<Initialisable>> toInit = new HashMap<>();
+	private List<InitialiseMessage> initFailList = new LinkedList<>();
 
 	/**
-	 * An object which can be initialise must have this method, which will be called
-	 * by initialisers.
+	 * Constructor takes a list of Initialisable objects
+	 * @param initList the list of objects ot initialise
 	 */
-	public void initialise();
+	public Initialiser(Iterable<Initialisable> initList) {
+		super();
+		for (Initialisable init:initList) {
+			int priority = init.initPriority();
+			// the sorted set sorts the integers in increasing order
+			priorities.add(priority);
+			if (toInit.get(priority).isEmpty())
+				toInit.put(priority, new LinkedList<>());
+			toInit.get(priority).add(init);
+		}
+	}
 	
 	/**
-	 * This is used to decide in which order objects must be initialised. They will be
-	 * initialised from the lowest to the highest priority. The use case is to set this
-	 * as a class constant.
-	 * @return the priority level for the object to initialise.
+	 * Initialises all objects passed to the constructor
+	 * following their priority ranking, from the lowest to the highest priority
 	 */
-	public int initPriority();
-
+	public void initialise() {
+		// the SortedSet iterator returns its content in ascending order
+		for (int priority:priorities)
+			for (Initialisable init:toInit.get(priority))
+				try {
+					init.initialise();
+				}
+				catch (Exception e) {
+					initFailList.add(new InitialiseMessage(init,e));
+				}
+	}
+	
+	/**
+	 * Returns the problems which occured during the initialisation process.
+	 * @return null if no error, the error list otherwise
+	 */
+	public Iterable<InitialiseMessage> errorList() {
+		if (initFailList.isEmpty())
+			return null;
+		else 
+			return initFailList;
+	}
+	
 }
