@@ -27,63 +27,34 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.init;
+package au.edu.anu.rscs.aot.graph.impl;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import au.edu.anu.rscs.aot.init.Initialisable;
+import fr.cnrs.iees.graph.NodeFactory;
+import fr.cnrs.iees.graph.TreeNodeFactory;
+import fr.cnrs.iees.graph.impl.TreeGraphNode;
+import fr.cnrs.iees.identity.Identity;
+import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 
 /**
- * A new version of Shayne's initialiser - much, much simpler.
- * @author Jacques Gignoux - 7 mai 2019
+ * A replacement for AotNode - a TreegraphNode that can be initialised. Descendants must implement
+ * the initialise() method.
+ * @author Jacques Gignoux - 9 mai 2019
  *
  */
-public class Initialiser {
-	
-	private SortedMap<Integer,List<Initialisable>> toInit = new TreeMap<>();
-	private List<InitialiseMessage> initFailList = new LinkedList<>();
+public class InitialisableNode extends TreeGraphNode implements Initialisable {
 
-	/**
-	 * Constructor takes a list of Initialisable objects
-	 * @param initList the list of objects ot initialise
-	 */
-	public Initialiser(Iterable<Initialisable> initList) {
-		super();
-		for (Initialisable init:initList) {
-			int priority = init.initRank();
-			// the sorted map sorts the key integers in increasing order
-			if (toInit.get(priority).isEmpty())
-				toInit.put(priority, new LinkedList<>());
-			toInit.get(priority).add(init);
-		}
+	public InitialisableNode(Identity id, TreeNodeFactory tf, NodeFactory nf, ReadOnlyPropertyList props) {
+		super(id, tf, nf, props);
 	}
-	
-	/**
-	 * Initialises all objects passed to the constructor
-	 * following their priority ranking, from the lowest to the highest priority
-	 */
+
+	@Override
 	public void initialise() {
-		// the SortedMap iterator returns its content in ascending order
-		for (int priority:toInit.keySet())
-			for (Initialisable init:toInit.get(priority))
-				try {
-					init.initialise();
-				}
-				catch (Exception e) {
-					initFailList.add(new InitialiseMessage(init,e));
-				}
 	}
-	
-	/**
-	 * Returns the problems which occured during the initialisation process.
-	 * @return null if no error, the error list otherwise
-	 */
-	public Iterable<InitialiseMessage> errorList() {
-		if (initFailList.isEmpty())
-			return null;
-		else 
-			return initFailList;
+
+	@Override
+	public int initRank() {
+		return 0;
 	}
-	
+
 }

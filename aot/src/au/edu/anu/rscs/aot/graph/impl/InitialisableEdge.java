@@ -27,63 +27,33 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.init;
+package au.edu.anu.rscs.aot.graph.impl;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import au.edu.anu.rscs.aot.init.Initialisable;
+import fr.cnrs.iees.graph.EdgeFactory;
+import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.impl.DataEdgeImpl;
+import fr.cnrs.iees.identity.Identity;
+import fr.cnrs.iees.properties.SimplePropertyList;
 
 /**
- * A new version of Shayne's initialiser - much, much simpler.
- * @author Jacques Gignoux - 7 mai 2019
+ * A replacement for AotEdge - an Edge with properties, which can be initialised
+ * @author Jacques Gignoux - 9 mai 2019
  *
  */
-public class Initialiser {
-	
-	private SortedMap<Integer,List<Initialisable>> toInit = new TreeMap<>();
-	private List<InitialiseMessage> initFailList = new LinkedList<>();
+public class InitialisableEdge extends DataEdgeImpl implements Initialisable {
 
-	/**
-	 * Constructor takes a list of Initialisable objects
-	 * @param initList the list of objects ot initialise
-	 */
-	public Initialiser(Iterable<Initialisable> initList) {
-		super();
-		for (Initialisable init:initList) {
-			int priority = init.initRank();
-			// the sorted map sorts the key integers in increasing order
-			if (toInit.get(priority).isEmpty())
-				toInit.put(priority, new LinkedList<>());
-			toInit.get(priority).add(init);
-		}
+	public InitialisableEdge(Identity id, Node start, Node end, SimplePropertyList props, EdgeFactory factory) {
+		super(id, start, end, props, factory);
 	}
-	
-	/**
-	 * Initialises all objects passed to the constructor
-	 * following their priority ranking, from the lowest to the highest priority
-	 */
+
+	@Override
 	public void initialise() {
-		// the SortedMap iterator returns its content in ascending order
-		for (int priority:toInit.keySet())
-			for (Initialisable init:toInit.get(priority))
-				try {
-					init.initialise();
-				}
-				catch (Exception e) {
-					initFailList.add(new InitialiseMessage(init,e));
-				}
 	}
-	
-	/**
-	 * Returns the problems which occured during the initialisation process.
-	 * @return null if no error, the error list otherwise
-	 */
-	public Iterable<InitialiseMessage> errorList() {
-		if (initFailList.isEmpty())
-			return null;
-		else 
-			return initFailList;
+
+	@Override
+	public int initRank() {
+		return 0;
 	}
-	
+
 }

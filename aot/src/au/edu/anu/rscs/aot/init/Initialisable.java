@@ -48,6 +48,6 @@ public interface Initialisable {
 	 * as a class constant.
 	 * @return the priority level for the object to initialise.
 	 */
-	public int initPriority();
+	public int initRank();
 
 }
