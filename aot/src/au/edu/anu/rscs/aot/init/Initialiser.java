@@ -29,12 +29,10 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.init;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * A new version of Shayne's initialiser - much, much simpler.
@@ -43,8 +41,7 @@ import java.util.TreeSet;
  */
 public class Initialiser {
 	
-	private SortedSet<Integer> priorities = new TreeSet<Integer>();
-	private Map<Integer,List<Initialisable>> toInit = new HashMap<>();
+	private SortedMap<Integer,List<Initialisable>> toInit = new TreeMap<>();
 	private List<InitialiseMessage> initFailList = new LinkedList<>();
 
 	/**
@@ -55,8 +52,7 @@ public class Initialiser {
 		super();
 		for (Initialisable init:initList) {
 			int priority = init.initPriority();
-			// the sorted set sorts the integers in increasing order
-			priorities.add(priority);
+			// the sorted map sorts the key integers in increasing order
 			if (toInit.get(priority).isEmpty())
 				toInit.put(priority, new LinkedList<>());
 			toInit.get(priority).add(init);
@@ -68,8 +64,8 @@ public class Initialiser {
 	 * following their priority ranking, from the lowest to the highest priority
 	 */
 	public void initialise() {
-		// the SortedSet iterator returns its content in ascending order
-		for (int priority:priorities)
+		// the SortedMap iterator returns its content in ascending order
+		for (int priority:toInit.keySet())
 			for (Initialisable init:toInit.get(priority))
 				try {
 					init.initialise();
