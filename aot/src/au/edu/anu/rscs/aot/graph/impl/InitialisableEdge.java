@@ -29,7 +29,7 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.graph.impl;
 
-import au.edu.anu.rscs.aot.init.Initialisable;
+import fr.ens.biologie.generic.Initialisable;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.impl.DataEdgeImpl;
