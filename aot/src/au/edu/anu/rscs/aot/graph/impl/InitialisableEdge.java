@@ -32,7 +32,7 @@ package au.edu.anu.rscs.aot.graph.impl;
 import fr.ens.biologie.generic.Initialisable;
 import fr.cnrs.iees.graph.EdgeFactory;
 import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.impl.DataEdgeImpl;
+import fr.cnrs.iees.graph.impl.ALDataEdge;
 import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.SimplePropertyList;
 
@@ -41,7 +41,7 @@ import fr.cnrs.iees.properties.SimplePropertyList;
  * @author Jacques Gignoux - 9 mai 2019
  *
  */
-public class InitialisableEdge extends DataEdgeImpl implements Initialisable {
+public class InitialisableEdge extends ALDataEdge implements Initialisable {
 
 	public InitialisableEdge(Identity id, Node start, Node end, SimplePropertyList props, EdgeFactory factory) {
 		super(id, start, end, props, factory);

@@ -30,11 +30,10 @@
 package au.edu.anu.rscs.aot.graph.impl;
 
 import fr.ens.biologie.generic.Initialisable;
-import fr.cnrs.iees.graph.NodeFactory;
-import fr.cnrs.iees.graph.TreeNodeFactory;
-import fr.cnrs.iees.graph.impl.TreeGraphNode;
+import fr.cnrs.iees.graph.GraphFactory;
+import fr.cnrs.iees.graph.impl.TreeGraphDataNode;
 import fr.cnrs.iees.identity.Identity;
-import fr.cnrs.iees.properties.ReadOnlyPropertyList;
+import fr.cnrs.iees.properties.SimplePropertyList;
 
 /**
  * A replacement for AotNode - a TreegraphNode that can be initialised. Descendants must implement
@@ -42,10 +41,10 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
  * @author Jacques Gignoux - 9 mai 2019
  *
  */
-public class InitialisableNode extends TreeGraphNode implements Initialisable {
+public class InitialisableNode extends TreeGraphDataNode implements Initialisable {
 
-	public InitialisableNode(Identity id, TreeNodeFactory tf, NodeFactory nf, ReadOnlyPropertyList props) {
-		super(id, tf, nf, props);
+	public InitialisableNode(Identity id, GraphFactory nf, SimplePropertyList props) {
+		super(id, nf, props);
 	}
 
 	@Override

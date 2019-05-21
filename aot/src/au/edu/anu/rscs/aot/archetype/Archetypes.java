@@ -45,14 +45,14 @@ import au.edu.anu.rscs.aot.queries.Query;
 
 import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import au.edu.anu.rscs.aot.util.IntegerRange;
-import fr.cnrs.iees.graph.DataTreeNode;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
-import fr.cnrs.iees.graph.MinimalGraph;
+import fr.cnrs.iees.graph.NodeSet;
 import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.ReadOnlyDataElement;
+import fr.cnrs.iees.graph.ReadOnlyDataHolder;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
 import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.io.FileImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
@@ -86,6 +86,7 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * @author Shayne Flint - looong ago		
  *
  */
+// tested OK with version 0.1.2 on 21/5/2019
 public class Archetypes {
 	
 	/** The universal archetype - the archetype for archetypes */
@@ -136,7 +137,7 @@ public class Archetypes {
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
 	 * @param archetype the archetype tree to check against
 	 */
-	public void check(MinimalGraph<?> graphToCheck, Tree<? extends TreeNode> archetype) {
+	public void check(NodeSet<?> graphToCheck, Tree<? extends TreeNode> archetype) {
 		for (TreeNode arch: archetype.nodes()) 
 			if (arch instanceof ArchetypeRootSpec)
 				check(graphToCheck,(ArchetypeRootSpec)arch);
@@ -178,7 +179,7 @@ public class Archetypes {
 	 * @param archetype  the archetype root node to check against
 	 */
 	@SuppressWarnings("unchecked")
-	public void check(MinimalGraph<?> graphToCheck, ArchetypeRootSpec archetype) {
+	public void check(NodeSet<?> graphToCheck, ArchetypeRootSpec archetype) {
 		checkFailList.clear();
 		log.info("Checking against archetype: " + archetype.id());
 		// first, check that the graph to check is a tree or a treegraph
@@ -218,10 +219,10 @@ public class Archetypes {
 						checkFailList.add(new CheckMessage(treeToCheck,new AotException(message),hasNode));
 				}
 			}
-			if (exclusive && complyCount != treeToCheck.size()) {
+			if (exclusive && complyCount != treeToCheck.nNodes()) {
 				checkFailList.add(new CheckMessage(treeToCheck,
 					new AotException("Expected all nodes to comply (got " 
-						+ (treeToCheck.size() - complyCount)
+						+ (treeToCheck.nNodes() - complyCount)
 						+ " nodes which didn't comply)"),null));
 			}
 		}
@@ -237,15 +238,15 @@ public class Archetypes {
 		for (TreeNode prop: (List<TreeNode>) get(an,
 			children(),
 			selectZeroOrMany(hasTheLabel("hasProperty"))))
-			if (DataTreeNode.class.isAssignableFrom(prop.getClass()))
-				result.add((String)((DataTreeNode)prop).properties().getPropertyValue("hasName"));
+			if (SimpleDataTreeNode.class.isAssignableFrom(prop.getClass()))
+				result.add((String)((SimpleDataTreeNode)prop).properties().getPropertyValue("hasName"));
 		return result;
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void checkConstraints(Object item, TreeNode spec) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
-		String qLabel = spec.treeNodeFactory().treeNodeClassName(ConstraintSpec.class);
+		String qLabel = spec.factory().nodeClassName(ConstraintSpec.class);
 		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(spec, 
 			children(), 
 			selectZeroOrMany(hasTheLabel(qLabel)))) {
@@ -309,7 +310,7 @@ public class Archetypes {
 	@SuppressWarnings("unchecked")
 	private void checkEdges(TreeNode nodeToCheck, NodeSpec hasNode) {
 		// get the 'hasEdge' label from the archetype factory
-		String eLabel = hasNode.treeNodeFactory().treeNodeClassName(EdgeSpec.class);
+		String eLabel = hasNode.factory().nodeClassName(EdgeSpec.class);
 		int toNodeCount = 0;
 //		int fromNodeCount = 0; // fromNode disabled for the moment
 		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
@@ -342,7 +343,7 @@ public class Archetypes {
 			// for nodeToCheck to have edges, it must be a subclass of Node
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
-				for (Edge ed:node.getEdges(Direction.OUT))
+				for (Edge ed:node.edges(Direction.OUT))
 					if (NodeReference.matchesRef(nodeToCheck,toNodeRef)) {
 						boolean ok = true;
 						// check edge label
@@ -402,7 +403,7 @@ public class Archetypes {
 	@SuppressWarnings("unchecked")
 	private void checkProperties(Object element, NodeSpec hasNode) {
 		// get the 'hasProperty' label from the archetype factory
-		String pLabel = hasNode.treeNodeFactory().treeNodeClassName(PropertySpec.class);
+		String pLabel = hasNode.factory().nodeClassName(PropertySpec.class);
 		for (PropertySpec propertyArchetype: (List<PropertySpec>) get(hasNode,
 				children(),
 				selectZeroOrMany(hasTheLabel(pLabel)))) {
@@ -432,8 +433,8 @@ public class Archetypes {
 				Exception e = new AotException("'multiplicity' property missing for property specification "+ propertyArchetype);
 				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
-			if (element instanceof ReadOnlyDataElement) {
-				ReadOnlyPropertyList nprops = ((ReadOnlyDataElement)element).properties(); 
+			if (element instanceof ReadOnlyDataHolder) {
+				ReadOnlyPropertyList nprops = ((ReadOnlyDataHolder)element).properties(); 
 				if (!nprops.hasProperty(key)) { // property not found
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						Exception e = new AotException("Required property '"+key+"' missing for element "+ element);
