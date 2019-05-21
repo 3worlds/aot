@@ -43,8 +43,8 @@ import fr.cnrs.iees.properties.SimplePropertyList;
  */
 public class InitialisableNode extends TreeGraphDataNode implements Initialisable {
 
-	public InitialisableNode(Identity id, GraphFactory nf, SimplePropertyList props) {
-		super(id, nf, props);
+	public InitialisableNode(Identity id, SimplePropertyList props, GraphFactory nf) {
+		super(id, props, nf);
 	}
 
 	@Override
