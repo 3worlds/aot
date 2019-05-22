@@ -29,7 +29,6 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.archetype;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -54,7 +53,7 @@ import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
 import fr.cnrs.iees.graph.impl.TreeGraph;
-import fr.cnrs.iees.io.FileImporter;
+import fr.cnrs.iees.graph.io.GraphImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
@@ -99,13 +98,8 @@ public class Archetypes {
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
 		super();
-		String archetypefile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
-			+ File.separator + "src" 
-			+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
-			+ File.separator + "ArchetypeArchetype.ugt";
-		File file = new File(archetypefile);
-		FileImporter fi = new FileImporter(file);
-		archetypeArchetype  = (Tree<? extends TreeNode>) fi.getGraph();
+		archetypeArchetype = (Tree<? extends TreeNode>) 
+			GraphImporter.importGraph("ArchetypeArchetype.ugt",this.getClass());
 	}
 	
 	/**
