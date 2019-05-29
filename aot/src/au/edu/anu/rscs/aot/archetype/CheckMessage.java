@@ -33,6 +33,10 @@ import fr.cnrs.iees.graph.TreeNode;
 
 /**
  * A class to store error messages from archetype checks.
+ * 
+ * NOTE: Ian, feel free to adapt this class to your needs by putting in any useful information
+ * for user feedback. These messages are created by Archetypes.check(...) methods.
+ * 
  * @author Jacques Gignoux - 6 mai 2019
  *
  */
@@ -73,12 +77,20 @@ public class CheckMessage {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Archetype check failed on requirement:\n\t")
-			.append(archetypeNode.toString())
-			.append("\n--for object:\n\t")
-			.append(target.toString())
-			.append("\n--with Error:\n\t")
-			.append(exc.toString());
+		if (archetypeNode==null)
+			sb.append("Archetype check failed \n");
+		else
+			sb.append("Archetype check failed on requirement:\n\t")
+				.append(archetypeNode.toString())
+				.append('\n');
+		if (target!=null)
+			sb.append("--for object:\n\t")
+				.append(target.toString())
+				.append('\n');
+		if (exc!=null)
+			sb.append("--with Error:\n\t")
+				.append(exc.toString())
+				.append('\n');
 		return sb.toString();
 	}
 }

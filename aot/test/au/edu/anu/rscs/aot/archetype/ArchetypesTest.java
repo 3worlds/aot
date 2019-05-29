@@ -32,7 +32,6 @@ package au.edu.anu.rscs.aot.archetype;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-
 import org.junit.jupiter.api.Test;
 
 import fr.cnrs.iees.graph.Tree;
@@ -62,7 +61,15 @@ class ArchetypesTest {
 		arch.checkArchetype(graph);
 		String indent = "";
 		printTree(graph.root(),indent);
-		
+		Iterable<CheckMessage> errors = arch.errorList();
+		if (errors!=null) {
+			System.out.println("There were errors in specifications: ");
+			for (CheckMessage m:errors)
+				System.out.println(m.toString()+"\n");
+		}
+		else 
+			System.out.println("Specifications checked with no error.");
+		assertNull(errors);
 	}
 	
 	private void printTree(TreeNode parent,String indent) {

@@ -30,7 +30,7 @@ archetype ArchetypeForArchetypes
 	hasNode ArchetypeRootSpec
 		isOfClass = String("archetype")
 		multiplicity = IntegerRange("1..1")
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]""))
+		hasParent = StringTable(([1]""))
 
 		//-------------------------------------------------------
 		// 4 the "archetype" node has an *exclusive* property
@@ -49,7 +49,7 @@ archetype ArchetypeForArchetypes
 	//-------------------------------------------------------
 	hasNode NodeSpec
 		isOfClass = String("hasNode")
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]"archetype"))
+		hasParent = StringTable(([1]"archetype:"))
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
@@ -97,8 +97,7 @@ archetype ArchetypeForArchetypes
 	//-------------------------------------------------------
 	hasNode ConstraintSpec
 		isOfClass = String("mustSatisfyQuery")
-		// would be nicer to have: hasParent = StringTable(([3]"hasNode","hasProperty","hasEdge"))
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([3]"hasNode","hasProperty","hasEdge"))
+		hasParent = StringTable(([3]"hasNode:","hasProperty:","hasEdge:"))
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
@@ -116,7 +115,7 @@ archetype ArchetypeForArchetypes
 	//-------------------------------------------------------
 	hasNode PropertySpec
 		isOfClass = String("hasProperty")
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([2]"hasNode","hasEdge"))
+		hasParent = StringTable(([2]"hasNode:","hasEdge:"))
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------
@@ -149,7 +148,7 @@ archetype ArchetypeForArchetypes
 	//-------------------------------------------------------
 	hasNode EdgeSpec
 		isOfClass = String("hasEdge")
-		hasParent = au.edu.anu.rscs.aot.collections.tables.StringTable(([1]"hasNode"))
+		hasParent = StringTable(([1]"hasNode:"))
 		multiplicity = IntegerRange("0..*")
 
 		//-------------------------------------------------------

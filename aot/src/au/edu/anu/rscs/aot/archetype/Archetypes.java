@@ -187,7 +187,6 @@ public class Archetypes {
 			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
 			int complyCount = 0;
 			for (TreeNode tn:archetype.getChildren())
-//				if (NodeSpec.class.isAssignableFrom(tn.getClass())) {
 				if (tn instanceof NodeSpec) {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
@@ -197,8 +196,8 @@ public class Archetypes {
 						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
 							log.info("checking node: " + n.toUniqueString());
 							check(n,hasNode);
-							count++;
 							complyCount++;
+							count++;
 					}
 					IntegerRange range = null;
 					if (hasNode.properties().hasProperty("multiplicity"))
@@ -207,13 +206,14 @@ public class Archetypes {
 						range = new IntegerRange(0, Integer.MAX_VALUE);
 					if (!range.inRange(count)) {
 						String message = "Expected " + range 
-							+ " nodes with parents '" + parentList 
+							+ " nodes of class '" + requiredClass
+							+ "' with parents '" + parentList 
 							+ "' (got " + count
 							+ ") archetype=" + hasNode.toUniqueString();
 						checkFailList.add(new CheckMessage(treeToCheck,new AotException(message),hasNode));
 				}
 			}
-			if (exclusive && complyCount != treeToCheck.nNodes()) {
+			if (exclusive && (complyCount != treeToCheck.nNodes())) {
 				checkFailList.add(new CheckMessage(treeToCheck,
 					new AotException("Expected all nodes to comply (got " 
 						+ (treeToCheck.nNodes() - complyCount)
