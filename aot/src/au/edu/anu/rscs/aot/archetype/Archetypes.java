@@ -380,6 +380,10 @@ public class Archetypes {
 
 		// I havent put this code in (from Shayne's Archetype class) because I suspect its useless
 		// I copy it here just to remember we may need it one day
+		
+		// 31/5/2019 We probably need it to check cross link multiplicities - at the moment we
+		// get an OMhtkException  if multiplicity is not correct, that should be an AotException.
+		
 // check other edge counts
 //
 //		int otherOutCount = node.degree(Direction.OUT) - toNodeCount;
