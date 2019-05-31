@@ -295,7 +295,7 @@ public class Archetypes {
 				log.severe("cannot instantiate Query '"+queryClassName+"'");
 				e.printStackTrace();
 			// this only means the query failed and it should be reported to the user
-			} catch (AotException e) {
+			} catch (Exception e) {
 				checkFailList.add(new CheckMessage(item,e,queryNode));
 			}
 		}
