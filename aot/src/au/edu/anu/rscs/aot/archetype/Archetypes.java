@@ -376,8 +376,10 @@ public class Archetypes {
 				try {
 					edgeMult.check(toNodes.size());
 				} catch (Exception e) {
-					Exception ee = new AotException("Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
-						+ toNodeRef + "] (found " + toNodes.size() + ") ");
+					Exception ee = new AotException("Expected " + nodeToCheck + " to have " 
+						+ edgeMult + " out edge(s) to nodes that match ["
+						+ toNodeRef + "] with label '" + edgeLabel
+						+ "' (found " + toNodes.size() + ") ");
 					checkFailList.add(new CheckMessage(node, ee, edgeSpec));
 				}
 			}
