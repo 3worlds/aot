@@ -338,7 +338,7 @@ public class Archetypes {
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
 				for (Edge ed:node.edges(Direction.OUT))
-					if (NodeReference.matchesRef(nodeToCheck,toNodeRef)) {
+					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)) {
 						boolean ok = true;
 						// check edge label
 						if (edgeLabel!=null)
@@ -363,7 +363,7 @@ public class Archetypes {
 							ok = false;
 						if (ok) {
 							toNodeCount++;
-							toNodes.add(node); // what's the use of this list now ?
+							toNodes.add(ed.endNode()); // what's the use of this list now ?
 						}
 				}
 				// check edge multiplicity
