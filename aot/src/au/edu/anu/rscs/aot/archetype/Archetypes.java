@@ -370,7 +370,9 @@ public class Archetypes {
 				try {
 					edgeMult.check(toNodeCount);
 				} catch (Exception e) {
-					checkFailList.add(new CheckMessage(node, e, edgeSpec));
+					Exception ee = new AotException("Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
+						+ toNodeRef + "] (found " + toNodes.size() + ") ");
+					checkFailList.add(new CheckMessage(node, ee, edgeSpec));
 				}
 			}
 			// else error ? we must have a Node here ?
@@ -380,13 +382,11 @@ public class Archetypes {
 
 		// I havent put this code in (from Shayne's Archetype class) because I suspect its useless
 		// I copy it here just to remember we may need it one day
-		
-		// 31/5/2019 We probably need it to check cross link multiplicities - at the moment we
-		// get an OMhtkException  if multiplicity is not correct, that should be an AotException.
-		
+			
 // check other edge counts
-//
-//		int otherOutCount = node.degree(Direction.OUT) - toNodeCount;
+////
+//		IntegerRange otherOutEdges = new IntegerRange(0, Integer.MAX_VALUE);
+//		int otherOutCount = nodeToCheck.degree(Direction.OUT) - toNodeCount;
 //		if (!otherOutEdges.inRange(otherOutCount)) {
 //			recordError("Expected " + otherOutEdges + " other out edges from node '" + node.toShortString()
 //					+ "' referenced by [" + ref + "] (found " + otherOutCount + ")", node);
