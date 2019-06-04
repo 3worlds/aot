@@ -42,7 +42,6 @@ import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import au.edu.anu.rscs.aot.queries.Query;
 
-import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.Direction;
 import fr.cnrs.iees.graph.Edge;
@@ -58,7 +57,7 @@ import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
-
+import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
 /**
@@ -301,11 +300,17 @@ public class Archetypes {
 		}
 	}
 	
+	private boolean edgeLabelMatch(Edge e, String label) {
+		if (label!=null)
+			return (e.classId().equals(label));
+		return false;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void checkEdges(TreeNode nodeToCheck, NodeSpec hasNode) {
 		// get the 'hasEdge' label from the archetype factory
 		String eLabel = hasNode.factory().nodeClassName(EdgeSpec.class);
-		int toNodeCount = 0;
+//		int toNodeCount = 0;
 //		int fromNodeCount = 0; // fromNode disabled for the moment
 		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
 				children(),
@@ -338,7 +343,8 @@ public class Archetypes {
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
 				for (Edge ed:node.edges(Direction.OUT))
-					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)) {
+					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)
+							&& edgeLabelMatch(ed,edgeLabel)) {
 						boolean ok = true;
 						// check edge label
 						if (edgeLabel!=null)
@@ -362,13 +368,13 @@ public class Archetypes {
 						if (checkFailList.size()>nprobs)
 							ok = false;
 						if (ok) {
-							toNodeCount++;
-							toNodes.add(ed.endNode()); // what's the use of this list now ?
+//							toNodeCount++;
+							toNodes.add(ed.endNode());
 						}
 				}
 				// check edge multiplicity
 				try {
-					edgeMult.check(toNodeCount);
+					edgeMult.check(toNodes.size());
 				} catch (Exception e) {
 					Exception ee = new AotException("Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
 						+ toNodeRef + "] (found " + toNodes.size() + ") ");
