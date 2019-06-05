@@ -33,6 +33,7 @@ import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
 import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
  * 
@@ -45,6 +46,10 @@ public class NodeSpec extends SimpleDataTreeNode {
 	// belongs to package fr.cnrs.iees.graph.impl
 	public NodeSpec(Identity id, SimplePropertyList props, NodeFactory factory) {
 		super(id, props, factory);
+	}
+
+	public NodeSpec(Identity id, NodeFactory factory) {
+		super(id, new ExtendablePropertyListImpl(), factory);
 	}
 
 }

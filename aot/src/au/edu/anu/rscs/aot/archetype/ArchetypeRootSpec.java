@@ -4,6 +4,7 @@ import fr.cnrs.iees.graph.NodeFactory;
 import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
 import fr.cnrs.iees.identity.Identity;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
  * 
@@ -16,6 +17,10 @@ public class ArchetypeRootSpec extends SimpleDataTreeNode {
 	// belongs to package fr.cnrs.iees.graph.impl
 	public ArchetypeRootSpec(Identity id, SimplePropertyList props, NodeFactory factory) {
 		super(id, props, factory);
+	}
+
+	public ArchetypeRootSpec(Identity id, NodeFactory factory) {
+		super(id, new ExtendablePropertyListImpl(), factory);
 	}
 
 }
