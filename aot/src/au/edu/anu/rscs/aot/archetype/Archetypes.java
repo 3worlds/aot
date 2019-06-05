@@ -183,7 +183,9 @@ public class Archetypes {
 			checkFailList.add(new CheckMessage(treeToCheck,e,null));
 		}
 		if (treeToCheck!=null) {
-			boolean exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
+			boolean exclusive = false;
+			if (archetype.properties().hasProperty("exclusive"))
+				exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
 			int complyCount = 0;
 			for (TreeNode tn:archetype.getChildren())
 				if (tn instanceof NodeSpec) {
