@@ -283,11 +283,16 @@ public class Archetypes {
 				// have to be able to handle changes in argument order. This means
 				// there must be a constructor for every possible argument order.
 				// cf issue #4 in aot
-				// if argument order matters ObjectTable should be used as a unique argument
+				// if argument order matters some Table should be used as a unique argument
 				Constructor<? extends Query> queryConstructor;
 				queryConstructor = queryClass.getConstructor(parameterTypes);
 				query = (Query) queryConstructor.newInstance(parameterValues);
 				query.check(item);
+				// this to handle sub-archetypes, which return a list of check messages
+				if (query.getResult() instanceof Iterable<?>)
+					for (Object o:(Iterable<?>)query.getResult())
+						if (o instanceof CheckMessage)
+							checkFailList.add((CheckMessage) o);
 			// this is bad. means there is an error in query name
 			// it should crash because archetypes are not supposed to be written by hand
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | 
