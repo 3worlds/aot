@@ -214,6 +214,7 @@ public class Archetypes {
 						checkFailList.add(new CheckMessage(treeToCheck,new AotException(message),hasNode));
 				}
 			}
+			// PROBLEM here: nodes added in sub-archetypes are not counted as valid here...
 			if (exclusive && (complyCount != treeToCheck.nNodes())) {
 				checkFailList.add(new CheckMessage(treeToCheck,
 					new AotException("Expected all nodes to comply (got " 
