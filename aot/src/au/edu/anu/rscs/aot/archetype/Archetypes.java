@@ -350,7 +350,12 @@ public class Archetypes {
 			// for nodeToCheck to have edges, it must be a subclass of Node
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
-				for (Edge ed:node.edges(Direction.OUT))
+				for (Edge ed:node.edges(Direction.OUT)) {
+					if (ed.factory().edgeClass(ed.classId())==null) {
+						Exception e = new AotException("Class '" + edgeLabel
+							+ "' not found for edge " + ed);
+						checkFailList.add(new CheckMessage(ed, e, edgeSpec));
+					}
 					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)
 							&& edgeLabelMatch(ed,edgeLabel)) {
 						boolean ok = true;
@@ -379,6 +384,7 @@ public class Archetypes {
 //							toNodeCount++;
 							toNodes.add(ed.endNode());
 						}
+					}
 				}
 				// check edge multiplicity
 				try {
