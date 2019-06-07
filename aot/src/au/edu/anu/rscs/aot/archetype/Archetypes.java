@@ -193,12 +193,13 @@ public class Archetypes {
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
 					String requiredClass = (String) hasNode.properties().getPropertyValue("isOfClass");
 					int count = 0;
-					for (TreeNode n:treeToCheck.nodes())
+					for (TreeNode n:treeToCheck.nodes()) {
 						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
 							log.info("checking node: " + n.toUniqueString());
 							check(n,hasNode);
 							complyCount++;
 							count++;
+						}
 					}
 					IntegerRange range = null;
 					if (hasNode.properties().hasProperty("multiplicity"))
