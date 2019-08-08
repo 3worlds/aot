@@ -42,4 +42,12 @@ public interface ArchetypeArchetypeConstants {
 	public static final String aaHasNode ="hasNode" ;
 	public static final String aaHasProperty = "hasProperty";
 	public static final String aaMustSatisfyQuery = "mustSatisfyQuery";
+	public static final String aaHasName = "hasName";
+	public static final String aaClassName = "className";
+	public final static String aaToNode = "toNode";
+	public final static String aaHasId = "hasId";
+	public final static String aaType = "type";
+
+	
+
 }

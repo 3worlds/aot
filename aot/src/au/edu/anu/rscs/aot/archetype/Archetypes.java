@@ -85,7 +85,7 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  *
  */
 // tested OK with version 0.1.2 on 21/5/2019
-public class Archetypes {
+public class Archetypes implements ArchetypeArchetypeConstants{
 	
 	/** The universal archetype - the archetype for archetypes */
 	private Tree<? extends TreeNode> archetypeArchetype = null;
@@ -190,8 +190,8 @@ public class Archetypes {
 			for (TreeNode tn:archetype.getChildren())
 				if (tn instanceof NodeSpec) {
 					NodeSpec hasNode = (NodeSpec) tn;
-					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue("hasParent");
-					String requiredClass = (String) hasNode.properties().getPropertyValue("isOfClass");
+					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(aaHasParent);
+					String requiredClass = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
 					int count = 0;
 					for (TreeNode n:treeToCheck.nodes()) {
 						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
@@ -202,8 +202,8 @@ public class Archetypes {
 						}
 					}
 					IntegerRange range = null;
-					if (hasNode.properties().hasProperty("multiplicity"))
-						range = (IntegerRange) hasNode.properties().getPropertyValue("multiplicity");
+					if (hasNode.properties().hasProperty(aaMultiplicity))
+						range = (IntegerRange) hasNode.properties().getPropertyValue(aaMultiplicity);
 					else
 						range = new IntegerRange(0, Integer.MAX_VALUE);
 					if (!range.inRange(count)) {
@@ -234,9 +234,9 @@ public class Archetypes {
 			selectOne(hasTheName(archetypeNodeLabel)));
 		for (TreeNode prop: (List<TreeNode>) get(an,
 			children(),
-			selectZeroOrMany(hasTheLabel("hasProperty"))))
+			selectZeroOrMany(hasTheLabel(aaHasProperty))))
 			if (SimpleDataTreeNode.class.isAssignableFrom(prop.getClass()))
-				result.add((String)((SimpleDataTreeNode)prop).properties().getPropertyValue("hasName"));
+				result.add((String)((SimpleDataTreeNode)prop).properties().getPropertyValue(aaHasName));
 		return result;
 	}
 	
@@ -248,7 +248,7 @@ public class Archetypes {
 			children(), 
 			selectZeroOrMany(hasTheLabel(qLabel)))) {
 			ReadOnlyPropertyList queryProps = queryNode.properties();
-			String queryClassName = (String) queryProps.getPropertyValue("className");
+			String queryClassName = (String) queryProps.getPropertyValue(aaClassName);
 			log.info("checking query: " + queryClassName);	
 			// default properties: potential list
 			Set<String> defaultProps = getArchetypePropertyList("ConstraintSpec");
@@ -328,24 +328,24 @@ public class Archetypes {
 			SimplePropertyList eprops = edgeSpec.properties();
 			// edge spec toNode
 			String toNodeRef = null;
-			if (eprops.hasProperty("toNode"))
-				toNodeRef = (String) eprops.getPropertyValue("toNode");
+			if (eprops.hasProperty(aaToNode))
+				toNodeRef = (String) eprops.getPropertyValue(aaToNode);
 			else { // this is an error, an edge spec must have a toNode property
-				Exception e = new AotException("'toNode' property missing for edge specification "+ edgeSpec);
+				Exception e = new AotException("'"+aaToNode+"' property missing for edge specification "+ edgeSpec);
 				checkFailList.add(new CheckMessage(edgeSpec,e,null));
 			}
 			// edge spec multiplicity
 			IntegerRange edgeMult = new IntegerRange(1, 1);
-			if (eprops.hasProperty("multiplicity"))
-				edgeMult = (IntegerRange) eprops.getPropertyValue("multiplicity");
+			if (eprops.hasProperty(aaMultiplicity))
+				edgeMult = (IntegerRange) eprops.getPropertyValue(aaMultiplicity);
 			// edge spec label
 			String edgeLabel = null; // valid default value ???
-			if (eprops.hasProperty("isOfClass"))
-				edgeLabel = (String) eprops.getPropertyValue("isOfClass");
+			if (eprops.hasProperty(aaIsOfClass))
+				edgeLabel = (String) eprops.getPropertyValue(aaIsOfClass);
 			// edge spec id
 			String edgeId = null;
-			if (eprops.hasProperty("hasId"))
-				edgeId = (String) eprops.getPropertyValue("hasId");
+			if (eprops.hasProperty(aaHasId))
+				edgeId = (String) eprops.getPropertyValue(aaHasId);
 			// search for edges that point to nodes types or names listed in the spec
 			List<Node> toNodes = new LinkedList<Node>();
 			// for nodeToCheck to have edges, it must be a subclass of Node
@@ -432,26 +432,26 @@ public class Archetypes {
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
 			String key = null;
-			if (pprops.hasProperty("hasName"))
-				key = (String) pprops.getPropertyValue("hasName");
+			if (pprops.hasProperty(aaHasName))
+				key = (String) pprops.getPropertyValue(aaHasName);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'hasName' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'"+aaHasName+"' property missing for property specification "+ propertyArchetype);
 				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			// property spec type
 			String typeName = null;
-			if (pprops.hasProperty("type"))
-				typeName = (String) pprops.getPropertyValue("type");
+			if (pprops.hasProperty(aaType))
+				typeName = (String) pprops.getPropertyValue(aaType);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'type' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'"+aaType+"' property missing for property specification "+ propertyArchetype);
 				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			// property spec multiplicity
 			IntegerRange multiplicity = new IntegerRange(1, 1);
-			if (pprops.hasProperty("multiplicity"))
-				multiplicity = (IntegerRange) pprops.getPropertyValue("multiplicity");
+			if (pprops.hasProperty(aaMultiplicity))
+				multiplicity = (IntegerRange) pprops.getPropertyValue(aaMultiplicity);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'multiplicity' property missing for property specification "+ propertyArchetype);
+				Exception e = new AotException("'"+aaMultiplicity+"' property missing for property specification "+ propertyArchetype);
 				checkFailList.add(new CheckMessage(propertyArchetype, e, null));
 			}
 			if (element instanceof ReadOnlyDataHolder) {
