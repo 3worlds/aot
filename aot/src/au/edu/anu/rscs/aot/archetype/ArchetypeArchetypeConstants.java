@@ -33,7 +33,7 @@ package au.edu.anu.rscs.aot.archetype;
  *
  * @date 8 Aug 2019
  */
-// prefixed with 'aa' (Archetype Archetype)
+// prefixed with 'aa' (Archetype Archetype - TODO could convert to enum (but don't really need the class field)
 public interface ArchetypeArchetypeConstants {
 	public static final String aaIsOfClass = "isOfClass";
 	public static final String aaMultiplicity = "multiplicity";
