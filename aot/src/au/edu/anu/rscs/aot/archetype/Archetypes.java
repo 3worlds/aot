@@ -180,6 +180,7 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 		try {
 			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
 		} catch (ClassCastException e) {
+			// IDD: graph is not a tree;
 			checkFailList.add(new CheckMessage(treeToCheck,e,null));
 		}
 		if (treeToCheck!=null) {
@@ -268,6 +269,7 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 					parameterNames[cnt] = property.getKey();
 					try {
 						parameterTypes[cnt] = Class.forName(property.getClassName());
+						// IDD: the property class is unknown
 					} catch (ClassNotFoundException e) {
 						checkFailList.add(new CheckMessage(queryNode,e,null));
 //						log.severe("Cannot get class for archetype check property" + queryNode);
