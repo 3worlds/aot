@@ -41,6 +41,8 @@ import fr.cnrs.iees.graph.TreeNode;
  *
  */
 public class CheckMessage {
+	/* set of codes to flag the error context */
+	public static final int eDontCare = -1;
 
 	/** the error raised by the check() method */
 	private Exception exc = null;
@@ -49,14 +51,18 @@ public class CheckMessage {
 	/** the archetype constraint which was being checked - NB it may be null if the check was on an archetype node */
 	private TreeNode archetypeNode = null;
 	
+	private int code;
+	
 	/**
 	 * 
 	 * @param check
 	 * @param failed
 	 * @param onNode
 	 */
-	public CheckMessage(Object check, Exception failed, TreeNode onNode) {
+	// Could have many constructors to assist with context
+	public CheckMessage(int code,Object check, Exception failed, TreeNode onNode) {
 		super();
+		this.code = code;
 		target = check;
 		exc = failed;
 		archetypeNode = onNode;
@@ -72,6 +78,10 @@ public class CheckMessage {
 
 	public TreeNode getArchetypeNode() {
 		return archetypeNode;
+	}
+	
+	public int getCode() {
+		return code;
 	}
 	
 	@Override
