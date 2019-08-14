@@ -41,8 +41,28 @@ import fr.cnrs.iees.graph.TreeNode;
  *
  */
 public class CheckMessage {
-	/* set of codes to flag the error context */
-	public static final int eDontCare = -1;
+	/* temporary set of codes to flag the error context */
+	public static final int code0 = 0;
+	public static final int code1 = 1;
+	public static final int code2 = 2;
+	public static final int code3 = 3;
+	public static final int code4 = 4;
+	public static final int code5 = 5;
+	public static final int code6 = 6;
+	public static final int code7 = 7;
+	public static final int code8 = 8;
+	public static final int code9 = 9;
+	public static final int code10 = 10;
+	public static final int code11 = 11;
+	public static final int code12 = 12;
+	public static final int code13 = 13;
+	public static final int code14 = 14;
+	public static final int code15 = 15;
+	public static final int code16 = 16;
+	public static final int code17 = 17;
+	public static final int code18 = 18;
+	public static final int code19 = 19;
+	public static final int code20 = 20;
 
 	/** the error raised by the check() method */
 	private Exception exc = null;
