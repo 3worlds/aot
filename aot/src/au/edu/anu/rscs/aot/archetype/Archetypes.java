@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
@@ -97,6 +98,7 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
 		super();
+		log.setLevel(Level.OFF);
 		archetypeArchetype = (Tree<? extends TreeNode>) 
 			GraphImporter.importGraph("ArchetypeArchetype.ugt",this.getClass());
 	}
