@@ -29,13 +29,16 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.archetype;
 
+import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.TreeNode;
 
 /**
  * A class to store error messages from archetype checks.
  * 
- * NOTE: Ian, feel free to adapt this class to your needs by putting in any useful information
- * for user feedback. These messages are created by Archetypes.check(...) methods.
+ * NOTE: Ian, feel free to adapt this class to your needs by putting in any
+ * useful information for user feedback. These messages are created by
+ * Archetypes.check(...) methods.
  * 
  * @author Jacques Gignoux - 6 mai 2019
  *
@@ -66,13 +69,27 @@ public class CheckMessage {
 
 	/** the error raised by the check() method */
 	private Exception exc = null;
-	/** the object which caused the error - NB it may be an archetype node (if there was an error in the archetype file) */
+	/**
+	 * the object which caused the error - NB it may be an archetype node (if there
+	 * was an error in the archetype file)
+	 */
 	private Object target = null;
-	/** the archetype constraint which was being checked - NB it may be null if the check was on an archetype node */
+	/**
+	 * the archetype constraint which was being checked - NB it may be null if the
+	 * check was on an archetype node
+	 */
 	private TreeNode archetypeNode = null;
-	
+
+	private String requiredClass;
+
+	private StringTable parentList;
+
 	private int code;
+
+	private IntegerRange range;
 	
+	private int count;
+
 	/**
 	 * 
 	 * @param check
@@ -80,16 +97,36 @@ public class CheckMessage {
 	 * @param onNode
 	 */
 	// Could have many constructors to assist with context
-	public CheckMessage(int code,Object check, Exception failed, TreeNode onNode) {
+	public CheckMessage(int code, Object check, Exception failed, TreeNode onNode, String requiredClass,
+			StringTable parentList, IntegerRange range,int count) {
 		super();
 		this.code = code;
 		target = check;
 		exc = failed;
 		archetypeNode = onNode;
+		this.requiredClass = requiredClass;
+		this.parentList = parentList;
+		this.range = range;
+		this.count = count;
+	}
+
+	public int count() {
+		return count;
+	}
+	public String requiredClass() {
+		return requiredClass;
+	}
+
+	public StringTable parentList() {
+		return parentList;
 	}
 
 	public Exception getException() {
 		return exc;
+	}
+
+	public IntegerRange range() {
+		return range;
 	}
 
 	public Object getTarget() {
@@ -99,28 +136,22 @@ public class CheckMessage {
 	public TreeNode getArchetypeNode() {
 		return archetypeNode;
 	}
-	
+
 	public int getCode() {
 		return code;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if (archetypeNode==null)
+		if (archetypeNode == null)
 			sb.append("Archetype check failed \n");
 		else
-			sb.append("Archetype check failed on requirement:\n\t")
-				.append(archetypeNode.toString())
-				.append('\n');
-		if (target!=null)
-			sb.append("--for object:\n\t")
-				.append(target.toString())
-				.append('\n');
-		if (exc!=null)
-			sb.append("--with Error:\n\t")
-				.append(exc.toString())
-				.append('\n');
+			sb.append("Archetype check failed on requirement:\n\t").append(archetypeNode.toString()).append('\n');
+		if (target != null)
+			sb.append("--for object:\n\t").append(target.toString()).append('\n');
+		if (exc != null)
+			sb.append("--with Error:\n\t").append(exc.toString()).append('\n');
 		return sb.toString();
 	}
 }
