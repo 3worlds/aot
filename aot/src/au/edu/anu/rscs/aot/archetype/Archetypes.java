@@ -62,60 +62,77 @@ import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
 /**
- * <p>This code was initially developed by Shayne Flint as the core of Aspect-Oriented Thinking 
- * (AOT) and has been deeply refactored by J. Gignoux.</p> 
- * <p>It checks that a graph (a {@linkplain TreeGraph}, actually, i.e. a tree with cross-links) complies with
- * an <em>archetype</em> describing how graphs should look like. In other words, it is a tool
- * for checking that specifications or configurations comply with requirements. The archetype
- * describes the requirements. Notice that the first check that is provided here is to check
- * that an archetype... is an archetype, i.e. complies with the requirements needed to call 
- * a graph an archetype.</p>
- * <p>There are two sets of methods here: the <em>check(...)</em> methods perform the checks and
- * capture all errors (as exceptions) in a list. the <em>complies(...)</em> methods perform a check
- * and return false if an Exception was found during the checking process.</p>
- * <p>Afer a call to {@linkp check()}, {@link checkList()} may be called to retrieve all
- * checking errors.</p>
- * <p>NB: an archetype is a {@linkplain Tree}, but a configuration/specification graph is a 
- * {@linkplain TreeGraph}.</p>
- * <p>NOTE: by default this class spits a lot of log messages. These are logged at the
- * INFO level (="debugging"), so if you want to get rid of them just set the log level to
- * WARNING.</p>
+ * <p>
+ * This code was initially developed by Shayne Flint as the core of
+ * Aspect-Oriented Thinking (AOT) and has been deeply refactored by J. Gignoux.
+ * </p>
+ * <p>
+ * It checks that a graph (a {@linkplain TreeGraph}, actually, i.e. a tree with
+ * cross-links) complies with an <em>archetype</em> describing how graphs should
+ * look like. In other words, it is a tool for checking that specifications or
+ * configurations comply with requirements. The archetype describes the
+ * requirements. Notice that the first check that is provided here is to check
+ * that an archetype... is an archetype, i.e. complies with the requirements
+ * needed to call a graph an archetype.
+ * </p>
+ * <p>
+ * There are two sets of methods here: the <em>check(...)</em> methods perform
+ * the checks and capture all errors (as exceptions) in a list. the
+ * <em>complies(...)</em> methods perform a check and return false if an
+ * Exception was found during the checking process.
+ * </p>
+ * <p>
+ * Afer a call to {@linkp check()}, {@link checkList()} may be called to
+ * retrieve all checking errors.
+ * </p>
+ * <p>
+ * NB: an archetype is a {@linkplain Tree}, but a configuration/specification
+ * graph is a {@linkplain TreeGraph}.
+ * </p>
+ * <p>
+ * NOTE: by default this class spits a lot of log messages. These are logged at
+ * the INFO level (="debugging"), so if you want to get rid of them just set the
+ * log level to WARNING.
+ * </p>
  * 
  * @author Jacques Gignoux - 6 mars 2019
- * @author Shayne Flint - looong ago		
+ * @author Shayne Flint - looong ago
  *
  */
 // tested OK with version 0.1.2 on 21/5/2019
-public class Archetypes implements ArchetypeArchetypeConstants{
-	
+public class Archetypes implements ArchetypeArchetypeConstants {
+
 	/** The universal archetype - the archetype for archetypes */
 	private Tree<? extends TreeNode> archetypeArchetype = null;
-	
+
 	private Logger log = Logger.getLogger(Archetypes.class.getName());
-	
+
 	private List<CheckMessage> checkFailList = new LinkedList<CheckMessage>();
-	
+
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
 		super();
 		log.setLevel(Level.OFF);
-		archetypeArchetype = (Tree<? extends TreeNode>) 
-			GraphImporter.importGraph("ArchetypeArchetype.ugt",this.getClass());
+		archetypeArchetype = (Tree<? extends TreeNode>) GraphImporter.importGraph("ArchetypeArchetype.ugt",
+				this.getClass());
 	}
-	
+
 	/**
-	 * checks that an archetype is an archetype (= check it against archetypeArchetype)
+	 * checks that an archetype is an archetype (= check it against
+	 * archetypeArchetype)
+	 * 
 	 * @param archetype the archetype to check
 	 */
-	public void checkArchetype(Tree<? extends TreeNode> graphToCheck) {		
-		if (archetypeArchetype!=null)
-			check(graphToCheck,archetypeArchetype);
+	public void checkArchetype(Tree<? extends TreeNode> graphToCheck) {
+		if (archetypeArchetype != null)
+			check(graphToCheck, archetypeArchetype);
 		else
 			log.warning("Archetype for archetypes not found - no check performed");
 	}
-	
+
 	/**
 	 * checks that an archetype is an archetype and returns true if it complies.
+	 * 
 	 * @param graphToCheck the tree to check
 	 * @return true if graphToCheck is a valid archetype
 	 */
@@ -126,52 +143,57 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 		else
 			return false;
 	}
-	
+
 	/**
-	 * checks that <strong>graphToCheck</strong> complies with <strong>archetype</strong>.
+	 * checks that <strong>graphToCheck</strong> complies with
+	 * <strong>archetype</strong>.
+	 * 
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
-	 * @param archetype the archetype tree to check against
+	 * @param archetype    the archetype tree to check against
 	 */
 	public void check(NodeSet<?> graphToCheck, Tree<? extends TreeNode> archetype) {
-		for (TreeNode arch: archetype.nodes()) 
+		for (TreeNode arch : archetype.nodes())
 			if (arch instanceof ArchetypeRootSpec)
-				check(graphToCheck,(ArchetypeRootSpec)arch);
+				check(graphToCheck, (ArchetypeRootSpec) arch);
 	}
-	
-	// returns true if the parent label (=class name) of 'child' matches one of 
-	// the names passed in 'parentlist' OR if parentList=null and child is the root node
+
+	// returns true if the parent label (=class name) of 'child' matches one of
+	// the names passed in 'parentlist' OR if parentList=null and child is the root
+	// node
 	private boolean matchesParent(TreeNode child, StringTable parentList) {
 		// root node - has no parent
-		if (child.getParent()==null ) {
-			if (parentList==null)
+		if (child.getParent() == null) {
+			if (parentList == null)
 				return true;
-			if (parentList.size()==0)
+			if (parentList.size() == 0)
 				return true;
-			for (int i=0; i<parentList.size(); i++)
-				if ((parentList.getWithFlatIndex(i)==null)||(parentList.getWithFlatIndex(i).length()==0))
-					return true;	
+			for (int i = 0; i < parentList.size(); i++)
+				if ((parentList.getWithFlatIndex(i) == null) || (parentList.getWithFlatIndex(i).length() == 0))
+					return true;
 			return false;
 		}
 		// parent exists, must match at least one id of parentList
-		else  {
+		else {
 //			String pid = child.getParent().classId();
-			for (int i=0; i<parentList.size(); i++)
-				if (NodeReference.matchesRef(child.getParent(),parentList.getWithFlatIndex(i)))
+			for (int i = 0; i < parentList.size(); i++)
+				if (NodeReference.matchesRef(child.getParent(), parentList.getWithFlatIndex(i)))
 //				if (pid.equals(parentList.getWithFlatIndex(i)))
 					return true;
 		}
 		return false;
 	}
-	
+
 	private boolean matchesClass(TreeNode node, String requiredClass) {
 		return node.classId().equals(requiredClass);
 	}
-	
+
 	/**
-	 * checks that <strong>graphToCheck</strong> complies with <strong>archetype</strong>.
-	 * Here, <strong>archetype</strong> is the root node of an archetype tree.
+	 * checks that <strong>graphToCheck</strong> complies with
+	 * <strong>archetype</strong>. Here, <strong>archetype</strong> is the root node
+	 * of an archetype tree.
+	 * 
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
-	 * @param archetype  the archetype root node to check against
+	 * @param archetype    the archetype root node to check against
 	 */
 	@SuppressWarnings("unchecked")
 	public void check(NodeSet<?> graphToCheck, ArchetypeRootSpec archetype) {
@@ -183,23 +205,33 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
 		} catch (ClassCastException e) {
 			// IDD: graph is not a tree;treeToCheck maybe null??
-			checkFailList.add(new CheckMessage(CheckMessage.code0NotATree,graphToCheck,e,null,null,null,null,-1));
+			checkFailList
+					.add(new CheckMessage(CheckMessage.code0NotATree, graphToCheck, e, null, null, null, null, -1));
 		}
-		if (treeToCheck!=null) {
+		// Check that the tree has only one root - otherwise disaster!
+		int nRoots = 0;
+		for (TreeNode root : treeToCheck.roots())
+			nRoots++;
+		if (nRoots != 1) {
+			checkFailList.add(new CheckMessage(CheckMessage.code17MoreThanOneRoot, treeToCheck,
+					new AotException("Tree must only have one root"), null, null, null, null, nRoots));
+		}
+
+		if (treeToCheck != null) {
 			boolean exclusive = false;
 			if (archetype.properties().hasProperty("exclusive"))
 				exclusive = (Boolean) archetype.properties().getPropertyValue("exclusive");
 			int complyCount = 0;
-			for (TreeNode tn:archetype.getChildren())
+			for (TreeNode tn : archetype.getChildren())
 				if (tn instanceof NodeSpec) {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(aaHasParent);
 					String requiredClass = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
 					int count = 0;
-					for (TreeNode n:treeToCheck.nodes()) {
-						if (matchesClass(n,requiredClass) && matchesParent(n,parentList)) {
+					for (TreeNode n : treeToCheck.nodes()) {
+						if (matchesClass(n, requiredClass) && matchesParent(n, parentList)) {
 							log.info("checking node: " + n.toUniqueString());
-							check(n,hasNode);
+							check(n, hasNode);
 							complyCount++;
 							count++;
 						}
@@ -210,54 +242,48 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 					else
 						range = new IntegerRange(0, Integer.MAX_VALUE);
 					if (!range.inRange(count)) {
-						String message = "Expected " + range 
-							+ " nodes of class '" + requiredClass
-							+ "' with parents '" + parentList 
-							+ "' (got " + count
-							+ ") archetype=" + hasNode.toUniqueString();
-						checkFailList.add(new CheckMessage(CheckMessage.code1,treeToCheck,new AotException(message),hasNode,requiredClass,parentList,range,count));
+						String message = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '"
+								+ parentList + "' (got " + count + ") archetype=" + hasNode.toUniqueString();
+						checkFailList.add(new CheckMessage(CheckMessage.code1, treeToCheck, new AotException(message),
+								hasNode, requiredClass, parentList, range, count));
+					}
 				}
-			}
 			// PROBLEM here: nodes added in sub-archetypes are not counted as valid here...
 			if (exclusive && (complyCount != treeToCheck.nNodes())) {
-				checkFailList.add(new CheckMessage(CheckMessage.code2Exclusive,treeToCheck,
-					new AotException("Expected all nodes to comply (got " 
-						+ (treeToCheck.nNodes() - complyCount)
-						+ " nodes which didn't comply)"),null,null,null,null,complyCount));
+				checkFailList.add(new CheckMessage(
+						CheckMessage.code2Exclusive, treeToCheck, new AotException("Expected all nodes to comply (got "
+								+ (treeToCheck.nNodes() - complyCount) + " nodes which didn't comply)"),
+						null, null, null, null, complyCount));
 			}
 		}
 	}
-	
+
 	// returns the list of property names possible for a given archetype node
 	@SuppressWarnings("unchecked")
 	private Set<String> getArchetypePropertyList(String archetypeNodeLabel) {
 		Set<String> result = new HashSet<String>();
-		TreeNode an = (TreeNode) get(archetypeArchetype.root(),
-			children(),
-			selectOne(hasTheName(archetypeNodeLabel)));
-		for (TreeNode prop: (List<TreeNode>) get(an,
-			children(),
-			selectZeroOrMany(hasTheLabel(aaHasProperty))))
+		TreeNode an = (TreeNode) get(archetypeArchetype.root(), children(), selectOne(hasTheName(archetypeNodeLabel)));
+		for (TreeNode prop : (List<TreeNode>) get(an, children(), selectZeroOrMany(hasTheLabel(aaHasProperty))))
 			if (SimpleDataTreeNode.class.isAssignableFrom(prop.getClass()))
-				result.add((String)((SimpleDataTreeNode)prop).properties().getPropertyValue(aaHasName));
+				result.add((String) ((SimpleDataTreeNode) prop).properties().getPropertyValue(aaHasName));
 		return result;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void checkConstraints(Object item, TreeNode spec) {
 		// get the 'mustSatisfyQuery' label from the archetype factory
 		String qLabel = spec.factory().nodeClassName(ConstraintSpec.class);
-		for (ConstraintSpec queryNode: (List<ConstraintSpec>) get(spec, 
-			children(), 
-			selectZeroOrMany(hasTheLabel(qLabel)))) {
+		for (ConstraintSpec queryNode : (List<ConstraintSpec>) get(spec, children(),
+				selectZeroOrMany(hasTheLabel(qLabel)))) {
 			ReadOnlyPropertyList queryProps = queryNode.properties();
 			String queryClassName = (String) queryProps.getPropertyValue(aaClassName);
-			log.info("checking query: " + queryClassName);	
+			log.info("checking query: " + queryClassName);
 			// default properties: potential list
 			Set<String> defaultProps = getArchetypePropertyList("ConstraintSpec");
-			// find the default props that are effectively present in the above list and count them 
+			// find the default props that are effectively present in the above list and
+			// count them
 			int defaultPropCount = 0;
-			for (String key:queryProps.getKeysAsSet())
+			for (String key : queryProps.getKeysAsSet())
 				if (defaultProps.contains(key))
 					defaultPropCount += 1;
 			int parameterCount = queryProps.size() - defaultPropCount;
@@ -273,7 +299,8 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 						parameterTypes[cnt] = Class.forName(property.getClassName());
 						// IDD: the property class is unknown
 					} catch (ClassNotFoundException e) {
-						checkFailList.add(new CheckMessage(CheckMessage.code3PropertyClass,queryNode,e,null,null,null,null,-1));
+						checkFailList.add(new CheckMessage(CheckMessage.code3PropertyClass, queryNode, e, null, null,
+								null, null, -1));
 //						log.severe("Cannot get class for archetype check property" + queryNode);
 //						e.printStackTrace();
 					}
@@ -296,38 +323,35 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 				query.check(item);
 				// this to handle sub-archetypes, which return a list of check messages
 				if (query.getResult() instanceof Iterable<?>)
-					for (Object o:(Iterable<?>)query.getResult())
+					for (Object o : (Iterable<?>) query.getResult())
 						if (o instanceof CheckMessage)
 							checkFailList.add((CheckMessage) o);
-			// this is bad. means there is an error in query name
-			// it should crash because archetypes are not supposed to be written by hand
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | 
-					InstantiationException | IllegalAccessException | IllegalArgumentException |
-					InvocationTargetException e) {
-				log.severe("cannot instantiate Query '"+queryClassName+"'");
+				// this is bad. means there is an error in query name
+				// it should crash because archetypes are not supposed to be written by hand
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				log.severe("cannot instantiate Query '" + queryClassName + "'");
 				e.printStackTrace();
-			// this only means the query failed and it should be reported to the user
+				// this only means the query failed and it should be reported to the user
 			} catch (Exception e) {
-				checkFailList.add(new CheckMessage(CheckMessage.code4Query,item,e,queryNode,null,null,null,-1));
+				checkFailList.add(new CheckMessage(CheckMessage.code4Query, item, e, queryNode, null, null, null, -1));
 			}
 		}
 	}
-	
+
 	private boolean edgeLabelMatch(Edge e, String label) {
-		if (label!=null)
+		if (label != null)
 			return (e.classId().equals(label));
 		return false;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void checkEdges(TreeNode nodeToCheck, NodeSpec hasNode) {
 		// get the 'hasEdge' label from the archetype factory
 		String eLabel = hasNode.factory().nodeClassName(EdgeSpec.class);
 //		int toNodeCount = 0;
 //		int fromNodeCount = 0; // fromNode disabled for the moment
-		for (EdgeSpec edgeSpec: (List<EdgeSpec>) get(hasNode,
-				children(),
-				selectZeroOrMany(hasTheLabel(eLabel)))) {
+		for (EdgeSpec edgeSpec : (List<EdgeSpec>) get(hasNode, children(), selectZeroOrMany(hasTheLabel(eLabel)))) {
 			log.info("checking edge spec: " + edgeSpec.toUniqueString());
 			SimplePropertyList eprops = edgeSpec.properties();
 			// edge spec toNode
@@ -335,8 +359,9 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 			if (eprops.hasProperty(aaToNode))
 				toNodeRef = (String) eprops.getPropertyValue(aaToNode);
 			else { // this is an error, an edge spec must have a toNode property
-				Exception e = new AotException("'"+aaToNode+"' property missing for edge specification "+ edgeSpec);
-				checkFailList.add(new CheckMessage(CheckMessage.code5,edgeSpec,e,null,null,null,null,-1));
+				Exception e = new AotException(
+						"'" + aaToNode + "' property missing for edge specification " + edgeSpec);
+				checkFailList.add(new CheckMessage(CheckMessage.code5, edgeSpec, e, null, null, null, null, -1));
 			}
 			// edge spec multiplicity
 			IntegerRange edgeMult = new IntegerRange(1, 1);
@@ -355,35 +380,36 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 			// for nodeToCheck to have edges, it must be a subclass of Node
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
-				for (Edge ed:node.edges(Direction.OUT)) {
-					if (ed.factory().edgeClass(ed.classId())==null) {
-						Exception e = new AotException("Class '" + edgeLabel
-							+ "' not found for edge " + ed);
-						checkFailList.add(new CheckMessage(CheckMessage.code6OutEdgeMissing,ed, e, edgeSpec,null,null,edgeMult,-1));
+				for (Edge ed : node.edges(Direction.OUT)) {
+					if (ed.factory().edgeClass(ed.classId()) == null) {
+						Exception e = new AotException("Class '" + edgeLabel + "' not found for edge " + ed);
+						checkFailList.add(new CheckMessage(CheckMessage.code6OutEdgeMissing, ed, e, edgeSpec, null,
+								null, edgeMult, -1));
 					}
-					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)
-							&& edgeLabelMatch(ed,edgeLabel)) {
+					if (NodeReference.matchesRef((TreeNode) ed.endNode(), toNodeRef) && edgeLabelMatch(ed, edgeLabel)) {
 						boolean ok = true;
 						// check edge label
-						if (edgeLabel!=null)
+						if (edgeLabel != null)
 							if (!ed.classId().equals(edgeLabel)) {
-								Exception e = new AotException("Edge "+ed+" should be of class ["+
-									edgeLabel+"]. Class ["+ed.classId()+"] found instead.");
-								checkFailList.add(new CheckMessage(CheckMessage.code7,ed, e, edgeSpec,null,null,edgeMult,-1));
+								Exception e = new AotException("Edge " + ed + " should be of class [" + edgeLabel
+										+ "]. Class [" + ed.classId() + "] found instead.");
+								checkFailList.add(new CheckMessage(CheckMessage.code7, ed, e, edgeSpec, null, null,
+										edgeMult, -1));
 								ok = false;
-						}
+							}
 						// check edge id
-						if (edgeId!=null)
+						if (edgeId != null)
 							if (!ed.id().equals(edgeId)) {
-								Exception e = new AotException("Edge "+ed+" should have id ["+
-									edgeId+"]. Id ["+ed.id()+"] found instead.");
-								checkFailList.add(new CheckMessage(CheckMessage.code8,ed, e, edgeSpec,null,null,edgeMult,-1));
+								Exception e = new AotException("Edge " + ed + " should have id [" + edgeId + "]. Id ["
+										+ ed.id() + "] found instead.");
+								checkFailList.add(new CheckMessage(CheckMessage.code8, ed, e, edgeSpec, null, null,
+										edgeMult, -1));
 								ok = false;
-						}
+							}
 						// check queries on edge
 						int nprobs = checkFailList.size();
-						checkConstraints(ed,edgeSpec);
-						if (checkFailList.size()>nprobs)
+						checkConstraints(ed, edgeSpec);
+						if (checkFailList.size() > nprobs)
 							ok = false;
 						if (ok) {
 //							toNodeCount++;
@@ -395,21 +421,22 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 				try {
 					edgeMult.check(toNodes.size());
 				} catch (Exception e) {
-					Exception ee = new AotException("Expected " + nodeToCheck + " to have " 
-						+ edgeMult + " out edge(s) to nodes that match ["
-						+ toNodeRef + "] with label '" + edgeLabel
-						+ "' (found " + toNodes.size() + ") ");
-					checkFailList.add(new CheckMessage(CheckMessage.code9OutEdgeRangeCheck,node, ee, edgeSpec,null,null,edgeMult,toNodes.size()));
+					Exception ee = new AotException(
+							"Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
+									+ toNodeRef + "] with label '" + edgeLabel + "' (found " + toNodes.size() + ") ");
+					checkFailList.add(new CheckMessage(CheckMessage.code9OutEdgeRangeCheck, node, ee, edgeSpec, null,
+							null, edgeMult, toNodes.size()));
 				}
 			}
 			// else error ? we must have a Node here ?
 			// edges specified but object is not a node ???
-			
-		} // loop on EdgeSpecs 
 
-		// I havent put this code in (from Shayne's Archetype class) because I suspect its useless
+		} // loop on EdgeSpecs
+
+		// I havent put this code in (from Shayne's Archetype class) because I suspect
+		// its useless
 		// I copy it here just to remember we may need it one day
-			
+
 // check other edge counts
 ////
 //		IntegerRange otherOutEdges = new IntegerRange(0, Integer.MAX_VALUE);
@@ -424,13 +451,12 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 //			recordError("Expected " + otherInEdges + " other in edges from node '" + node.toShortString()
 //					+ "' referenced by [" + ref + "] (found " + otherInCount + ")", node);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void checkProperties(Object element, NodeSpec hasNode) {
 		// get the 'hasProperty' label from the archetype factory
 		String pLabel = hasNode.factory().nodeClassName(PropertySpec.class);
-		for (PropertySpec propertyArchetype: (List<PropertySpec>) get(hasNode,
-				children(),
+		for (PropertySpec propertyArchetype : (List<PropertySpec>) get(hasNode, children(),
 				selectZeroOrMany(hasTheLabel(pLabel)))) {
 			log.info("checking property spec: " + propertyArchetype.toUniqueString());
 			SimplePropertyList pprops = propertyArchetype.properties();
@@ -439,72 +465,78 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 			if (pprops.hasProperty(aaHasName))
 				key = (String) pprops.getPropertyValue(aaHasName);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'"+aaHasName+"' property missing for property specification "+ propertyArchetype);
-				checkFailList.add(new CheckMessage(CheckMessage.code10,propertyArchetype, e, null,null,null,null,-1));
+				Exception e = new AotException(
+						"'" + aaHasName + "' property missing for property specification " + propertyArchetype);
+				checkFailList
+						.add(new CheckMessage(CheckMessage.code10, propertyArchetype, e, null, null, null, null, -1));
 			}
 			// property spec type
 			String typeName = null;
 			if (pprops.hasProperty(aaType))
 				typeName = (String) pprops.getPropertyValue(aaType);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'"+aaType+"' property missing for property specification "+ propertyArchetype);
-				checkFailList.add(new CheckMessage(CheckMessage.code11,propertyArchetype, e, null,null,null,null,-1));
+				Exception e = new AotException(
+						"'" + aaType + "' property missing for property specification " + propertyArchetype);
+				checkFailList
+						.add(new CheckMessage(CheckMessage.code11, propertyArchetype, e, null, null, null, null, -1));
 			}
 			// property spec multiplicity
 			IntegerRange multiplicity = new IntegerRange(1, 1);
 			if (pprops.hasProperty(aaMultiplicity))
 				multiplicity = (IntegerRange) pprops.getPropertyValue(aaMultiplicity);
 			else { // this is an error, a property must have a name
-				Exception e = new AotException("'"+aaMultiplicity+"' property missing for property specification "+ propertyArchetype);
-				checkFailList.add(new CheckMessage(CheckMessage.code12,propertyArchetype, e, null,null,null,multiplicity,0));
+				Exception e = new AotException(
+						"'" + aaMultiplicity + "' property missing for property specification " + propertyArchetype);
+				checkFailList.add(
+						new CheckMessage(CheckMessage.code12, propertyArchetype, e, null, null, null, multiplicity, 0));
 			}
 			if (element instanceof ReadOnlyDataHolder) {
-				ReadOnlyPropertyList nprops = ((ReadOnlyDataHolder)element).properties(); 
+				ReadOnlyPropertyList nprops = ((ReadOnlyDataHolder) element).properties();
 				if (!nprops.hasProperty(key)) { // property not found
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
-						Exception e = new AotException("Required property '"+key+"' missing for element "+ element);
-						checkFailList.add(new CheckMessage(CheckMessage.code13MissingProperty,element, e, propertyArchetype,null,null,multiplicity,0));
+						Exception e = new AotException(
+								"Required property '" + key + "' missing for element " + element);
+						checkFailList.add(new CheckMessage(CheckMessage.code13MissingProperty, element, e,
+								propertyArchetype, null, null, multiplicity, 0));
 					}
-				}
-				else { // property is here
+				} else { // property is here
 					Property prop = nprops.getProperty(key);
 					Object pvalue = prop.getValue();
 					String ptype = null;
-					if (pvalue!=null)
+					if (pvalue != null)
 						ptype = ValidPropertyTypes.typeOf(pvalue);
-					if (ptype==null) { // the property type is not in the valid property type list
-						Exception e = new AotException("Unknown property type for property '"+key
-							+"' in element "+ element);
-						checkFailList.add(new CheckMessage(CheckMessage.code14UnknowPropertyType,element, e, propertyArchetype,null,null,null,-1));
+					if (ptype == null) { // the property type is not in the valid property type list
+						Exception e = new AotException(
+								"Unknown property type for property '" + key + "' in element " + element);
+						checkFailList.add(new CheckMessage(CheckMessage.code14UnknowPropertyType, element, e,
+								propertyArchetype, null, null, null, -1));
+					} else if (!ptype.equals(typeName)) { // the property type is not the one required
+						Exception e = new AotException(
+								"Property '" + key + "' in element '" + element + "' is not of the required type '"
+										+ typeName + "' (type '" + ptype + "' found instead)");
+						checkFailList.add(new CheckMessage(CheckMessage.code15WrongPropertyType, element, e,
+								propertyArchetype, null, null, null, -1));
 					}
-					else if (!ptype.equals(typeName)) { // the property type is not the one required
-						Exception e = new AotException("Property '"+key
-							+"' in element '"+ element 
-							+"' is not of the required type '" + typeName
-							+"' (type '"+ptype
-							+"' found instead)");
-						checkFailList.add(new CheckMessage(CheckMessage.code15WrongPropertyType,element,e,propertyArchetype,null,null,null,-1));
-					}
-					checkConstraints(prop,propertyArchetype);
+					checkConstraints(prop, propertyArchetype);
 				}
-			}
-			else {
+			} else {
 				// properties specified but object has no property list
-				Exception e = new AotException("Element '"+element+"' has no property list");
-				checkFailList.add(new CheckMessage(CheckMessage.code16,element,e,propertyArchetype,null,null,null,-1));
+				Exception e = new AotException("Element '" + element + "' has no property list");
+				checkFailList.add(
+						new CheckMessage(CheckMessage.code16, element, e, propertyArchetype, null, null, null, -1));
 			}
 		} // loop on PropertySpecs
 	}
-	
-	private void check(TreeNode nodeToCheck, 
-			NodeSpec hasNode) {
+
+	private void check(TreeNode nodeToCheck, NodeSpec hasNode) {
 		checkConstraints(nodeToCheck, hasNode);
 		checkEdges(nodeToCheck, hasNode);
-		checkProperties(nodeToCheck,hasNode);
+		checkProperties(nodeToCheck, hasNode);
 	}
-	
+
 	/**
 	 * Get the checking errors.
+	 * 
 	 * @return null if no checking errors, the (read-only) list of errors otherwise
 	 */
 	public Iterable<CheckMessage> errorList() {
@@ -513,7 +545,7 @@ public class Archetypes implements ArchetypeArchetypeConstants{
 		else
 			return checkFailList;
 	}
-	
+
 	// temporary, for debugging
 	public String toString() {
 		return archetypeArchetype.toString();

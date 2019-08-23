@@ -62,7 +62,7 @@ public class CheckMessage {
 	public static final int code14UnknowPropertyType = 14;
 	public static final int code15WrongPropertyType = 15;
 	public static final int code16 = 16;
-	public static final int code17 = 17;// spare...
+	public static final int code17MoreThanOneRoot = 17;// spare...
 	public static final int code18 = 18;
 	public static final int code19 = 19;
 	public static final int code20 = 20;
