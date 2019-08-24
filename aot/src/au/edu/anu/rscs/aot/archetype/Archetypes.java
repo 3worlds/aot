@@ -212,9 +212,10 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		int nRoots = 0;
 		for (TreeNode root : treeToCheck.roots())
 			nRoots++;
-		if (nRoots != 1) {
+		if (nRoots > 1) {
+			// checkSubArchetypeQuery produces trees with no root!
 			checkFailList.add(new CheckMessage(CheckMessage.code17MoreThanOneRoot, treeToCheck,
-					new AotException("Tree must only have one root"), null, null, null, null, nRoots));
+					new AotException("Tree must only have one root. Found["+nRoots+"]"), null, null, null, null, nRoots));
 		}
 
 		if (treeToCheck != null) {
