@@ -65,7 +65,7 @@ public class CheckMessage {
 	public static final int code17MoreThanOneRoot = 17;// spare...
 	public static final int code18 = 18;
 	public static final int code19 = 19;
-	public static final int code20 = 20;
+	public static final int code20Deploy = 20;
 
 	/** the error raised by the check() method */
 	private Exception exc = null;
