@@ -30,9 +30,9 @@
 	</publications>
 
 	<dependencies>
-		<dependency org="fr.ens.biologie" name="generics" rev="[0.1.1,)"/>
-		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="[0.2.1,)"/>
-		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.1.1,)"/>
+		<dependency org="fr.ens.biologie" name="generics" rev="[0.1.10,)"/>
+		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="[0.2.10,)"/>
+		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.1.2,)"/>
 	</dependencies>
 
 </ivy-module>
