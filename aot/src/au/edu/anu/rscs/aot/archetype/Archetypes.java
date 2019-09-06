@@ -113,7 +113,6 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
 		super();
-		log.setLevel(Level.OFF);
 		archetypeArchetype = (Tree<? extends TreeNode>) GraphImporter.importGraph("ArchetypeArchetype.ugt",
 				this.getClass());
 	}
