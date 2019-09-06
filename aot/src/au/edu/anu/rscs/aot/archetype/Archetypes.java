@@ -56,6 +56,7 @@ import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.graph.io.GraphImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.ens.biologie.generic.utils.Logging;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
 import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
@@ -105,7 +106,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	/** The universal archetype - the archetype for archetypes */
 	private Tree<? extends TreeNode> archetypeArchetype = null;
 
-	private Logger log = Logger.getLogger(Archetypes.class.getName());
+	private static Logger log = Logging.getLogger(Archetypes.class);
 
 	private List<CheckMessage> checkFailList = new LinkedList<CheckMessage>();
 
@@ -195,7 +196,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
 	 * @param archetype    the archetype root node to check against
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	public void check(NodeSet<?> graphToCheck, ArchetypeRootSpec archetype) {
 		checkFailList.clear();
 		log.info("Checking against archetype: " + archetype.id());
