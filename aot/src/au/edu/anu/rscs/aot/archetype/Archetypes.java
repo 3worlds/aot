@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
@@ -234,6 +233,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							log.info("checking node: " + n.toUniqueString());
 							check(n, hasNode);
 							complyCount++;
+							// Pb here: if parents have the same label but different name
+							// then the real multiplicity is not count, it's lower
+							// how to count multiplicity per individual parent, not
+							// per parent label?
+							// this is causing checking errors.
 							count++;
 						}
 					}
