@@ -45,8 +45,8 @@ public class VersionSettings {
 	 * 
 	 */
 	protected static String[][] DEPS = { 
-		{"fr.ens.biologie", "generics", "[0.1.11,)", null},
-		{"au.edu.anu.rscs.aot", "omugi", "[0.2.11,)", null},
+		{"fr.ens.biologie", "generics", "[0.1.12,)", null},
+		{"au.edu.anu.rscs.aot", "omugi", "[0.2.12,)", null},
 		{"au.edu.anu.rscs.aot", "qgraph", "[0.1.3,)", null}
 	};
 	
