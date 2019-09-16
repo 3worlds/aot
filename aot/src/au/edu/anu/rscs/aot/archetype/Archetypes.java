@@ -151,6 +151,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	 * @param archetype    the archetype tree to check against
 	 */
 	public void check(NodeSet<?> graphToCheck, Tree<? extends TreeNode> archetype) {
+		if (!(archetype.root() instanceof ArchetypeRootSpec))
+			throw new AotException("Archetype does not have "+ArchetypeRootSpec.class.getSimpleName()+ " as its root! "+archetype.root());
 		for (TreeNode arch : archetype.nodes())
 			if (arch instanceof ArchetypeRootSpec)
 				check(graphToCheck, (ArchetypeRootSpec) arch);
