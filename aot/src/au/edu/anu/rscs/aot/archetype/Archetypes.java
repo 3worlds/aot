@@ -31,9 +31,11 @@ package au.edu.anu.rscs.aot.archetype;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -229,7 +231,9 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(aaHasParent);
 					String requiredClass = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
-					int count = 0;
+//					int count = 0;
+					// count must be made by parent, because multiplicities apply to parents
+					Map<TreeNode,Integer> countByParent = new HashMap<>();
 					for (TreeNode n : treeToCheck.nodes()) {
 						if (matchesClass(n, requiredClass) && matchesParent(n, parentList)) {
 							log.info("checking node: " + n.toUniqueString());
@@ -240,7 +244,14 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							// how to count multiplicity per individual parent, not
 							// per parent label?
 							// this is causing checking errors.
-							count++;
+//							count++;
+							TreeNode parent = n.getParent();
+							if (parent!=null) { // NB hashmap accepts null keys - but ony one instance...
+								if (!countByParent.containsKey(parent))
+									countByParent.put(parent,1);
+								else
+									countByParent.put(parent,countByParent.get(parent)+1);
+							}
 						}
 					}
 					IntegerRange range = null;
@@ -248,19 +259,20 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						range = (IntegerRange) hasNode.properties().getPropertyValue(aaMultiplicity);
 					else
 						range = new IntegerRange(0, Integer.MAX_VALUE);
-					if (!range.inRange(count)) {
-						String message = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '"
-								+ parentList + "' (got " + count + ") archetype=" + hasNode.toUniqueString();
-						checkFailList.add(new CheckMessage(CheckMessage.code1, treeToCheck, new AotException(message),
-								hasNode, requiredClass, parentList, range, count));
+					for (int count:countByParent.values())
+						if (!range.inRange(count)) {
+							String message = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '"
+									+ parentList + "' (got " + count + ") archetype=" + hasNode.toUniqueString();
+							checkFailList.add(new CheckMessage(CheckMessage.code1, treeToCheck, new AotException(message),
+									hasNode, requiredClass, parentList, range, count));
 					}
 				}
 			// PROBLEM here: nodes added in sub-archetypes are not counted as valid here...
 			if (exclusive && (complyCount != treeToCheck.nNodes())) {
 				checkFailList.add(new CheckMessage(
-						CheckMessage.code2Exclusive, treeToCheck, new AotException("Expected all nodes to comply (got "
-								+ (treeToCheck.nNodes() - complyCount) + " nodes which didn't comply)"),
-						null, null, null, null, complyCount));
+					CheckMessage.code2Exclusive, treeToCheck, new AotException("Expected all nodes to comply (got "
+						+ (treeToCheck.nNodes() - complyCount) + " nodes which didn't comply)"),
+					null, null, null, null, complyCount));
 			}
 		}
 	}
