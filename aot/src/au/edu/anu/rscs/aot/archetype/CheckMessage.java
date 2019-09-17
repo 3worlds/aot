@@ -97,8 +97,9 @@ public class CheckMessage {
 	 * @param onNode
 	 */
 	// Could have many constructors to assist with context
-	public CheckMessage(int code, Object check, Exception failed, TreeNode onNode, String requiredClass,
-			StringTable parentList, IntegerRange range,int count) {
+	public CheckMessage(int code, Object check, Exception failed, 
+			TreeNode onNode, String requiredClass,
+			StringTable parentList, IntegerRange range, int count) {
 		super();
 		this.code = code;
 		target = check;
