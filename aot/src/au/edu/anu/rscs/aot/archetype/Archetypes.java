@@ -201,6 +201,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 				NodeSpec child = (NodeSpec) tn;
 				StringTable parentList = (StringTable) child.properties().getPropertyValue(aaHasParent);
 				for (int i=0; i<parentList.size(); i++) {
+					// NB this is not very good coding - the ":" may appear as dangerous flaw later
 					if (parentList.getWithFlatIndex(i).equals(parentClassName+":"))
 						result.add(child);
 				}
@@ -434,7 +435,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						checkFailList.add(new CheckMessage(CheckMessage.code6OutEdgeMissing, ed, e, edgeSpec, null,
 							null, edgeMult, -1));
 					}
-					if (NodeReference.matchesRef((TreeNode) ed.endNode(), toNodeRef) && edgeLabelMatch(ed, edgeLabel)) {
+					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)
+						&& edgeLabelMatch(ed, edgeLabel)) {
 						boolean ok = true;
 						// check edge label
 						if (edgeLabel != null)
@@ -463,6 +465,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 //							toNodeCount++;
 							toNodes.add(ed.endNode());
 						}
+						
 					}
 				}
 				// check edge multiplicity
