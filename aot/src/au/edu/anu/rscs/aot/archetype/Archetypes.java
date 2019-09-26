@@ -58,6 +58,7 @@ import fr.cnrs.iees.graph.impl.TreeGraph;
 import fr.cnrs.iees.graph.io.GraphImporter;
 import fr.cnrs.iees.properties.ReadOnlyPropertyList;
 import fr.cnrs.iees.properties.SimplePropertyList;
+import fr.ens.biologie.generic.utils.Duple;
 import fr.ens.biologie.generic.utils.Logging;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
@@ -71,7 +72,8 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * </p>
  * <p>
  * It checks that a graph (a {@linkplain TreeGraph}, actually, i.e. a tree with
- * cross-links) complies with an <em>archetype</em> describing how graphs should
+ * cross-links) complies with an <em>archetype</em> graph (actually, a {@linkplain Tree})
+ * describing how graphs should
  * look like. In other words, it is a tool for checking that specifications or
  * configurations comply with requirements. The archetype describes the
  * requirements. Notice that the first check that is provided here is to check
@@ -85,7 +87,7 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * Exception was found during the checking process.
  * </p>
  * <p>
- * Afer a call to {@linkp check()}, {@link checkList()} may be called to
+ * Afer a call to {@linkplain check()}, {@link checkList()} may be called to
  * retrieve all checking errors.
  * </p>
  * <p>
@@ -400,7 +402,9 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		String eLabel = hasNode.factory().nodeClassName(EdgeSpec.class);
 //		int toNodeCount = 0;
 //		int fromNodeCount = 0; // fromNode disabled for the moment
-		for (EdgeSpec edgeSpec : (List<EdgeSpec>) get(hasNode, children(), selectZeroOrMany(hasTheLabel(eLabel)))) {
+		for (EdgeSpec edgeSpec : (List<EdgeSpec>) get(hasNode, 
+				children(), 
+				selectZeroOrMany(hasTheLabel(eLabel)))) {
 			log.info("checking edge spec: " + edgeSpec.toUniqueString());
 			SimplePropertyList eprops = edgeSpec.properties();
 			// edge spec toNode
@@ -411,6 +415,15 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 				Exception e = new AotException(
 					"'" + aaToNode + "' property missing for edge specification " + edgeSpec);
 				checkFailList.add(new CheckMessage(CheckMessage.code5, edgeSpec, e, null, null, null, null, -1));
+			}
+			// edge spec fromNode (= the parent hasNode class type)
+			String fromNodeRef = null;
+			if (hasNode.properties().hasProperty(aaIsOfClass))
+				fromNodeRef = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
+			else { // error, parent must have a class
+				Exception e = new AotException(
+					"'" + aaIsOfClass + "' property missing for edge 'from' node specification " + edgeSpec);
+				checkFailList.add(new CheckMessage(CheckMessage.code13MissingProperty, edgeSpec, e, null, null, null, null, -1));
 			}
 			// edge spec multiplicity
 			IntegerRange edgeMult = new IntegerRange(1, 1);
@@ -425,7 +438,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			if (eprops.hasProperty(aaHasId))
 				edgeId = (String) eprops.getPropertyValue(aaHasId);
 			// search for edges that point to nodes types or names listed in the spec
-			List<Node> toNodes = new LinkedList<Node>();
+//			List<Node> toNodes = new LinkedList<Node>();
+			List<Duple<Node,Node>> edgeEnds = new LinkedList<>();
 			// for nodeToCheck to have edges, it must be a subclass of Node
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
@@ -435,8 +449,9 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						checkFailList.add(new CheckMessage(CheckMessage.code6OutEdgeMissing, ed, e, edgeSpec, null,
 							null, edgeMult, -1));
 					}
-					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef)
-						&& edgeLabelMatch(ed, edgeLabel)) {
+					if (NodeReference.matchesRef((TreeNode) ed.endNode(),toNodeRef) &&
+						NodeReference.matchesRef((TreeNode) ed.startNode(),fromNodeRef) &&
+						edgeLabelMatch(ed, edgeLabel)) {
 						boolean ok = true;
 						// check edge label
 						if (edgeLabel != null)
@@ -463,20 +478,21 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							ok = false;
 						if (ok) {
 //							toNodeCount++;
-							toNodes.add(ed.endNode());
+//							toNodes.add(ed.endNode());
+							edgeEnds.add(new Duple<>(ed.startNode(),ed.endNode()));
 						}
-						
 					}
 				}
 				// check edge multiplicity
 				try {
-					edgeMult.check(toNodes.size());
+//					edgeMult.check(toNodes.size());
+					edgeMult.check(edgeEnds.size());
 				} catch (Exception e) {
 					Exception ee = new AotException(
 						"Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
-							+ toNodeRef + "] with label '" + edgeLabel + "' (found " + toNodes.size() + ") ");
+							+ toNodeRef + "] with label '" + edgeLabel + "' (found " + edgeEnds.size() + ") ");
 					checkFailList.add(new CheckMessage(CheckMessage.code9OutEdgeRangeCheck, node, ee, edgeSpec, null,
-						null, edgeMult, toNodes.size()));
+						null, edgeMult, edgeEnds.size()));
 				}
 			}
 			// else error ? we must have a Node here ?
