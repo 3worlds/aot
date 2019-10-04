@@ -68,6 +68,8 @@ archetype ArchetypeForArchetypes
 		// for the root node, write hasParent=StringTable(([1]""))
 		// single-level Node references can be used, e.g. NodeClass:NodeId
 		// or NodeClass: or :NodeId
+		// NOTE: This means if a sub archetype parent table differs from the class
+		// archetype we must use a ParentClassQuery to constrain the options
 		//-------------------------------------------------------
 		hasProperty NodeParentSpec
 			hasName = String("hasParent")
