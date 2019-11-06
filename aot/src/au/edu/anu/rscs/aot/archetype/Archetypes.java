@@ -258,7 +258,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					for (TreeNode n : treeToCheck.nodes()) {
 						if (matchesClass(n, requiredClass) && matchesParent(n, parentList)) {
 							log.info("checking node: " + n.toUniqueString());
-							check(n, hasNode);
+							checkNode(n, hasNode);
 							complyCount++;
 							TreeNode parent = n.getParent();
 							// counting realized multiplicity
@@ -444,6 +444,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			if (nodeToCheck instanceof Node) {
 				Node node = (Node) nodeToCheck;
 				for (Edge ed : node.edges(Direction.OUT)) {
+					// check edge class
 					if (ed.factory().edgeClass(ed.classId()) == null) {
 						Exception e = new AotException("Class '" + edgeLabel + "' not found for edge " + ed);
 						checkFailList.add(new CheckMessage(CheckMessage.code6OutEdgeMissing, ed, e, edgeSpec, null,
@@ -471,8 +472,10 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 									edgeMult, -1));
 								ok = false;
 							}
-						// check queries on edge
+						// check queries on edge & edge properties
 						int nprobs = checkFailList.size();
+						if (ed instanceof ReadOnlyDataHolder)
+							checkEdgeProperties(ed,edgeSpec);
 						checkConstraints(ed, edgeSpec);
 						if (checkFailList.size() > nprobs)
 							ok = false;
@@ -518,13 +521,27 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 //			recordError("Expected " + otherInEdges + " other in edges from node '" + node.toShortString()
 //					+ "' referenced by [" + ref + "] (found " + otherInCount + ")", node);
 	}
-
+	
 	@SuppressWarnings("unchecked")
-	private void checkProperties(Object element, NodeSpec hasNode) {
+	private void checkNodeProperties(Object element, NodeSpec hasNode) {
 		// get the 'hasProperty' label from the archetype factory
 		String pLabel = hasNode.factory().nodeClassName(PropertySpec.class);
-		for (PropertySpec propertyArchetype : (List<PropertySpec>) get(hasNode, children(),
-				selectZeroOrMany(hasTheLabel(pLabel)))) {
+		List<PropertySpec> lp = (List<PropertySpec>) get(hasNode, children(),
+			selectZeroOrMany(hasTheLabel(pLabel)));
+		checkProperties(element,lp);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void checkEdgeProperties(Object element, EdgeSpec hasEdge) {
+		// get the 'hasProperty' label from the archetype factory
+		String pLabel = hasEdge.factory().nodeClassName(PropertySpec.class);
+		List<PropertySpec> lp = (List<PropertySpec>) get(hasEdge, children(),
+			selectZeroOrMany(hasTheLabel(pLabel)));
+		checkProperties(element,lp);
+	}
+
+	private void checkProperties(Object element, List<PropertySpec> pSpecList) {
+		for (PropertySpec propertyArchetype : pSpecList) {
 			log.info("checking property spec: " + propertyArchetype.toUniqueString());
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
@@ -595,10 +612,10 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		} // loop on PropertySpecs
 	}
 
-	private void check(TreeNode nodeToCheck, NodeSpec hasNode) {
+	private void checkNode(TreeNode nodeToCheck, NodeSpec hasNode) {
 		checkConstraints(nodeToCheck, hasNode);
 		checkEdges(nodeToCheck, hasNode);
-		checkProperties(nodeToCheck, hasNode);
+		checkNodeProperties(nodeToCheck, hasNode);
 	}
 
 	/**
