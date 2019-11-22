@@ -29,12 +29,14 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.archetype;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.Element;
+import fr.cnrs.iees.graph.Node;
+import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 
 /**
@@ -77,6 +79,13 @@ public class CheckMessage {
 		return e.classId() + ":" + e.id();
 	}
 
+	// Some messages are not immediately relevant. To prevent cluttering the UI,
+	// use the shortDesc as a flag for
+	// this and don't add to the checklist
+	public boolean suppress() {
+		return (shortDesc == null);
+	}
+
 	private void buildDescriptions() {
 		String cat = errorType.category();
 		switch (errorType) {
@@ -103,13 +112,60 @@ public class CheckMessage {
 					+ getRef(nodeToCheck) + "' against '" + getRef(nodeSpec) + "'→" + getRef(edgeSpec);
 			break;
 		}
+		/*-"'" + aaHasName + "' property missing for property specification " + propertyArchetype);*/
+		case code10_PropertyMissingInArchetype: {
+			Object element = args[0];
+			PropertySpec spec = (PropertySpec) args[1];
+			String key = (String) args[2];
+			shortDesc = cat + "Property '" + key + "' is missing from the specification '" + getRef(spec) + "'.";
+			if (element instanceof Element) {
+				Element el = (Element) element;
+				longDesc = cat + "Property '" + key + "' is missing from the specification when checking '" + getRef(el)
+						+ "' against '" + getRef(spec.getParent()) + "'→'" + getRef(spec);
+			} else
+				longDesc = cat + "Property '" + key + "' is missing from the specification [" + spec + "].";
+			break;
 		}
+		/*-	"Expected " + range + " nodes of class '" + requiredClass
+									+ "' with parents '" + parentList + "' (got " + count + ") archetype="
+									+ hasNode.toUniqueString();
+		*/
+			case code1_NodeRangeError: {
+			Tree<? extends TreeNode> treeToCheck = (Tree<? extends TreeNode>) args[0];
+			NodeSpec nodeSpec = (NodeSpec) args[1];
+			String requiredClass = (String) args[2];
+			StringTable parents = (StringTable) args[3];
+			IntegerRange range = (IntegerRange) args[4];
+			Integer count = (Integer) args[5];
+			// we should suppress this message if no nodes exist in treeToCheck within the
+			// parents table;
+			// Actually, we need the potential parents list
+			
+			if (!findClass(treeToCheck,parents))
+				break;
+			shortDesc = cat+"Expected " + range + " nodes of class '" + requiredClass
+					+ "' with parents '" + parents+" but found "+count;
+			longDesc = shortDesc;
+			break;
+		}
+		default: {
+			throw new AotException("Unrecognized ErrorType in CheckMessage");
+		}
+		}
+	}
+
+	private boolean findClass(Tree<? extends TreeNode> tree, StringTable parents) {
+		for (Node node:tree.nodes())
+			if (parents.contains(node.classId()))
+				return true;
+		return false;
 	}
 
 	public String verbose1() {
 		return shortDesc;
 	}
 
+	
 	public String verbose2() {
 		return longDesc;
 	}

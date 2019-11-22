@@ -304,9 +304,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							String message = "Expected " + range + " nodes of class '" + requiredClass
 									+ "' with parents '" + parentList + "' (got " + count + ") archetype="
 									+ hasNode.toUniqueString();
-							checkFailList
-									.add(new CheckMessage(ErrorTypes.code1_NodeRangeError, new AotException(message),
-											treeToCheck, hasNode, requiredClass, parentList, range, (Integer) count));
+							CheckMessage chkmsg = new CheckMessage(ErrorTypes.code1_NodeRangeError,
+									new AotException(message), treeToCheck, hasNode, requiredClass, parentList, range,
+									(Integer) count);
+							if (!chkmsg.suppress())
+								checkFailList.add(chkmsg);
 						}
 				}
 			// PROBLEM here: nodes added in sub-archetypes are not counted as valid here...
@@ -437,7 +439,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, an edge spec must have a toNode property
 				Exception e = new AotException(
 						"'" + aaToNode + "' property missing for edge specification " + edgeSpec);
-				checkFailList.add(new CheckMessage(ErrorTypes.code5_EdgeSpecsMissing, e, nodeToCheck,hasNode,edgeSpec,aaToNode));
+				checkFailList.add(new CheckMessage(ErrorTypes.code5_EdgeSpecsMissing, e, nodeToCheck, hasNode, edgeSpec,
+						aaToNode));
 //				checkFailList.add(new CheckMessage(CheckMessage.code5_PropertyOfEdgeMissing, edgeSpec, e, null, null,
 //						null, null, -1));
 			}
@@ -474,8 +477,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					// check edge class
 					if (ed.factory().edgeClass(ed.classId()) == null) {
 						Exception e = new AotException("Class '" + edgeLabel + "' not found for edge " + ed);
-						checkFailList
-								.add(new CheckMessage(ErrorTypes.code6_EdgeClassUnknown, e, ed, edgeSpec));
+						checkFailList.add(new CheckMessage(ErrorTypes.code6_EdgeClassUnknown, e, ed, edgeSpec));
 //						checkFailList.add(new CheckMessage(CheckMessage.code6_EdgeClassMissing, ed, e, edgeSpec, null,
 //								null, edgeMult, -1));
 					}
@@ -584,8 +586,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaHasName + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, propertyArchetype,
-						aaHasName));
+				checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, element,
+						propertyArchetype, aaHasName));
 //				checkFailList.add(new CheckMessage(CheckMessage.code10_PropertyMissing, propertyArchetype, e, null,
 //						null, null, null, -1));
 			}
@@ -596,8 +598,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaType + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(
-						new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, propertyArchetype, aaType));
+				checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, element,
+						propertyArchetype, aaType));
 //				checkFailList.add(new CheckMessage(CheckMessage.code11_PropertyMissing, propertyArchetype, e, null,
 //						null, null, null, -1));
 			}
@@ -608,8 +610,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaMultiplicity + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, propertyArchetype,
-						aaMultiplicity));
+				checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, element,
+						propertyArchetype, aaMultiplicity));
 //				checkFailList.add(new CheckMessage(CheckMessage.code12_PropertyMissing, propertyArchetype, e, null,
 //						null, null, multiplicity, 0));
 			}
@@ -619,8 +621,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						Exception e = new AotException(
 								"Required property '" + key + "' missing for element " + element);
-						checkFailList.add(new CheckMessage(ErrorTypes.code13_PropertyMissing, e, element,
-								propertyArchetype, multiplicity, key));
+						checkFailList.add(new CheckMessage(ErrorTypes.code10_PropertyMissingInArchetype, e, element,
+								propertyArchetype, key));
 					}
 				} else { // property is here
 					Property prop = nprops.getProperty(key);

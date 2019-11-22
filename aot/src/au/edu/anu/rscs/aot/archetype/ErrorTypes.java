@@ -4,13 +4,13 @@ import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 
 public enum ErrorTypes {
-	/*-Tree<? extends TreeNode> treeToCheck, Integer complyCount, List<TreeNode>nonCompliantNodes*/
+	/*-Tree<? extends TreeNode> treeToCheck, Integer complyCount, List<TreeNode>nonCompliantNoeldes*/
 	code2_GraphIsExclusiveButHasNoncompilantNodes/**/("Archetype Error: "), //
 
 	/*-TreeNode nodeToCheck,NodeSpec nodeSpec,EdgeSpec edgeSpec,String key*/
 	code5_EdgeSpecsMissing/*                 */("Archetype error: "), //
 
-	/*-PropertySpec propertyArchetype,String key*/
+	/*-Object element,PropertySpec propertyArchetype,String key*/
 	code10_PropertyMissingInArchetype/*            */("Archetype Error: "), //
 	
 	/*-treeToCheck, NodeSpec hasNode, String requiredClass, StringTable parentList, IntegerRange range, Integer count*/
