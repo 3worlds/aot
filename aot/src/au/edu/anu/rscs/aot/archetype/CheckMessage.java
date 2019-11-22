@@ -29,8 +29,12 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.archetype;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.util.IntegerRange;
+import fr.cnrs.iees.graph.Element;
 import fr.cnrs.iees.graph.TreeNode;
 
 /**
@@ -45,114 +49,87 @@ import fr.cnrs.iees.graph.TreeNode;
  */
 public class CheckMessage {
 	/* temporary set of codes to flag the error context */
-	public static final int code0NotATree = 0;
-	public static final int code1 = 1;
-	public static final int code2Exclusive = 2;
-	public static final int code3PropertyClass = 3;
-	public static final int code4Query = 4;
-	public static final int code5 = 5;
-	public static final int code6OutEdgeMissing = 6;
-	public static final int code7 = 7;
-	public static final int code8 = 8;
-	public static final int code9OutEdgeRangeCheck = 9;
-	public static final int code10 = 10;
-	public static final int code11 = 11;
-	public static final int code12 = 12;
-	public static final int code13MissingProperty = 13;
-	public static final int code14UnknowPropertyType = 14;
-	public static final int code15WrongPropertyType = 15;
-	public static final int code16 = 16;
-	public static final int code17MoreThanOneRoot = 17;// spare...
-	public static final int code18 = 18;
-	public static final int code19 = 19;
-	public static final int code20Deploy = 20;
 
 	/** the error raised by the check() method */
 	private Exception exc = null;
-	/**
-	 * the object which caused the error - NB it may be an archetype node (if there
-	 * was an error in the archetype file)
-	 */
-	private Object target = null;
-	/**
-	 * the archetype constraint which was being checked - NB it may be null if the
-	 * check was on an archetype node
-	 */
-	private TreeNode archetypeNode = null;
 
-	private String requiredClass;
+	private ErrorTypes errorType;
 
-	private StringTable parentList;
+	private Object[] args;
 
-	private int code;
+	private String shortDesc;
 
-	private IntegerRange range;
-	
-	private int count;
+	private String longDesc;
 
 	/**
-	 * 
-	 * @param check
-	 * @param failed
-	 * @param onNode
+	 * @param errorType
+	 * @param exception
+	 * @param args
 	 */
-	// Could have many constructors to assist with context
-	public CheckMessage(int code, Object check, Exception failed, 
-			TreeNode onNode, String requiredClass,
-			StringTable parentList, IntegerRange range, int count) {
-		super();
-		this.code = code;
-		target = check;
-		exc = failed;
-		archetypeNode = onNode;
-		this.requiredClass = requiredClass;
-		this.parentList = parentList;
-		this.range = range;
-		this.count = count;
+	public CheckMessage(ErrorTypes errorType, Exception exception, Object... args) {
+		this.errorType = errorType;
+		this.exc = exception;
+		this.args = args;
+		buildDescriptions();
 	}
 
-	public int count() {
-		return count;
-	}
-	public String requiredClass() {
-		return requiredClass;
+	private static String getRef(Element e) {
+		return e.classId() + ":" + e.id();
 	}
 
-	public StringTable parentList() {
-		return parentList;
+	private void buildDescriptions() {
+		String cat = errorType.category();
+		switch (errorType) {
+		case code2_GraphIsExclusiveButHasNoncompilantNodes: {
+			String classOfTree = args[0].getClass().getSimpleName();
+			int complyCount = (int) args[1];
+			List<TreeNode> nonCompliantNodes = (List<TreeNode>) args[2];
+			shortDesc = cat + "Nodes found with no matching specifications.";
+			longDesc = shortDesc + "\n[";
+			for (TreeNode node : nonCompliantNodes)
+				longDesc += node.classId() + ":" + node.id() + ",";
+			longDesc += "]";
+			longDesc = longDesc.replace(",]", "]");
+			break;
+		}
+		case code5_EdgeSpecsMissing: {
+			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
+			TreeNode nodeToCheck = (TreeNode) args[0];
+			NodeSpec nodeSpec = (NodeSpec) args[1];
+			EdgeSpec edgeSpec = (EdgeSpec) args[2];
+			String key = (String) args[3];
+			shortDesc = cat + "Property '" + key + "' is missing from the specification '" + getRef(edgeSpec) + "'.";
+			longDesc = cat + "Property '" + key + "' is missing from the specification when checking '"
+					+ getRef(nodeToCheck) + "' against '" + getRef(nodeSpec) + "'→" + getRef(edgeSpec);
+			break;
+		}
+		}
 	}
 
-	public Exception getException() {
-		return exc;
+	public String verbose1() {
+		return shortDesc;
 	}
 
-	public IntegerRange range() {
-		return range;
+	public String verbose2() {
+		return longDesc;
 	}
 
-	public Object getTarget() {
-		return target;
-	}
-
-	public TreeNode getArchetypeNode() {
-		return archetypeNode;
-	}
-
-	public int getCode() {
-		return code;
+	public String verbose3() {
+		return longDesc + "\n" + exc.getMessage();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if (archetypeNode == null)
-			sb.append("Archetype check failed \n");
-		else
-			sb.append("Archetype check failed on requirement:\n\t").append(archetypeNode.toString()).append('\n');
-		if (target != null)
-			sb.append("--for object:\n\t").append(target.toString()).append('\n');
-		if (exc != null)
-			sb.append("--with Error:\n\t").append(exc.toString()).append('\n');
+		sb.append("short: ");
+		sb.append(shortDesc);
+		sb.append("\n");
+		sb.append("long: ");
+		sb.append(longDesc);
+		sb.append("\n");
+		sb.append("Exception: ");
+		sb.append(exc.toString());
+		sb.append("\n");
 		return sb.toString();
 	}
 }
