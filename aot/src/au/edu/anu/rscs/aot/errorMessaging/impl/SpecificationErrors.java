@@ -27,58 +27,55 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.archetype;
 
-import static org.junit.jupiter.api.Assertions.*;
+package au.edu.anu.rscs.aot.errorMessaging.impl;
 
-import java.io.File;
-import org.junit.jupiter.api.Test;
-
-import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.io.FileImporter;
 
-class ArchetypesTest {
+public enum SpecificationErrors {
+	/*-Tree<? extends TreeNode> treeToCheck, Integer complyCount, List<TreeNode>nonCompliantNoeldes*/
+	code2_GraphIsExclusiveButHasNoncompilantNodes/**/("Archetype: "), //
 
-	@Test
-	void testArchetypes() {
-		Archetypes arch = new Archetypes();
-		System.out.println(arch.toString());
-		assertNotNull(arch);		
-	}
+	/*-TreeNode nodeToCheck,SimpleDataTreeNode nodeSpec,SimpleDataTreeNode edgeSpec,String key*/
+	code5_EdgeSpecsMissing/*                       */("Archetype: "), //
 
-	@SuppressWarnings("unchecked")
-	@Test
-	void testCheckArchetype() {
-		Archetypes arch = new Archetypes();
-		String archetypefile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
-			+ File.separator + "src" 
-			+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
-			+ File.separator + "ArchetypeArchetype.ugt";
-		File file = new File(archetypefile);
-		FileImporter fi = new FileImporter(file);
-		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
-		arch.checkArchetype(graph);
-		String indent = "";
-		printTree(graph.root(),indent);
-		Iterable<ErrorMessagable> errors = arch.errorList();
-		if (errors!=null) {
-			System.out.println("There were errors in specifications: ");
-			for (ErrorMessagable m:errors)
-				System.out.println(m.toString()+"\n");
-		}
-		else 
-			System.out.println("Specifications checked with no error.");
-		assertNull(errors);
-	}
+	/*-Object element,PropertySpec propertyArchetype,String key*/
+	code10_PropertyMissingInArchetype/*            */("Archetype: "), //
 	
-	private void printTree(TreeNode parent,String indent) {
-		if (parent.getParent()!=null)
-			System.out.println(indent+parent.getParent().id()+"->"+parent.classId()+":"+parent.id());
-		else
-			System.out.println(indent+parent.classId()+":"+parent.id());
-		for (TreeNode child:parent.getChildren())
-			printTree(child,indent+"  ");		
+	/*-treeToCheck, NodeSpec hasNode, String requiredClass, StringTable parentList, IntegerRange range, Integer count*/
+	code1_NodeRangeError/*                         */("Node: "), //
+
+	/*-TreeNode n, String childClassName, StringTable parentList, IntegerRange childMult,Integer children.size())*/
+	code18_ChildrenOfClassRangeError/*             */("Node: "), //
+
+	/*-TreeNode item, queryNode,ConstraintSpec*/
+	code4_QueryEdge/*   TODO                       */("Edge: "), //
+	code4_QueryNode/*                              */("Node: "), //
+	code4_QueryProperty/*                          */("Property: "), //
+	code4_QueryItem/*                              */("Item: "), //
+
+	/*- EdgeSpec edgeSpec,String key*/
+	codex_EdgeFromNodeClassMissing/*               */("Archetype: "),//
+	
+	/*-Edge ed, EdgeSpec edgeSpec, String edgeLabel*/
+	code6_EdgeClassUnknown/*                       */("Edge: "), //
+	code7_EdgeClassWrong/*                         */("Edge: "), //
+	code8_EdgeIdWrong/*                            */("Edge: "), //
+	code9_EdgeRangeError/*                         */("Edge: "), //
+	code3_PropertyClass/*                          */("Property_Query?: "), // 
+	code13_PropertyMissing/*                       */("Property: "), // not used
+	code14_PropertyTypeUnknown/*                   */("Property: "), //
+	code15_PropertyWrongType/*                     */("Property: "), //
+	code16_ElementHasNoPropertyList/*              */("Element: "), //
+	;
+	private final String category;
+
+	private SpecificationErrors(String category) {
+		this.category = category;
+	}
+
+	public String category() {
+		return category;
 	}
 }

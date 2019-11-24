@@ -27,58 +27,17 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.archetype;
 
-import static org.junit.jupiter.api.Assertions.*;
+package au.edu.anu.rscs.aot.errorMessaging;
 
-import java.io.File;
-import org.junit.jupiter.api.Test;
 
-import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
-import fr.cnrs.iees.graph.Tree;
-import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.io.FileImporter;
-
-class ArchetypesTest {
-
-	@Test
-	void testArchetypes() {
-		Archetypes arch = new Archetypes();
-		System.out.println(arch.toString());
-		assertNotNull(arch);		
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	void testCheckArchetype() {
-		Archetypes arch = new Archetypes();
-		String archetypefile = System.getProperty("user.dir") // <home dir>/<eclipse workspace>/<project>
-			+ File.separator + "src" 
-			+ File.separator + this.getClass().getPackage().getName().replace('.',File.separatorChar) 
-			+ File.separator + "ArchetypeArchetype.ugt";
-		File file = new File(archetypefile);
-		FileImporter fi = new FileImporter(file);
-		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
-		arch.checkArchetype(graph);
-		String indent = "";
-		printTree(graph.root(),indent);
-		Iterable<ErrorMessagable> errors = arch.errorList();
-		if (errors!=null) {
-			System.out.println("There were errors in specifications: ");
-			for (ErrorMessagable m:errors)
-				System.out.println(m.toString()+"\n");
-		}
-		else 
-			System.out.println("Specifications checked with no error.");
-		assertNull(errors);
-	}
-	
-	private void printTree(TreeNode parent,String indent) {
-		if (parent.getParent()!=null)
-			System.out.println(indent+parent.getParent().id()+"->"+parent.classId()+":"+parent.id());
-		else
-			System.out.println(indent+parent.classId()+":"+parent.id());
-		for (TreeNode child:parent.getChildren())
-			printTree(child,indent+"  ");		
-	}
+/**
+ * Author Ian Davies
+ *
+ * Date Dec 12, 2018
+ */
+public interface ErrorListListener {
+	public void onReceiveMsg(ErrorMessagable msg);
+	public void onClear();
+	public void state(boolean valid);
 }
