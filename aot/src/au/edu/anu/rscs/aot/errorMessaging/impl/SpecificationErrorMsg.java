@@ -184,7 +184,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_NODE_UNSATISFIED: {
 			/*-item, queryNode*/
-			Element element = (Edge) args[0];
+			Element element = (Element) args[0];
 			Node qNode = (Node) args[1];
 			String msg = parseQueryMsg(exc.getMessage());
 			verbose1 = category() +  element.toUniqueString() + ": " + msg;
