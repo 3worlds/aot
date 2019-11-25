@@ -34,40 +34,34 @@ import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 
 public enum SpecificationErrors {
-	/*-Tree<? extends TreeNode> treeToCheck, Integer complyCount, List<TreeNode>nonCompliantNoeldes*/
-	code2_GraphIsExclusiveButHasNoncompilantNodes/**/("Archetype: "), //
+	GRAPH_MISSING_SPECIFICATION_NODE/*             */("Archetype"), //
 
-	/*-TreeNode nodeToCheck,SimpleDataTreeNode nodeSpec,SimpleDataTreeNode edgeSpec,String key*/
-	code5_EdgeSpecsMissing/*                       */("Archetype: "), //
+	GRAPH_MISSING_SPECIFICATION_PROPERTY/*         */("Archetype"), //
 
-	/*-Object element,PropertySpec propertyArchetype,String key*/
-	code10_PropertyMissingInArchetype/*            */("Archetype: "), //
+	QUERY_PROPERTY_CLASS_UNKNOWN/*                 */("Archetype"), // 
+
+	NODE_WRONG_MULTIPLICITY/*                      */("Node"), //
+
+	CHILD_MULTIPLICITY_INCORRECT/*              */("Node"), //
+
+	QUERY_EDGE_UNSATISFIED/*   TODO                */("Edge"), //
+	QUERY_NODE_UNSATISFIED/*                       */("Node"), //
+	QUERY_PROPERTY_UNSATISFIED/*                   */("Property"), //
+	QUERY_ITEM_UNSATISFIED/*                       */("Item"), //
+
+	EDGE_CLASS_UNKNOWN/*                           */("Edge"), //
+
+	EDGE_CLASS_INCORRECT/*                         */("Edge"), //
+
+	EDGE_ID_INCORRECT/*                            */("Edge"), //
+
+	EDGE_OUT_OF_RANGE/*                            */("Edge"), //
 	
-	/*-treeToCheck, NodeSpec hasNode, String requiredClass, StringTable parentList, IntegerRange range, Integer count*/
-	code1_NodeRangeError/*                         */("Node: "), //
+	PROPERTY_UNKNOWN/*                             */("Property"), //
 
-	/*-TreeNode n, String childClassName, StringTable parentList, IntegerRange childMult,Integer children.size())*/
-	code18_ChildrenOfClassRangeError/*             */("Node: "), //
-
-	/*-TreeNode item, queryNode,ConstraintSpec*/
-	code4_QueryEdge/*   TODO                       */("Edge: "), //
-	code4_QueryNode/*                              */("Node: "), //
-	code4_QueryProperty/*                          */("Property: "), //
-	code4_QueryItem/*                              */("Item: "), //
-
-	/*- EdgeSpec edgeSpec,String key*/
-	codex_EdgeFromNodeClassMissing/*               */("Archetype: "),//
+	PROPERTY_INCORRECT_TYPE/*                     */("Property"), //
 	
-	/*-Edge ed, EdgeSpec edgeSpec, String edgeLabel*/
-	code6_EdgeClassUnknown/*                       */("Edge: "), //
-	code7_EdgeClassWrong/*                         */("Edge: "), //
-	code8_EdgeIdWrong/*                            */("Edge: "), //
-	code9_EdgeRangeError/*                         */("Edge: "), //
-	code3_PropertyClass/*                          */("Property_Query?: "), // 
-	code13_PropertyMissing/*                       */("Property: "), // not used
-	code14_PropertyTypeUnknown/*                   */("Property: "), //
-	code15_PropertyWrongType/*                     */("Property: "), //
-	code16_ElementHasNoPropertyList/*              */("Element: "), //
+	ELEMENT_MISSING_PROPERTY_LIST/*               */("Element"), //
 	;
 	private final String category;
 
@@ -79,3 +73,8 @@ public enum SpecificationErrors {
 		return category;
 	}
 }
+/*-Object element,PropertySpec propertyArchetype,String key*/
+//code10_PropertyMissingInArchetype/*            */("Archetype"), //
+//codex_EdgeFromNodeClassMissing/*               */("Archetype"),//
+
+

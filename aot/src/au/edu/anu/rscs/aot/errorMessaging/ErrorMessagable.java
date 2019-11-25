@@ -89,7 +89,7 @@ public interface ErrorMessagable {
 	 * For example implementations may use enums and so the type could be the
 	 * enum.name(). Best used as a suffix to all verbose3() methods.
 	 */
-	public String code();
+	public String errorName();
 
 
 }

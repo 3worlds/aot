@@ -29,6 +29,8 @@
  **************************************************************************/
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import au.edu.anu.rscs.aot.AotException;
@@ -99,220 +101,248 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		return e.classId() + ":" + e.id();
 	}
 
-	private String errorCodeString() {
-		return "[Error Code = " + code() + "]";
-	}
-
 	private void buildDescriptions() {
 		String cat = errorType.category();
 		switch (errorType) {
-		case code2_GraphIsExclusiveButHasNoncompilantNodes: {
+		case GRAPH_MISSING_SPECIFICATION_NODE: {
 			/*
 			 * "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount) +
 			 * " nodes which didn't comply)";
 			 */
-			System.out.println(errorType);
-			String classOfTree = args[0].getClass().getSimpleName();
-			int complyCount = (int) args[1];
-			List<TreeNode> nonCompliantNodes = (List<TreeNode>) args[2];
-			verbose1 = cat + "Node(s) found with no matching specification(s).";
-			verbose2 = verbose1 + "\n[";
-			for (TreeNode node : nonCompliantNodes)
-				verbose2 += node.classId() + ":" + node.id() + ",";
-			verbose2 += "]";
-			verbose2 = verbose2.replace(",]", "]" + errorCodeString());
-			break;
-		}
-		case code5_EdgeSpecsMissing: {
-			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
-			System.out.println(errorType);
-			TreeNode nodeToCheck = (TreeNode) args[0];
-			NodeSpec nodeSpec = (NodeSpec) args[1];
-			EdgeSpec edgeSpec = (EdgeSpec) args[2];
-			String key = (String) args[3];
-			verbose1 = cat + "Property '" + key + "' is missing from the specification when checking '"
-					+ nodeToCheck.toUniqueString() + "' against '" + edgeSpec.toUniqueString() + code();
-			verbose2 = cat + "Property '" + key + "' is missing from the specification when checking '" + nodeToCheck
-					+ "' against '" + edgeSpec + errorCodeString();
-			break;
-		}
-		/*-"'" + aaHasName + "' property missing for property specification " + propertyArchetype);*/
-		case code10_PropertyMissingInArchetype: {
-			System.out.println(errorType);
-			Object element = args[0];
-			PropertySpec spec = (PropertySpec) args[1];
-			String key = (String) args[2];
-			verbose1 = cat + "Property '" + key + "' is missing from the specification '" + spec.toUniqueString()
-					+ "'.";
-			if (element instanceof Element) {
-				Element el = (Element) element;
-				verbose2 = cat + "Property '" + key + "' is missing from the specification when checking '" + getRef(el)
-						+ "' against '" + getRef(spec.getParent()) + "'→'" + getRef(spec);
-			} else
-				verbose2 = cat + "Property '" + key + "' is missing from the specification [" + spec + "].";
-			break;
-		}
-		/*-	"Expected " + range + " nodes of class '" + requiredClass
-									+ "' with parents '" + parentList + "' (got " + count + ") archetype="
-									+ hasNode.toUniqueString();
-		*/
-		case code1_NodeRangeError: {
-			System.out.println(errorType);
 			Tree<? extends TreeNode> treeToCheck = (Tree<? extends TreeNode>) args[0];
-			NodeSpec nodeSpec = (NodeSpec) args[1];
-			String requiredClass = (String) args[2];
-			StringTable parents = (StringTable) args[3];
-			IntegerRange range = (IntegerRange) args[4];
-			Integer count = (Integer) args[5];
-			TreeNode specs = (TreeNode) args[6];
-			/*
-			 * Suppress this message if no nodes exist in treeToCheck that are contained in
-			 * the parents table.
-			 */
+			int complyCount = (int) args[1];
+			// The archetype does not really do its job here. More testing required.
+			List<TreeNode> compliantNodes = (List<TreeNode>) args[2];
+			List<TreeNode> nonCompliantNodes = new ArrayList<>();
+			for (TreeNode node : treeToCheck.nodes())
+				if (!compliantNodes.contains(node))
+					nonCompliantNodes.add(node);
+			verbose1 = category() + "Expected all nodes to have matching specifications. Found "
+					+ (treeToCheck.nNodes() - complyCount) + " which didn't comply.";
+			verbose2 = category() + errorName() + "Expected all nodes to have matching specifications. Found "
+					+ (treeToCheck.nNodes() - complyCount) + " which didn't comply:\n";
+			for (TreeNode node : nonCompliantNodes)
+				verbose2 += node.toUniqueString() + ",\n";
+			break;
+		}
+		case GRAPH_MISSING_SPECIFICATION_PROPERTY: {
+			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
 
-			if (!findClass(treeToCheck, parents))
-				break;
-			// can rephrase depending on count being less or greater than range.last
-			verbose1 = cat + "Unexpected child. Expected " + range + " nodes of class '" + requiredClass
-					+ "' with parents '" + parents + " but found " + count;
-			verbose2 = verbose1 + " Specifications [" + specs + "]";
+			Node target = (Node) args[0];
+			Node spec = (Node) args[1];
+			String key = (String) args[2];
+			verbose1 = category() + "Property '" + key + "' is missing from specification when checking '"
+					+ target.toUniqueString() + "' against '" + spec.toUniqueString() + ".";
+			verbose2 = category() + errorName() + "Property '" + key + "' is missing from specification when checking '"
+					+ target + "' against '" + spec + ".";
+			break;
+		}
 
-			if (count < range.getLast())
-				verbose1 = cat + "Missing child of class '" + requiredClass + "'.";
+		case NODE_WRONG_MULTIPLICITY: {
+			/*-	"Expected " + range + " nodes of class '" + requiredClass
+			+ "' with parents '" + parentList + "' (got " + count + ") archetype="
+			+ hasNode.toUniqueString();
+			*/
+			Node spec = (Node) args[0];
+			String requiredClass = (String) args[1];
+			StringTable parentList = (StringTable) args[2];
+			IntegerRange range = (IntegerRange) args[3];
+			Integer count = (Integer) args[4];
+			// could rephrase depending on count being less or greater than range.last
+			verbose1 = category() + "Expected " + range + " nodes of class '" + requiredClass + "' with parents '"
+					+ parentList + "' but found " + count + ".";
+			verbose2 = category() + errorName() + "Expected " + range + " nodes of class '" + requiredClass
+					+ "' with parents '" + parentList + "' but found " + count + ".\n[Specification: " + spec + "].";
 			break;
 		}
 		/*-"Expected " + childMult + " nodes of class '" + childClassName
 			+ "' with parent '" + n.classId() + "' (got " + children.size()
 			+ ") archetype=" + hasNode.toUniqueString();*/
-		case code18_ChildrenOfClassRangeError: {
-			System.out.println(errorType);
-			TreeNode targetNode = (TreeNode) args[0];
+		case CHILD_MULTIPLICITY_INCORRECT: {
+			/*-targetNode, childClassName, childMult,children.size(), hasNode*/
+			Node parent = (Node) args[0];
 			String childClassName = (String) args[1];
-			StringTable parents = (StringTable) args[2];
-			IntegerRange range = (IntegerRange) args[3];
-			Integer nChildren = (Integer) args[4];
-			TreeNode specs = (TreeNode) args[5];
-			verbose2 = cat + "Expected " + range + " nodes of class '" + childClassName + "' with parent '"
-					+ targetNode.classId() + "' but found " + nChildren + " for specification [" + specs + "]";
-
-			if (nChildren < range.getLast()) {
-				verbose1 = cat + "'" + getRef(targetNode) + "' requires child of class '" + childClassName + "'";
-			}
-			verbose1 = cat + "Unexpected child. Expected " + range + " nodes of class '" + childClassName
-					+ "' with parent '" + targetNode.classId() + "' but found " + nChildren;
+			IntegerRange range = (IntegerRange) args[2];
+			Integer nChildren = (Integer) args[3];
+			TreeNode spec = (TreeNode) args[4];
+			verbose1 = category() + "Expected " + range + " nodes of class '" + childClassName + "' with parent '"
+					+ parent.toUniqueString() + " but found " + nChildren + ".";
+			verbose2 = category() + errorName() + "Expected " + range + " nodes of class '" + childClassName
+					+ "' with parent '" + parent + " but found " + nChildren + ".\n[Specification: " + spec + "].";
 			break;
 		}
-		case code4_QueryEdge: {
-			/* Should also mention the query class simpleName for debugging */
-			/* we need secret codes in query msgs for parsing */
-			/* String s= "Sea of shit ||Nice little message|| in an ocean of shit"; */
-			// On the otherhand we could have brief and verbose msgs for each query.
-			System.out.println(errorType);
+		case QUERY_EDGE_UNSATISFIED: {
+			/*-item, queryNode, qClassName*/
+			Element element = (Edge) args[0];
+			Node qNode = (Node) args[1];
+			String qClassName = (String) args[2];
+			String msg = exc.getMessage();
+		
+			String[] parts = exc.getMessage().split("\\|");
+			verbose1 = category() + " Target:" + element.toUniqueString() + "\n" + msg;
+			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + msg
+					+ "\n[Specification: " + qNode + "][Query: "+qClassName+"].";
 			break;
 		}
-		case code4_QueryNode: {
-			System.out.println(errorType);
+		case QUERY_NODE_UNSATISFIED: {
+			/*-item, queryNode*/
+			Element element = (Edge) args[0];
+			Node qNode = (Node) args[1];
+			String msg = exc.getMessage();
+		
+			String[] parts = exc.getMessage().split("\\|");
+			verbose1 = category() + " Target:" + element.toUniqueString() + "\n" + msg;
+			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + msg
+					+ "\n[Specification: " + qNode + "].";
 			break;
 		}
-		case code4_QueryProperty: {
-			System.out.println(errorType);
+		case QUERY_PROPERTY_UNSATISFIED: {
+			/*-item, queryNode*/
+			Property property = (Property) args[0];
+			Node qNode = (Node) args[1];
+			String msg = exc.getMessage();
+		
+			String[] parts = exc.getMessage().split("\\|");
+			verbose1 = category() + " Property '" + property.getKey() + "' [" + msg+"]";
+			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + Arrays.deepToString(parts)
+					+ "\n[Specification: " + qNode + "].";
 			break;
 		}
-		case code4_QueryItem: {
-			System.out.println(errorType);
+		case QUERY_ITEM_UNSATISFIED: {
+			/*-item, queryNode*/
+			Object item =  args[0];
+			Node qNode = (Node) args[1];
+			String msg = exc.getMessage();
+		
+			String[] parts = exc.getMessage().split("\\|");
+			verbose1 = category() + " Target:" + item + "\n" + msg;
+			verbose2 = category() + errorName() +item + "\nMSG PARTS: " + msg
+					+ "\n[Specification: " + qNode + "].";
 			break;
 		}
-		case codex_EdgeFromNodeClassMissing: {
-			System.out.println(errorType);
-			SimpleDataTreeNode spec = (SimpleDataTreeNode) args[0];
-			SimpleDataTreeNode nodeSpec = (SimpleDataTreeNode) spec.getParent();
-			String key = (String) args[1];
-			break;
-		}
-		case code6_EdgeClassUnknown: {
+		case EDGE_CLASS_UNKNOWN: {
+			/*-ed,edgeSpec, edgeLabel*/
 			/* "Class '" + edgeLabel + "' not found for edge " + ed */
-			System.out.println(errorType);
-			Edge edge = (Edge) args[0];
-			SimpleDataTreeNode edgeSpec = (SimpleDataTreeNode) args[1];
+			Element target = (Element) args[0];
+			Node specs = (Node) args[1];
+			String label = (String) args[2];
+			verbose1 = category() + "Class '" + label + "' not found for edge " + target.toUniqueString() + ".";
+			verbose2 = category() + errorName() + "Class '" + label + "' not found for edge " + target.toUniqueString()
+					+ "[Specification: " + specs + "].";
 			break;
 		}
-		case code7_EdgeClassWrong: {
-			/*
-			 * "Edge " + ed + " should be of class [" + edgeLabel+ "]. Class [" +
-			 * ed.classId() + "] found instead.");
+		case EDGE_CLASS_INCORRECT: {
+			/*-
+			 * "Edge " + ed + " should be of class [" + edgeLabel+ "]. Class [" + ed.classId() + "] found instead.");
+			ed, edgeSpec,edgeLabel));
 			 */
-			System.out.println(errorType);
-			Edge edge = (Edge) args[0];
-			SimpleDataTreeNode edgeSpec = (SimpleDataTreeNode) args[1];
-			String edgeId = (String) args[2];
+			Element target = (Element) args[0];
+			Node spec = (Node) args[1];
+			String label = (String) args[2];
+			verbose1 = category() + "Edge " + target.toUniqueString() + " should be of class [" + label + "]. Class ["
+					+ target.classId() + "] found instead.";
+			verbose2 = category() + errorName() + "Edge " + target + " should be of class [" + label + "]. Class ["
+					+ target.classId() + "] found instead.";
 
 			break;
 		}
-		case code8_EdgeIdWrong: {
-			/*
-			 * "Edge " + ed + " should have id [" + edgeId + "]. Id ["+ ed.id() +
-			 * "] found instead.");
+		case EDGE_ID_INCORRECT: {
+			/*-
+			 * "Edge " + ed + " should have id [" + edgeId + "]. Id ["+ ed.id() + "] found instead.");
+				ed, edgeId));
 			 */
-			System.out.println(errorType);
-			Edge edge = (Edge) args[0];
-			SimpleDataTreeNode edgeSpec = (SimpleDataTreeNode) args[1];
+			Element edge = (Element) args[0];
+			String id = (String) args[1];
+			verbose1 = category() + "Edge " + edge.toUniqueString() + " should have id [" + id + "]. Id [" + edge.id()
+					+ "] found instead.";
+			verbose2 = category() + errorName() + "Edge " + edge + " should have id [" + id + "]. Id [" + edge.id()
+					+ "] found instead.";
 
 			break;
 		}
-		case code9_EdgeRangeError: {
-			/*
-			 * "Expected " + nodeToCheck + " to have " + edgeMult +
-			 * " out edge(s) to nodes that match [" + toNodeRef + "] with label '" +
-			 * edgeLabel + "' (found " + edgeEnds.size() + ") ");
+		case EDGE_OUT_OF_RANGE: {
+			/*-
+			 "Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
+				+ toNodeRef + "] with label '" + edgeLabel + "' (found " + edgeEnds.size() + ") ");
+				
+			nodeToCheck,edgeMult, edgeLabel, toNodeRef,edgeEnds.size(),edgeSpec
 			 */
-			System.out.println(errorType);
-			Node nodetoCheck = (Node) args[0];
-			TreeNode edgeSpec = (TreeNode) args[1];
-			IntegerRange edgeMult = (IntegerRange) args[2];
+			Node nodeToCheck = (Node) args[0];
+			IntegerRange edgeMult = (IntegerRange) args[1];
+			String edgeLabel = (String) args[2];
+			String toNodeRef = (String) args[3];
+			Integer edgeEndsSize = (Integer) args[4];
+			Node spec = (Node) args[5];
+			verbose1 = category() + "Expected " + nodeToCheck.toUniqueString() + " to have " + edgeMult
+					+ " out edge(s) to nodes that match [" + toNodeRef + "] with label '" + edgeLabel + "' but found "
+					+ edgeEndsSize + "'.";
+			verbose2 = category() + errorName() + "Expected " + nodeToCheck + " to have " + edgeMult
+					+ " out edge(s) to nodes that match [" + toNodeRef + "] with label '" + edgeLabel + "' but found "
+					+ edgeEndsSize + "'.";
 
 			break;
 		}
-		case code3_PropertyClass: {
-			System.out.println(errorType);
-			TreeNode queryContraint = (TreeNode) args[0];
+		case QUERY_PROPERTY_CLASS_UNKNOWN: {
+			/*-	queryNode, property));
+			log.severe("Cannot get class for archetype check property" + queryNode);
+			e.printStackTrace();
+			*/
+			TreeNode specs = (TreeNode) args[0];
 			Property property = (Property) args[1];
-			// TODO the class required to parameterise a query is unknown.
+			verbose1 = category() + " Cannot find property value '" + property.getKey() + "' in '"
+					+ specs.toUniqueString() + "'.";
+			verbose2 = category() + errorName() + " Cannot find property value '" + property.getKey() + "' in '" + specs
+					+ "'.";
 			break;
 		}
-		case code13_PropertyMissing: {
-			// unused
-			break;
-		}
-		case code14_PropertyTypeUnknown: {
-			/* "Unknown property type for property '" + key + "' in element " + element); */
-
-			System.out.println(errorType);
+//		case code13_PropertyMissing: {
+//			// unused
+//			break;
+//		}
+		case PROPERTY_UNKNOWN: {
+			/*-	"Unknown property type for property '" + key + "' in element " + element);
+			element, propertyArchetype, key
+			*/
 			Element element = (Element) args[0];
-			TreeNode propertySpec = (TreeNode) args[1];
+			TreeNode spec = (TreeNode) args[1];
 			String key = (String) args[2];
+			verbose1 = category() + "Unknown property type for property '" + key + "' in '" + element.toUniqueString()
+					+ "'.";
+			verbose2 = category() + errorName() + "Unknown property type for property '" + key + "' in '" + element
+					+ "'.";
 
 			break;
 		}
-		case code15_PropertyWrongType: {
-			/*
-			 * "Property '" + key + "' in element '" + element +
-			 * "' is not of the required type '"+ typeName + "' (type '" + ptype +
-			 * "' found instead)");
+		case PROPERTY_INCORRECT_TYPE: {
+			/*-
+			 * "Property '" + key + "' in element '" + element + "' is not of the required type '"
+										+ typeName + "' (type '" + ptype + "' found instead)");
+			
+				element, propertyArchetype, key, typeName, ptype;
 			 */
-			System.out.println(errorType);
 			Element element = (Element) args[0];
-			TreeNode propertySpecs = (TreeNode) args[1];
+			Node specs = (Node) args[1];
 			String key = (String) args[2];
 			String typeName = (String) args[3];
 			String ptype = (String) args[4];
+			verbose1 = category() + "Property '" + key + "' in '" + element.toUniqueString()
+					+ "' is not of the required type '" + typeName + "'. Type '" + ptype + "' found instead.";
+			verbose2 = category() + errorName() + "Property '" + key + "' in '" + element
+					+ "' is not of the required type '" + typeName + "'. Type '" + ptype
+					+ "' found instead.\nSpecification: [" + specs + "].";
 
 			break;
 		}
-		case code16_ElementHasNoPropertyList: {
-			/* "Element '" + element + "' has no property list" */
-			System.out.println(errorType);
+		case ELEMENT_MISSING_PROPERTY_LIST: {
+			/*-	properties specified but object has no property list
+				"Element '" + element + "' has no property list");
+				element, propertyArchetype));
+			  */
 			Element element = (Element) args[0];
-			TreeNode propertySpecs = (TreeNode) args[1];
+			Node specs = (Node) args[1];
+			verbose1 = category() + "No property list found for '" + element.toUniqueString() + "'.";
+			verbose2 = category() + errorName() + "No property list found for '" + element + "'.\nSpecification: ["
+					+ specs + "].";
 			break;
 		}
 		default: {
@@ -340,12 +370,26 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	}
 
 	@Override
+	public String errorName() {
+		return "[" + errorType.name() + "] ";
+	}
+
+	@Override
+	public String category() {
+		return "[" + errorType.category()+"] ";
+	}
+
+	public SpecificationErrors error() {
+		return errorType;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("short: ");
+		sb.append("verbose1: ");
 		sb.append(verbose1);
 		sb.append("\n");
-		sb.append("long: ");
+		sb.append("verbose2: ");
 		sb.append(verbose2);
 		sb.append("\n");
 		sb.append("Exception: ");
@@ -354,13 +398,28 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		return sb.toString();
 	}
 
-	@Override
-	public String code() {
-		return errorType.name();
-	}
-
-	@Override
-	public String category() {
-		return errorType.category();
-	}
 }
+/*-"'" + aaHasName + "' property missing for property specification " + propertyArchetype);*/
+//case code10_PropertyMissingInArchetype: {
+//
+//	Element target = (Element)args[0];
+//	TreeNode spec = (TreeNode) args[1];
+//	String key = (String) args[2];
+//	verbose1 = category() + "Property '" + key + "' is missing from specification when checking '" + target.toUniqueString()
+//			+ "'.";
+//	if (element instanceof Element) {
+//		Element el = (Element) element;
+//		verbose2 = cat + "Property '" + key + "' is missing from the specification when checking '" + getRef(el)
+//				+ "' against '" + getRef(spec.getParent()) + "'→'" + getRef(spec);
+//	} else
+//		verbose2 = cat + "Property '" + key + "' is missing from the specification [" + spec + "].";
+//	break;
+//}
+
+//case codex_EdgeFromNodeClassMissing: {
+//	System.out.println(errorType);
+//	SimpleDataTreeNode spec = (SimpleDataTreeNode) args[0];
+//	SimpleDataTreeNode nodeSpec = (SimpleDataTreeNode) spec.getParent();
+//	String key = (String) args[1];
+//	break;
+//}
