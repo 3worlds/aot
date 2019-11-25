@@ -176,11 +176,9 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element element = (Edge) args[0];
 			Node qNode = (Node) args[1];
 			String qClassName = (String) args[2];
-			String msg = exc.getMessage();
-		
-			String[] parts = exc.getMessage().split("\\|");
-			verbose1 = category() + " Target:" + element.toUniqueString() + "\n" + msg;
-			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + msg
+			String msg = parseQueryMsg(exc.getMessage());
+			verbose1 = category() + element.toUniqueString() + ": " + msg;
+			verbose2 = category() + errorName() + element+": " +  msg
 					+ "\n[Specification: " + qNode + "][Query: "+qClassName+"].";
 			break;
 		}
@@ -188,11 +186,9 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			/*-item, queryNode*/
 			Element element = (Edge) args[0];
 			Node qNode = (Node) args[1];
-			String msg = exc.getMessage();
-		
-			String[] parts = exc.getMessage().split("\\|");
-			verbose1 = category() + " Target:" + element.toUniqueString() + "\n" + msg;
-			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + msg
+			String msg = parseQueryMsg(exc.getMessage());
+			verbose1 = category() +  element.toUniqueString() + ": " + msg;
+			verbose2 = category() + errorName() + element+": " + msg
 					+ "\n[Specification: " + qNode + "].";
 			break;
 		}
@@ -200,23 +196,19 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			/*-item, queryNode*/
 			Property property = (Property) args[0];
 			Node qNode = (Node) args[1];
-			String msg = exc.getMessage();
-		
-			String[] parts = exc.getMessage().split("\\|");
-			verbose1 = category() + " Property '" + property.getKey() + "' [" + msg+"]";
-			verbose2 = category() + errorName() + msg + "\nMSG PARTS: " + Arrays.deepToString(parts)
-					+ "\n[Specification: " + qNode + "].";
+			String msg = parseQueryMsg(exc.getMessage());
+			verbose1 = category() + "Property '" + property.getKey()+"="+property.getValue() + "': " + msg;
+			verbose2 = category() + errorName() + "Property '" + property.getKey()+"="+property.getValue() + "': " + msg+
+					"\n[Specification: " + qNode + "].";
 			break;
 		}
 		case QUERY_ITEM_UNSATISFIED: {
 			/*-item, queryNode*/
 			Object item =  args[0];
 			Node qNode = (Node) args[1];
-			String msg = exc.getMessage();
-		
-			String[] parts = exc.getMessage().split("\\|");
-			verbose1 = category() + " Target:" + item + "\n" + msg;
-			verbose2 = category() + errorName() +item + "\nMSG PARTS: " + msg
+			String msg = parseQueryMsg(exc.getMessage());
+			verbose1 = category() + item + ": " + msg;
+			verbose2 = category() + errorName() + item + ": " + msg
 					+ "\n[Specification: " + qNode + "].";
 			break;
 		}
@@ -351,14 +343,21 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		}
 	}
-
-	private boolean findClass(Tree<? extends TreeNode> tree, StringTable parents) {
-		for (Node node : tree.nodes())
-			if (parents.contains(node.classId()))
-				return true;
-		return false;
+	
+	private String parseQueryMsg(String msg) {
+		if (msg.contains("||")) {
+			String[] parts = msg.split("\\|");
+			for (int i = 0;i<parts.length;i++) {
+				if (parts[i].equals("") && (i+1)<parts.length) {
+					return parts[i+1];
+				}
+			}
+			return msg;
+		}
+		return msg;
 	}
 
+	
 	@Override
 	public String verbose1() {
 		return verbose1;
