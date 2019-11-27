@@ -47,6 +47,7 @@ import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
+import fr.ens.biologie.generic.utils.Duple;
 
 /**
  * A class to store error messages from archetype checks.
@@ -173,47 +174,72 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_EDGE_UNSATISFIED: {
 			/*-item, queryNode, qClassName*/
-			Element element = (Edge) args[0];
-			Node qNode = (Node) args[1];
-			String msg = parseQueryMsg(exc.getMessage());
-			verbose1 = category() + getRef(element) + ": " + msg;
-			verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			if (result != null) {
+				verbose1 = result.getFirst();
+				verbose2 = result.getSecond();
+			} else {
+				Element element = (Edge) args[0];
+				Node qNode = (Node) args[1];
+				String msg = parseQueryMsg(exc.getMessage());
+				verbose1 = category() + getRef(element) + ": " + msg;
+				verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+			}
 			break;
 		}
 		case QUERY_NODE_UNSATISFIED: {
 			/*-item, queryNode*/
-			Element element = (Element) args[0];
-			Node qNode = (Node) args[1];
-			String msg = parseQueryMsg(exc.getMessage());
-			String prompt = getRef(element);
-			if (!msg.contains(prompt))
-				verbose1 = category() + getRef(element) + " " + msg;
-			else
-				verbose1 = category() + msg;
-			verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			if (result != null) {
+				verbose1 = result.getFirst();
+				verbose2 = result.getSecond();
+			} else {
+				Element element = (Element) args[0];
+				Node qNode = (Node) args[1];
+				String msg = parseQueryMsg(exc.getMessage());
+				String prompt = getRef(element);
+				if (!msg.contains(prompt))
+					verbose1 = category() + getRef(element) + " " + msg;
+				else
+					verbose1 = category() + msg;
+				verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+			}
+			;
 			break;
 		}
 		case QUERY_PROPERTY_UNSATISFIED: {
 			/*-item, queryNode*/
-			Property property = (Property) args[0];
-			Node qNode = (Node) args[1];
-			String msg = parseQueryMsg(exc.getMessage());
-			String prompt = "Property '" + property.getKey() + "=" + property.getValue() + "'";
-			if (!msg.contains(prompt))
-				verbose1 = category() + "Property '" + property.getKey() + "=" + property.getValue() + "' " + msg;
-			else
-				verbose1 = category() + msg;
-			verbose2 = category() + errorName() + "Property '" + property.getKey() + "=" + property.getValue() + "': "
-					+ msg + "\n[Specification: " + qNode + "].";
+			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			if (result != null) {
+				verbose1 = result.getFirst();
+				verbose2 = result.getSecond();
+			} else {
+				Property property = (Property) args[0];
+				Node qNode = (Node) args[1];
+				String msg = parseQueryMsg(exc.getMessage());
+				String prompt = "Property '" + property.getKey() + "=" + property.getValue() + "'";
+				if (!msg.contains(prompt))
+					verbose1 = category() + "Property '" + property.getKey() + "=" + property.getValue() + "' " + msg;
+				else
+					verbose1 = category() + msg;
+				verbose2 = category() + errorName() + "Property '" + property.getKey() + "=" + property.getValue()
+						+ "': " + msg + "\n[Specification: " + qNode + "].";
+			}
 			break;
 		}
 		case QUERY_ITEM_UNSATISFIED: {
 			/*-item, queryNode*/
-			Object item = args[0];
-			Node qNode = (Node) args[1];
-			String msg = parseQueryMsg(exc.getMessage());
-			verbose1 = category() + item + ": " + msg;
-			verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification: " + qNode + "].";
+			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			if (result != null) {
+				verbose1 = result.getFirst();
+				verbose2 = result.getSecond();
+			} else {
+				Object item = args[0];
+				Node qNode = (Node) args[1];
+				String msg = parseQueryMsg(exc.getMessage());
+				verbose1 = category() + item + ": " + msg;
+				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification: " + qNode + "].";
+			}
 			break;
 		}
 		case EDGE_CLASS_UNKNOWN: {
@@ -270,10 +296,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Integer edgeEndsSize = (Integer) args[4];
 			Node spec = (Node) args[5];
 			verbose1 = category() + "Expected " + getRef(nodeToCheck) + " to have " + edgeMult
-					+ " out edge(s) to nodes that match [" + toNodeRef + "] with label '" + edgeLabel + "' but found "
+					+ " out edge(s) to nodes that match '" + toNodeRef + "' with label '" + edgeLabel + "' but found "
 					+ edgeEndsSize + "'.";
 			verbose2 = category() + errorName() + "Expected " + nodeToCheck + " to have " + edgeMult
-					+ " out edge(s) to nodes that match [" + toNodeRef + "] with label '" + edgeLabel + "' but found "
+					+ " out edge(s) to nodes that match '" + toNodeRef + "' with label '" + edgeLabel + "' but found "
 					+ edgeEndsSize + "'.";
 
 			break;
@@ -345,6 +371,18 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			throw new AotException("Unrecognized ErrorType in CheckMessage");
 		}
 		}
+	}
+
+	private Duple<String, String> getSubArchMsg(String message) {
+		int v1 = message.indexOf("verbose1:");
+		int v2 = message.indexOf("verbose2:");
+		int e3 = message.indexOf("Exception:");
+		if (v1 >= 0 && v2 >= 0 && e3 >= 0) {
+			String s1 = message.substring(v1, v2 - 1).replace("verbose1: ", "");
+			String s2 = message.substring(v2, e3 - 1).replace("verbose2: ", "");
+			return new Duple<String, String>(s1, s2);
+		}
+		return null;
 	}
 
 	private String parseQueryMsg(String msg) {

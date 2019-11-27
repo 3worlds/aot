@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -396,7 +397,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 				// this is bad. means there is an error in query name
 				// it should crash because archetypes are not supposed to be written by hand
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchElementException e) {
 				log.severe("cannot instantiate Query '" + queryClassName + "'");
 				e.printStackTrace();
 				// this only means the query failed and it should be reported to the user

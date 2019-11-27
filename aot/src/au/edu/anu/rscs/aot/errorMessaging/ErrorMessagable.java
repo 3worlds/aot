@@ -75,5 +75,6 @@ public interface ErrorMessagable {
 	 * enum.name(). Additionl prefix to verbose2 strings
 	 */
 	public String errorName();
+	
 
 }
