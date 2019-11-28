@@ -30,13 +30,9 @@
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import au.edu.anu.rscs.aot.AotException;
-import au.edu.anu.rscs.aot.archetype.EdgeSpec;
-import au.edu.anu.rscs.aot.archetype.NodeSpec;
-import au.edu.anu.rscs.aot.archetype.PropertySpec;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.graph.property.Property;
@@ -46,8 +42,8 @@ import fr.cnrs.iees.graph.Element;
 import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
 import fr.ens.biologie.generic.utils.Duple;
+import static au.edu.anu.rscs.aot.queries.Query.*;
 
 /**
  * A class to store error messages from archetype checks.
@@ -174,14 +170,15 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_EDGE_UNSATISFIED: {
 			/*-item, queryNode, qClassName*/
-			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
 				Element element = (Edge) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(exc.getMessage());
+				String msg = parseQueryMsg(excmsg);
 				verbose1 = category() + getRef(element) + ": " + msg;
 				verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
 			}
@@ -189,14 +186,15 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_NODE_UNSATISFIED: {
 			/*-item, queryNode*/
-			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
 				Element element = (Element) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(exc.getMessage());
+				String msg = parseQueryMsg(excmsg);
 				String prompt = getRef(element);
 				if (!msg.contains(prompt))
 					verbose1 = category() + getRef(element) + " " + msg;
@@ -209,14 +207,15 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_PROPERTY_UNSATISFIED: {
 			/*-item, queryNode*/
-			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
 				Property property = (Property) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(exc.getMessage());
+				String msg = parseQueryMsg(excmsg);
 				String prompt = "Property '" + property.getKey() + "=" + property.getValue() + "'";
 				if (!msg.contains(prompt))
 					verbose1 = category() + "Property '" + property.getKey() + "=" + property.getValue() + "' " + msg;
@@ -229,14 +228,15 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case QUERY_ITEM_UNSATISFIED: {
 			/*-item, queryNode*/
-			Duple<String, String> result = getSubArchMsg(exc.getMessage());
+			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
 				Object item = args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(exc.getMessage());
+				String msg = parseQueryMsg(excmsg);
 				verbose1 = category() + item + ": " + msg;
 				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification: " + qNode + "].";
 			}
@@ -438,27 +438,3 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	}
 
 }
-/*-"'" + aaHasName + "' property missing for property specification " + propertyArchetype);*/
-//case code10_PropertyMissingInArchetype: {
-//
-//	Element target = (Element)args[0];
-//	TreeNode spec = (TreeNode) args[1];
-//	String key = (String) args[2];
-//	verbose1 = category() + "Property '" + key + "' is missing from specification when checking '" + target.toUniqueString()
-//			+ "'.";
-//	if (element instanceof Element) {
-//		Element el = (Element) element;
-//		verbose2 = cat + "Property '" + key + "' is missing from the specification when checking '" + getRef(el)
-//				+ "' against '" + getRef(spec.getParent()) + "'→'" + getRef(spec);
-//	} else
-//		verbose2 = cat + "Property '" + key + "' is missing from the specification [" + spec + "].";
-//	break;
-//}
-
-//case codex_EdgeFromNodeClassMissing: {
-//	System.out.println(errorType);
-//	SimpleDataTreeNode spec = (SimpleDataTreeNode) args[0];
-//	SimpleDataTreeNode nodeSpec = (SimpleDataTreeNode) spec.getParent();
-//	String key = (String) args[1];
-//	break;
-//}

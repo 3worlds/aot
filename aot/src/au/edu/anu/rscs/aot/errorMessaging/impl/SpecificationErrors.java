@@ -30,9 +30,6 @@
 
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
-import fr.cnrs.iees.graph.Tree;
-import fr.cnrs.iees.graph.TreeNode;
-
 public enum SpecificationErrors {
 	GRAPH_MISSING_SPECIFICATION_NODE/*             */("Archetype"), //
 
@@ -40,28 +37,29 @@ public enum SpecificationErrors {
 
 	QUERY_PROPERTY_CLASS_UNKNOWN/*                 */("Archetype"), // 
 
+	EDGE_CLASS_UNKNOWN/*                           */("Archetype"), //
+
+	EDGE_CLASS_INCORRECT/*                         */("Archetype"), //
+
+	EDGE_ID_INCORRECT/*                            */("Archetype"), //
+
+	PROPERTY_UNKNOWN/*                             */("Archetype"), //
+ 
+	PROPERTY_INCORRECT_TYPE/*                      */("Archetype"), //
+	
+	ELEMENT_MISSING_PROPERTY_LIST/*                */("Archetype"), //
+
 	NODE_WRONG_MULTIPLICITY/*                      */("Node"), //
 
-	CHILD_MULTIPLICITY_INCORRECT/*              */("Node"), //
+	CHILD_MULTIPLICITY_INCORRECT/*                 */("Node"), //
 
-	QUERY_EDGE_UNSATISFIED/*   TODO                */("Edge"), //
+	QUERY_EDGE_UNSATISFIED/*                       */("Edge"), //
 	QUERY_NODE_UNSATISFIED/*                       */("Node"), //
 	QUERY_PROPERTY_UNSATISFIED/*                   */("Property"), //
 	QUERY_ITEM_UNSATISFIED/*                       */("Item"), //
 
-	EDGE_CLASS_UNKNOWN/*                           */("Edge"), //
-
-	EDGE_CLASS_INCORRECT/*                         */("Edge"), //
-
-	EDGE_ID_INCORRECT/*                            */("Edge"), //
-
 	EDGE_OUT_OF_RANGE/*                            */("Edge"), //
 	
-	PROPERTY_UNKNOWN/*                             */("Property"), //
-
-	PROPERTY_INCORRECT_TYPE/*                     */("Property"), //
-	
-	ELEMENT_MISSING_PROPERTY_LIST/*               */("Element"), //
 	;
 	private final String category;
 
@@ -73,8 +71,5 @@ public enum SpecificationErrors {
 		return category;
 	}
 }
-/*-Object element,PropertySpec propertyArchetype,String key*/
-//code10_PropertyMissingInArchetype/*            */("Archetype"), //
-//codex_EdgeFromNodeClassMissing/*               */("Archetype"),//
 
 
