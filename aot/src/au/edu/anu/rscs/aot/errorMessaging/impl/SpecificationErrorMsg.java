@@ -101,7 +101,33 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	private void buildDescriptions() {
 		String cat = errorType.category();
 		switch (errorType) {
-		case GRAPH_MISSING_SPECIFICATION_NODE: {
+		case QUERY_PROPERTY_CLASS_UNKNOWN: {
+			/*-	queryNode, property));
+			log.severe("Cannot get class for archetype check property" + queryNode);
+			e.printStackTrace();
+			*/
+			TreeNode specs = (TreeNode) args[0];
+			Property property = (Property) args[1];
+			verbose1 = category() + " Cannot find property value '" + property.getKey() + "' in '" + getRef(specs)
+					+ "'.";
+			verbose2 = category() + errorName() + " Cannot find property value '" + property.getKey() + "' in '" + specs
+					+ "'.";
+			break;
+		}
+		case ELEMENT_MISSING_PROPERTY_LIST: {
+			/*-	properties specified but object has no property list
+				"Element '" + element + "' has no property list");
+				element, propertyArchetype));
+			  */
+			Element element = (Element) args[0];
+			Node specs = (Node) args[1];
+			verbose1 = category() + "No property list found for '" + getRef(element) + "'.";
+			verbose2 = category() + errorName() + "No property list found for '" + element + "'.\nSpecification=["
+					+ specs + "].";
+			break;
+		}
+
+		case NODE_MISSING_SPECIFICATION: {
 			/*
 			 * "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount) +
 			 * " nodes which didn't comply)";
@@ -122,20 +148,19 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				verbose2 += getRef(node) + ",\n";
 			break;
 		}
-		case GRAPH_MISSING_SPECIFICATION_PROPERTY: {
+		case PROPERTY_MISSING: {
 			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
 
 			Node target = (Node) args[0];
 			Node spec = (Node) args[1];
 			String key = (String) args[2];
-			verbose1 = category() + "Property '" + key + "' is missing from specification when checking '"
-					+ getRef(target) + "' against '" + getRef(spec) + ".";
-			verbose2 = category() + errorName() + "Property '" + key + "' is missing from specification when checking '"
-					+ target + "' against '" + spec + ".";
+			verbose1 = category() + "Property '" + key + "' is missing from '" + getRef(target) + "'.";
+			verbose2 = category() + errorName() + "Property '" + key + "' is missing from " + target
+					+ ".\n[Specification: " + spec + "].";
 			break;
 		}
 
-		case NODE_WRONG_MULTIPLICITY: {
+		case NODE_RANGE_INCORRECT1: {
 			/*-	"Expected " + range + " nodes of class '" + requiredClass
 			+ "' with parents '" + parentList + "' (got " + count + ") archetype="
 			+ hasNode.toUniqueString();
@@ -155,20 +180,21 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		/*-"Expected " + childMult + " nodes of class '" + childClassName
 			+ "' with parent '" + n.classId() + "' (got " + children.size()
 			+ ") archetype=" + hasNode.toUniqueString();*/
-		case CHILD_MULTIPLICITY_INCORRECT: {
+		case NODE_RANGE_INCORRECT2: {
 			/*-targetNode, childClassName, childMult,children.size(), hasNode*/
 			Node parent = (Node) args[0];
 			String childClassName = (String) args[1];
 			IntegerRange range = (IntegerRange) args[2];
 			Integer nChildren = (Integer) args[3];
 			TreeNode spec = (TreeNode) args[4];
-			verbose1 = category() + "Expected " + range + " nodes of class '" + childClassName + "' with parent '"
-					+ getRef(parent) + " but found " + nChildren + ".";
-			verbose2 = category() + errorName() + "Expected " + range + " nodes of class '" + childClassName
-					+ "' with parent '" + parent + " but found " + nChildren + ".\n[Specification: " + spec + "].";
+			// can rephase for not enough or too many
+			verbose1 = category() + "Expected " + range + " child nodes with reference [" + childClassName
+					+ ":] from parent '" + getRef(parent) + "' but found " + nChildren + ".";
+			verbose2 = category() + errorName() + "Expected " + range + " child nodes with reference [" + childClassName
+					+ "] from parent '" + parent + " but found " + nChildren + ".\n[Specification: " + spec + "].";
 			break;
 		}
-		case QUERY_EDGE_UNSATISFIED: {
+		case EDGE_QUERY_UNSATISFIED: {
 			/*-item, queryNode, qClassName*/
 			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
 			Duple<String, String> result = getSubArchMsg(excmsg);
@@ -176,15 +202,15 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
-				Element element = (Edge) args[0];
+				Edge edge = (Edge) args[0];
 				Node qNode = (Node) args[1];
 				String msg = parseQueryMsg(excmsg);
-				verbose1 = category() + getRef(element) + ": " + msg;
-				verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+				verbose1 = category() + getRef(edge) + ": " + msg;
+				verbose2 = category() + errorName() + edge + ": " + msg + "\n[Specification: " + qNode + "].";
 			}
 			break;
 		}
-		case QUERY_NODE_UNSATISFIED: {
+		case NODE_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
 			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
 			Duple<String, String> result = getSubArchMsg(excmsg);
@@ -192,20 +218,20 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				verbose1 = result.getFirst();
 				verbose2 = result.getSecond();
 			} else {
-				Element element = (Element) args[0];
+				Node node = (Node) args[0];
 				Node qNode = (Node) args[1];
 				String msg = parseQueryMsg(excmsg);
-				String prompt = getRef(element);
+				String prompt = getRef(node);
 				if (!msg.contains(prompt))
-					verbose1 = category() + getRef(element) + " " + msg;
+					verbose1 = category() + getRef(node) + " " + msg;
 				else
 					verbose1 = category() + msg;
-				verbose2 = category() + errorName() + element + ": " + msg + "\n[Specification: " + qNode + "].";
+				verbose2 = category() + errorName() + node + " " + msg + "\n[Specification: " + qNode + "].";
 			}
-			;
+
 			break;
 		}
-		case QUERY_PROPERTY_UNSATISFIED: {
+		case PROPERTY_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
 			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
 			Duple<String, String> result = getSubArchMsg(excmsg);
@@ -226,7 +252,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			}
 			break;
 		}
-		case QUERY_ITEM_UNSATISFIED: {
+		case ITEM_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
 			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
 			Duple<String, String> result = getSubArchMsg(excmsg);
@@ -238,7 +264,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				Node qNode = (Node) args[1];
 				String msg = parseQueryMsg(excmsg);
 				verbose1 = category() + item + ": " + msg;
-				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification: " + qNode + "].";
+				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification=" + qNode + "].";
 			}
 			break;
 		}
@@ -250,7 +276,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			String label = (String) args[2];
 			verbose1 = category() + "Class '" + label + "' not found for edge " + getRef(target) + ".";
 			verbose2 = category() + errorName() + "Class '" + label + "' not found for edge " + getRef(target)
-					+ "[Specification: " + specs + "].";
+					+ "[Specification=" + specs + "].";
 			break;
 		}
 		case EDGE_CLASS_INCORRECT: {
@@ -264,7 +290,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			verbose1 = category() + "Edge " + getRef(target) + " should be of class [" + label + "]. Class ["
 					+ target.classId() + "] found instead.";
 			verbose2 = category() + errorName() + "Edge " + target + " should be of class [" + label + "]. Class ["
-					+ target.classId() + "] found instead.";
+					+ target.classId() + "] found instead." + "[Specification=" + spec + "].";
 
 			break;
 		}
@@ -282,7 +308,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			break;
 		}
-		case EDGE_OUT_OF_RANGE: {
+		case EDGE_RANGE_INCORRECT: {
 			/*-
 			 "Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
 				+ toNodeRef + "] with label '" + edgeLabel + "' (found " + edgeEnds.size() + ") ");
@@ -300,21 +326,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 					+ edgeEndsSize + "'.";
 			verbose2 = category() + errorName() + "Expected " + nodeToCheck + " to have " + edgeMult
 					+ " out edge(s) to nodes that match '" + toNodeRef + "' with label '" + edgeLabel + "' but found "
-					+ edgeEndsSize + "'.";
+					+ edgeEndsSize + "'." + "[Specification=" + spec + "].";
 
-			break;
-		}
-		case QUERY_PROPERTY_CLASS_UNKNOWN: {
-			/*-	queryNode, property));
-			log.severe("Cannot get class for archetype check property" + queryNode);
-			e.printStackTrace();
-			*/
-			TreeNode specs = (TreeNode) args[0];
-			Property property = (Property) args[1];
-			verbose1 = category() + " Cannot find property value '" + property.getKey() + "' in '" + getRef(specs)
-					+ "'.";
-			verbose2 = category() + errorName() + " Cannot find property value '" + property.getKey() + "' in '" + specs
-					+ "'.";
 			break;
 		}
 //		case code13_PropertyMissing: {
@@ -330,11 +343,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			String key = (String) args[2];
 			verbose1 = category() + "Unknown property type for property '" + key + "' in '" + getRef(element) + "'.";
 			verbose2 = category() + errorName() + "Unknown property type for property '" + key + "' in '" + element
-					+ "'.";
+					+ "'." + "[Specification=" + spec + "].";
 
 			break;
 		}
-		case PROPERTY_INCORRECT_TYPE: {
+		case PROPERTY_TYPE_INCORRECT: {
 			/*-
 			 * "Property '" + key + "' in element '" + element + "' is not of the required type '"
 										+ typeName + "' (type '" + ptype + "' found instead)");
@@ -350,22 +363,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 					+ typeName + "'. Type '" + ptype + "' found instead.";
 			verbose2 = category() + errorName() + "Property '" + key + "' in '" + element
 					+ "' is not of the required type '" + typeName + "'. Type '" + ptype
-					+ "' found instead.\nSpecification: [" + specs + "].";
+					+ "' found instead.\nSpecification=[" + specs + "].";
 
 			break;
 		}
-		case ELEMENT_MISSING_PROPERTY_LIST: {
-			/*-	properties specified but object has no property list
-				"Element '" + element + "' has no property list");
-				element, propertyArchetype));
-			  */
-			Element element = (Element) args[0];
-			Node specs = (Node) args[1];
-			verbose1 = category() + "No property list found for '" + getRef(element) + "'.";
-			verbose2 = category() + errorName() + "No property list found for '" + element + "'.\nSpecification: ["
-					+ specs + "].";
-			break;
-		}
+		
 		default: {
 			System.out.println(errorType);
 			throw new AotException("Unrecognized ErrorType in CheckMessage");

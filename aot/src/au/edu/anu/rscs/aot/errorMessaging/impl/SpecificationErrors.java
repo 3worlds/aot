@@ -31,35 +31,23 @@
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
 public enum SpecificationErrors {
-	GRAPH_MISSING_SPECIFICATION_NODE/*             */("Archetype"), //
+	QUERY_PROPERTY_CLASS_UNKNOWN/* */("Archetype"), // 
+	ELEMENT_MISSING_PROPERTY_LIST/**/("Node/Edge"), //
+	NODE_MISSING_SPECIFICATION/*   */("Node"), //
+	NODE_RANGE_INCORRECT1/*        */("Node"), //
+	NODE_RANGE_INCORRECT2/*        */("Node"), //
+	NODE_QUERY_UNSATISFIED/*       */("Node"), //
+	EDGE_QUERY_UNSATISFIED/*       */("Edge"), //
+	EDGE_RANGE_INCORRECT/*         */("Edge"), //
+	EDGE_CLASS_UNKNOWN/*           */("Edge"), //
+	EDGE_CLASS_INCORRECT/*         */("Edge"), //
+	EDGE_ID_INCORRECT/*            */("Edge"), // 
+	PROPERTY_QUERY_UNSATISFIED/*   */("Property"), //
+	PROPERTY_MISSING/*             */("Property"), //
+	PROPERTY_UNKNOWN/*             */("Property"), //
+	PROPERTY_TYPE_INCORRECT/*      */("Property"), //	
+	ITEM_QUERY_UNSATISFIED/*       */("Item"), //
 
-	GRAPH_MISSING_SPECIFICATION_PROPERTY/*         */("Archetype"), //
-
-	QUERY_PROPERTY_CLASS_UNKNOWN/*                 */("Archetype"), // 
-
-	EDGE_CLASS_UNKNOWN/*                           */("Archetype"), //
-
-	EDGE_CLASS_INCORRECT/*                         */("Archetype"), //
-
-	EDGE_ID_INCORRECT/*                            */("Archetype"), //
-
-	PROPERTY_UNKNOWN/*                             */("Archetype"), //
- 
-	PROPERTY_INCORRECT_TYPE/*                      */("Archetype"), //
-	
-	ELEMENT_MISSING_PROPERTY_LIST/*                */("Archetype"), //
-
-	NODE_WRONG_MULTIPLICITY/*                      */("Node"), //
-
-	CHILD_MULTIPLICITY_INCORRECT/*                 */("Node"), //
-
-	QUERY_EDGE_UNSATISFIED/*                       */("Edge"), //
-	QUERY_NODE_UNSATISFIED/*                       */("Node"), //
-	QUERY_PROPERTY_UNSATISFIED/*                   */("Property"), //
-	QUERY_ITEM_UNSATISFIED/*                       */("Item"), //
-
-	EDGE_OUT_OF_RANGE/*                            */("Edge"), //
-	
 	;
 	private final String category;
 

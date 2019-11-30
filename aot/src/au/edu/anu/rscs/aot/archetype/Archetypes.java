@@ -287,7 +287,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 											+ "' with parent '" + targetNode.classId() + "' (got " + children.size()
 											+ ") archetype=" + hasNode.toUniqueString();
 									checkFailList.add(new SpecificationErrorMsg(
-											SpecificationErrors.CHILD_MULTIPLICITY_INCORRECT, new AotException(message),
+											SpecificationErrors.NODE_RANGE_INCORRECT2, new AotException(message),
 											targetNode, childClassName, childMult, children.size(), hasNode));
 //									checkFailList.add(new CheckMessage(CheckMessage.code18ChildrenOfClassRangeError, n,
 //											new AotException(message), n, childClassName, parentList, childMult,
@@ -308,7 +308,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 									+ "' with parents '" + parentList + "' (got " + count + ") archetype="
 									+ hasNode.toUniqueString();
 							SpecificationErrorMsg chkmsg = new SpecificationErrorMsg(
-									SpecificationErrors.NODE_WRONG_MULTIPLICITY, new AotException(message), hasNode,
+									SpecificationErrors.NODE_RANGE_INCORRECT1, new AotException(message), hasNode,
 									requiredClass, parentList, range, count);
 //							if (!chkmsg.suppress())
 							checkFailList.add(chkmsg);
@@ -318,7 +318,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			if (exclusive && (complyCount != treeToCheck.nNodes())) {
 				String msg = "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount)
 						+ " nodes which didn't comply)";
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_NODE,
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.NODE_MISSING_SPECIFICATION,
 						new AotException(msg), treeToCheck, complyCount, compliantNodes));
 			}
 		}
@@ -397,23 +397,24 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 				// this is bad. means there is an error in query name
 				// it should crash because archetypes are not supposed to be written by hand
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-					| IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchElementException e) {
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchElementException | NullPointerException e) {
 				log.severe("cannot instantiate Query '" + queryClassName + "'");
 				e.printStackTrace();
 				// this only means the query failed and it should be reported to the user
 			} catch (Exception e) {
 				if (item instanceof Edge)
-					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.QUERY_EDGE_UNSATISFIED, e, item,
-							queryNode));
+					checkFailList.add(
+							new SpecificationErrorMsg(SpecificationErrors.EDGE_QUERY_UNSATISFIED, e, item, queryNode));
 				else if (item instanceof TreeNode)
-					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.QUERY_NODE_UNSATISFIED, e, item,
-							queryNode));
+					checkFailList.add(
+							new SpecificationErrorMsg(SpecificationErrors.NODE_QUERY_UNSATISFIED, e, item, queryNode));
 				else if (item instanceof Property)
-					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.QUERY_PROPERTY_UNSATISFIED, e, item,
+					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_QUERY_UNSATISFIED, e, item,
 							queryNode));
 				else
-					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.QUERY_ITEM_UNSATISFIED, e, item,
-							queryNode));
+					checkFailList.add(
+							new SpecificationErrorMsg(SpecificationErrors.ITEM_QUERY_UNSATISFIED, e, item, queryNode));
 
 //				checkFailList.add(new CheckMessage(CheckMessage.code4Query, item, e, queryNode, null, null, null, -1));
 			}
@@ -442,8 +443,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, an edge spec must have a toNode property
 				Exception e = new AotException(
 						"'" + aaToNode + "' property missing for edge specification " + edgeSpec);
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY, e,
-						nodeToCheck, edgeSpec, aaToNode));
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, nodeToCheck,
+						edgeSpec, aaToNode));
 //				checkFailList.add(new CheckMessage(CheckMessage.code5_PropertyOfEdgeMissing, edgeSpec, e, null, null,
 //						null, null, -1));
 			}
@@ -454,8 +455,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // error, parent must have a class
 				Exception e = new AotException(
 						"'" + aaIsOfClass + "' property missing for edge 'from' node specification " + edgeSpec);
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY, e,
-						nodeToCheck, edgeSpec, aaIsOfClass));
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, nodeToCheck,
+						edgeSpec, aaIsOfClass));
 //				checkFailList.add(new CheckMessage(CheckMessage.code13_PropertyMissingForEdge, edgeSpec, e, null, null,
 //						null, null, -1));
 			}
@@ -534,7 +535,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					Exception ee = new AotException(
 							"Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
 									+ toNodeRef + "] with label '" + edgeLabel + "' (found " + edgeEnds.size() + ") ");
-					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.EDGE_OUT_OF_RANGE, ee, nodeToCheck,
+					checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.EDGE_RANGE_INCORRECT, ee, nodeToCheck,
 							edgeMult, edgeLabel, toNodeRef, edgeEnds.size(), edgeSpec));
 //					checkFailList.add(new CheckMessage(CheckMessage.code9_EdgeRangeError, node, ee, edgeSpec, null,
 //							null, edgeMult, edgeEnds.size()));
@@ -591,8 +592,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaHasName + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY, e,
-						element, propertyArchetype, aaHasName));
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, element,
+						propertyArchetype, aaHasName));
 //				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.code10_PropertyMissingInArchetype, e,
 //						element, propertyArchetype, aaHasName));
 			}
@@ -603,8 +604,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaType + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY, e,
-						element, propertyArchetype, aaType));
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, element,
+						propertyArchetype, aaType));
 //				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.code10_PropertyMissingInArchetype, e,
 //						element, propertyArchetype, aaType));
 //				checkFailList.add(new CheckMessage(CheckMessage.code11_PropertyMissing, propertyArchetype, e, null,
@@ -617,8 +618,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			else { // this is an error, a property must have a name
 				Exception e = new AotException(
 						"'" + aaMultiplicity + "' property missing for property specification " + propertyArchetype);
-				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY, e,
-						element, propertyArchetype, aaMultiplicity));
+				checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, element,
+						propertyArchetype, aaMultiplicity));
 //				checkFailList.add(new CheckMessage(CheckMessage.code12_PropertyMissing, propertyArchetype, e, null,
 //						null, null, multiplicity, 0));
 			}
@@ -628,9 +629,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						Exception e = new AotException(
 								"Required property '" + key + "' missing for element " + element);
-						checkFailList
-								.add(new SpecificationErrorMsg(SpecificationErrors.GRAPH_MISSING_SPECIFICATION_PROPERTY,
-										e, element, propertyArchetype, key));
+						checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, e, element,
+								propertyArchetype, key));
 					}
 				} else { // property is here
 					Property prop = nprops.getProperty(key);
@@ -649,7 +649,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 										+ typeName + "' (type '" + ptype + "' found instead)");
 //						checkFailList.add(new CheckMessage(CheckMessage.code15_PropertyWrongType, element, e,
 //								propertyArchetype, null, null, null, -1));
-						checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_INCORRECT_TYPE, e,
+						checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.PROPERTY_TYPE_INCORRECT, e,
 								element, propertyArchetype, key, typeName, ptype));
 					}
 					checkConstraints(prop, propertyArchetype);
