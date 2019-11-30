@@ -56,6 +56,11 @@ package au.edu.anu.rscs.aot.errorMessaging;
  * examined but also you can choose not to be overwhelmed with detail.
  */
 
+/**
+ * @author Ian Davies
+ *
+ * @date 30 Nov 2019
+ */
 public interface ErrorMessagable {
 	/* Brief description */
 	public String verbose1();

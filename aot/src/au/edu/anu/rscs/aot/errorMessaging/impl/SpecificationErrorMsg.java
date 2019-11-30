@@ -61,6 +61,11 @@ import static au.edu.anu.rscs.aot.queries.Query.*;
  * @author Jacques Gignoux - 6 mai 2019
  *
  */
+/**
+ * @author Ian Davies
+ *
+ * @date 30 Nov 2019
+ */
 public class SpecificationErrorMsg implements ErrorMessagable {
 
 	/** the error raised by the check() method */
@@ -99,7 +104,6 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	}
 
 	private void buildDescriptions() {
-		String cat = errorType.category();
 		switch (errorType) {
 		case QUERY_PROPERTY_CLASS_UNKNOWN: {
 			/*-	queryNode, property));
@@ -132,9 +136,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			 * "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount) +
 			 * " nodes which didn't comply)";
 			 */
+			@SuppressWarnings("unchecked")
 			Tree<? extends TreeNode> treeToCheck = (Tree<? extends TreeNode>) args[0];
 			int complyCount = (int) args[1];
 			// The archetype does not really do its job here. More testing required.
+			@SuppressWarnings("unchecked")
 			List<TreeNode> compliantNodes = (List<TreeNode>) args[2];
 			List<TreeNode> nonCompliantNodes = new ArrayList<>();
 			for (TreeNode node : treeToCheck.nodes())

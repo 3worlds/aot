@@ -30,6 +30,12 @@
 
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
+
+/**
+ * @author Ian Davies
+ *
+ * @date 30 Nov 2019
+ */
 public enum SpecificationErrors {
 	QUERY_PROPERTY_CLASS_UNKNOWN/* */("Archetype"), // 
 	ELEMENT_MISSING_PROPERTY_LIST/**/("Node/Edge"), //
