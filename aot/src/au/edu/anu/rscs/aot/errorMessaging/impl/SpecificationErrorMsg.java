@@ -394,15 +394,16 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	}
 
 	private String parseQueryMsg(String msg) {
-		if (msg.contains("||")) {
-			String[] parts = msg.split("\\|");
-			for (int i = 0; i < parts.length; i++) {
-				if (parts[i].equals("") && (i + 1) < parts.length) {
-					return parts[i + 1];
-				}
-			}
-			return msg;
-		}
+		// This conflicts with the use of "|" for index strings
+//		if (msg.contains("||")) {
+//			String[] parts = msg.split("\\|");
+//			for (int i = 0; i < parts.length; i++) {
+//				if (parts[i].equals("") && (i + 1) < parts.length) {
+//					return parts[i + 1];
+//				}
+//			}
+//			return msg;
+//		}
 		return msg;
 	}
 
