@@ -49,6 +49,11 @@ public class ErrorList {
 		return haveErrors;
 	}
 
+	/*
+	 * TODO: Flaw here as we have this static class AND an instance in the Archetype
+	 * ("checkFailList"). Seems to work because this is probably required for
+	 * collecting errors in sub-archetypes but not sure.
+	 */
 	public static void add(ErrorMessagable msg) {
 		haveErrors = true;
 		for (ErrorListListener listener : listeners)
