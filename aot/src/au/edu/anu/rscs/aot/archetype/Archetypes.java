@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 
 import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.rscs.aot.errorMessaging.ErrorList;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.errorMessaging.impl.SpecificationErrorMsg;
 import au.edu.anu.rscs.aot.errorMessaging.impl.SpecificationErrors;
@@ -239,12 +240,12 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		}
 		// Check that the tree has only one root - otherwise disaster!
 		Integer nRoots = 0;
-		for (TreeNode root : treeToCheck.roots())
+		for (TreeNode root : treeToCheck.roots()) {
 			nRoots++;
+		}
 		if (nRoots > 1) {
-			throw new AotException("Tree must only have one root. Found[" + nRoots + "]"); // checkSubArchetypeQuery
-																							// produces trees with no
-																							// root!
+			checkFailList.add(new SpecificationErrorMsg(
+					SpecificationErrors.TREE_MULTIPLE_ROOTS, new AotException("Tree must only have one root. Found[" + nRoots + "]\n"),treeToCheck));
 		}
 
 		if (treeToCheck != null) {

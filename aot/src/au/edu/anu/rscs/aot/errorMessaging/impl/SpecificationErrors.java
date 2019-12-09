@@ -38,6 +38,7 @@ package au.edu.anu.rscs.aot.errorMessaging.impl;
  */
 public enum SpecificationErrors {
 	QUERY_PROPERTY_CLASS_UNKNOWN/* */("Archetype"), // 
+	TREE_MULTIPLE_ROOTS/*          */("Graph"),//
 	ELEMENT_MISSING_PROPERTY_LIST/**/("Node/Edge"), //
 	NODE_MISSING_SPECIFICATION/*   */("Node"), //
 	NODE_RANGE_INCORRECT1/*        */("Node"), //

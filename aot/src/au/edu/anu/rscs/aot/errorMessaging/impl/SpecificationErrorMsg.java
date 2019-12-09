@@ -105,6 +105,16 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 	private void buildDescriptions() {
 		switch (errorType) {
+		case TREE_MULTIPLE_ROOTS:{
+			@SuppressWarnings("unchecked")
+			Tree<? extends TreeNode> treeToCheck =(Tree<? extends TreeNode> )args[0];
+			String refs = "";
+			for (TreeNode node:treeToCheck.roots()) 
+				refs+=getRef(node)+",";
+			verbose1 = category()+ "Tree must only have one root but found "+refs;
+			verbose2 = category()+errorName()+"\"Tree must only have one root but found:\n"+treeToCheck.roots();
+			break;
+		}
 		case QUERY_PROPERTY_CLASS_UNKNOWN: {
 			/*-	queryNode, property));
 			log.severe("Cannot get class for archetype check property" + queryNode);
