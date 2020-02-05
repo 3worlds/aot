@@ -167,8 +167,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		case PROPERTY_MISSING: {
 			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
 
-			Node target = (Node) args[0];
-			Node spec = (Node) args[1];
+			Element target = (Element) args[0];
+			Element spec = (Element) args[1];
 			String key = (String) args[2];
 			verbose1 = category() + "Property '" + key + "' is missing from '" + getRef(target) + "'.";
 			verbose2 = category() + errorName() + "Property '" + key + "' is missing from " + target
