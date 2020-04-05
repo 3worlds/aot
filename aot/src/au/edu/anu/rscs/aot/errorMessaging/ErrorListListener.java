@@ -38,6 +38,6 @@ package au.edu.anu.rscs.aot.errorMessaging;
  */
 public interface ErrorListListener {
 	public void onReceiveMsg(ErrorMessagable msg);
-	public void onClear();
-	public void state(boolean valid);
+	public void onStartCheck();
+	public void onEndCheck(boolean valid);
 }

@@ -60,19 +60,19 @@ public class ErrorList {
 			listener.onReceiveMsg(msg);
 	}
 
-	public static void clear() {
+	public static void startCheck() {
 		haveErrors = false;
 		for (ErrorListListener listener : listeners)
-			listener.onClear();
+			listener.onStartCheck();
 	}
 
 	public static void addListener(ErrorListListener listener) {
 		listeners.add(listener);
 	}
 
-	public static void signalState() {
+	public static void endCheck() {
 		for (ErrorListListener listener : listeners)
-			listener.state(!haveErrors);
+			listener.onEndCheck(!haveErrors);
 	}
 
 }
