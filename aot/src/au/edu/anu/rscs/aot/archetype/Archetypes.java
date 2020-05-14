@@ -4,13 +4,13 @@
  *  Copyright 2018: Shayne Flint, Jacques Gignoux & Ian D. Davies         *
  *       shayne.flint@anu.edu.au                                          *
  *       jacques.gignoux@upmc.fr                                          *
- *       ian.davies@anu.edu.au                                            * 
+ *       ian.davies@anu.edu.au                                            *
  *                                                                        *
  *  AOT is a method to generate elaborate software code from a series of  *
  *  independent domains of knowledge. It enables one to manage and        *
  *  maintain software from explicit specifications that can be translated *
  *  into any programming language.          							  *
- **************************************************************************                                       
+ **************************************************************************
  *  This file is part of AOT (Aspect-Oriented Thinking).                  *
  *                                                                        *
  *  AOT is free software: you can redistribute it and/or modify           *
@@ -21,7 +21,7 @@
  *  AOT is distributed in the hope that it will be useful,                *
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *  GNU General Public License for more details.                          *                         
+ *  GNU General Public License for more details.                          *
  *                                                                        *
  *  You should have received a copy of the GNU General Public License     *
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
@@ -102,7 +102,7 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * the INFO level (="debugging"), so if you want to get rid of them just set the
  * log level to WARNING.
  * </p>
- * 
+ *
  * @author Jacques Gignoux - 6 mars 2019
  * @author Shayne Flint - looong ago
  *
@@ -127,7 +127,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	/**
 	 * checks that an archetype is an archetype (= check it against
 	 * archetypeArchetype)
-	 * 
+	 *
 	 * @param archetype the archetype to check
 	 */
 	public void checkArchetype(Tree<? extends TreeNode> graphToCheck) {
@@ -139,7 +139,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 
 	/**
 	 * checks that an archetype is an archetype and returns true if it complies.
-	 * 
+	 *
 	 * @param graphToCheck the tree to check
 	 * @return true if graphToCheck is a valid archetype
 	 */
@@ -154,7 +154,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	/**
 	 * checks that <strong>graphToCheck</strong> complies with
 	 * <strong>archetype</strong>.
-	 * 
+	 *
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
 	 * @param archetype    the archetype tree to check against
 	 */
@@ -197,6 +197,13 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		return node.classId().equals(requiredClass);
 	}
 
+	private boolean matchesId(TreeNode node, String requiredId) {
+		if (requiredId!=null)
+			return node.id().equals(requiredId);
+		else
+			return true;
+	}
+
 	// this is probably making the code very slow... if the archetype has n nodes,
 	// this will cause n² loops on the archetype.
 	private List<NodeSpec> getChildrenSpecs(NodeSpec parentReq, ArchetypeRootSpec archetype) {
@@ -219,7 +226,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	 * checks that <strong>graphToCheck</strong> complies with
 	 * <strong>archetype</strong>. Here, <strong>archetype</strong> is the root node
 	 * of an archetype tree.
-	 * 
+	 *
 	 * @param graphToCheck the graph to check (usually a Tree or a TreeGraph)
 	 * @param archetype    the archetype root node to check against
 	 */
@@ -243,8 +250,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			nRoots++;
 		}
 		if (nRoots > 1) {
-			checkFailList.add(new SpecificationErrorMsg(
-					SpecificationErrors.TREE_MULTIPLE_ROOTS, new AotException("Tree must only have one root. Found[" + nRoots + "]\n"),treeToCheck));
+			checkFailList.add(new SpecificationErrorMsg(SpecificationErrors.TREE_MULTIPLE_ROOTS,
+				new AotException("Tree must only have one root. Found[" + nRoots + "]\n"),treeToCheck));
 		}
 
 		if (treeToCheck != null) {
@@ -258,11 +265,16 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					NodeSpec hasNode = (NodeSpec) tn;
 					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(aaHasParent);
 					String requiredClass = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
+					String requiredId = null;
+					if (hasNode.properties().hasProperty(aaHasId))
+						requiredId = (String) hasNode.properties().getPropertyValue(aaHasId);
 					List<NodeSpec> childrenSpec = getChildrenSpecs(hasNode, archetype);
 					// count must be made by parent, because multiplicities apply to parents
 					Map<TreeNode, Integer> countByParent = new HashMap<>();
 					for (TreeNode targetNode : treeToCheck.nodes()) {
-						if (matchesClass(targetNode, requiredClass) && matchesParent(targetNode, parentList)) {
+						if (matchesClass(targetNode, requiredClass) &&
+							matchesParent(targetNode, parentList)  &&
+							matchesId(targetNode, requiredId)) {
 							log.info("checking node: " + targetNode.toUniqueString());
 							checkNode(targetNode, hasNode);
 							complyCount++;
@@ -673,7 +685,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 
 	/**
 	 * Get the checking errors.
-	 * 
+	 *
 	 * @return null if no checking errors, the (read-only) list of errors otherwise
 	 */
 	public Iterable<ErrorMessagable> errorList() {

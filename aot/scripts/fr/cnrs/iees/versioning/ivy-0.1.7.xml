@@ -1,10 +1,10 @@
 <!--===================================================================================
- ant and ivy scripts for project <aot> version 0.1.8 (Thu May 14 14:35:49 CEST 2020)
+ ant and ivy scripts for project <aot> version 0.1.7 (Wed Nov 06 14:01:26 CET 2019)
  author: Jacques Gignoux <jacques.gignoux@upmc.fr>
 
  CAUTION: this file is generated - DO NOT EDIT!
  If you need to change this file, edit ../version/Setup.java appropriately and run it.
- This will re-generate this file and manage version numbers properly. 
+ This will re-generate this file and manage version numbers properly.
 ===================================================================================-->
 <ivy-module version="2.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -13,7 +13,7 @@
 
 	<info	organisation="au.edu.anu.rscs.aot"
 			module="aot"
-			revision="0.1.8"
+			revision="0.1.7"
 			status="integration">
 		<license name="gpl3" url="https://www.gnu.org/licenses/gpl-3.0.txt"/>
 		<description>AOT is a method to generate elaborate software code from a series of independent domains of knowledge. It enables one to manage and maintain software from explicit specifications that can be translated into any programming language.</description>
