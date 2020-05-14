@@ -17,7 +17,7 @@ tree // Archetype for all archetypes - an archetype is a tree!
 //-------------------------------------------------------
 // 1 this is an archetype
 //-------------------------------------------------------
-archetype ArchetypeForArchetypes 
+archetype ArchetypeForArchetypes
 
 	//-------------------------------------------------------
 	// 2 this archetype does not accept any other specification
@@ -38,7 +38,7 @@ archetype ArchetypeForArchetypes
 		// are acceptable or not
 		// absence of the property means non-exclusive archetype
 		//-------------------------------------------------------
-		hasProperty exclusivePropertySpec 
+		hasProperty exclusivePropertySpec
 			hasName = String("exclusive")
 			multiplicity = IntegerRange("0..1")
 			type = String("Boolean")
@@ -55,7 +55,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		// 6 a node spec may specify the node class (formerly label)
 		// if not present then any label is suitable and will be
-		// be lost during the tree import process, a default 
+		// be lost during the tree import process, a default
 		// class (eg TreeNode) will be used to instantiate the node
 		//-------------------------------------------------------
 		hasProperty NodeClassSpec
@@ -88,7 +88,7 @@ archetype ArchetypeForArchetypes
 		// 9 a node spec optionally has a *multiplicity*  property
 		// defaults to 0..* if not set
 		//-------------------------------------------------------
-		hasProperty NodeMultiplicitySpec 
+		hasProperty NodeMultiplicitySpec
 			hasName = String("multiplicity")
 			type = String("IntegerRange")
 			multiplicity = IntegerRange("0..1")
@@ -106,9 +106,9 @@ archetype ArchetypeForArchetypes
 		// 11 a constraint spec uses a Query class descendant
 		// which fully qualified name must be provided here
 		//-------------------------------------------------------
-		hasProperty ConstraintClassSpec 
+		hasProperty ConstraintClassSpec
 			hasName = String("className")
-			type = String("String") 
+			type = String("String")
 			multiplicity = IntegerRange("1..1")
 
 	//-------------------------------------------------------
@@ -125,7 +125,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		hasProperty PropertyNameSpec
 			hasName = String("hasName")
-			type = String("String") 
+			type = String("String")
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
@@ -133,7 +133,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		hasProperty PropertyTypeSpec
 			hasName = String("type")
-			type = String("String") 
+			type = String("String")
 			multiplicity = IntegerRange("1..1")
 
 		//-------------------------------------------------------
@@ -142,7 +142,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		hasProperty PropertyMultiplicitySpec
 			hasName = String("multiplicity")
-			type = String("IntegerRange") 
+			type = String("IntegerRange")
 			multiplicity = IntegerRange("1..1")
 
 	//-------------------------------------------------------
@@ -164,7 +164,7 @@ archetype ArchetypeForArchetypes
 		//-------------------------------------------------------
 		// 18 an edge spec may specify the edge class (formerly label)
 		// if not present then any label is suitable and will be
-		// be lost during the tree import process, a default 
+		// be lost during the tree import process, a default
 		// class (eg Edge) will be used to instantiate the edge
 		//-------------------------------------------------------
 		hasProperty EdgeClassSpec
@@ -185,7 +185,7 @@ archetype ArchetypeForArchetypes
 		// 20 an edge spec optionally has a *multiplicity*  property
 		// defaults to 0..* if not set
 		//-------------------------------------------------------
-		hasProperty EdgeMultiplicitySpec 
+		hasProperty EdgeMultiplicitySpec
 			hasName = String("multiplicity")
 			type = String("IntegerRange")
 			multiplicity = IntegerRange("0..1")
