@@ -33,8 +33,6 @@ package au.edu.anu.rscs.aot.errorMessaging;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.edu.anu.rscs.aot.errorMessaging.ErrorListListener;
-
 /**
  * Author Ian Davies
  *
