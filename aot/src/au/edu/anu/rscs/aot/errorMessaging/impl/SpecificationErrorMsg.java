@@ -43,7 +43,6 @@ import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 import fr.ens.biologie.generic.utils.Duple;
-import static au.edu.anu.rscs.aot.queries.Query.*;
 
 /**
  * A class to store error messages from archetype checks.
@@ -69,7 +68,7 @@ import static au.edu.anu.rscs.aot.queries.Query.*;
 public class SpecificationErrorMsg implements ErrorMessagable {
 
 	/** the error raised by the check() method */
-	private Exception exc;
+	private String message;
 
 	private SpecificationErrors errorType;
 
@@ -84,9 +83,9 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	 * @param exception
 	 * @param args
 	 */
-	public SpecificationErrorMsg(SpecificationErrors errorType, Exception exception, Object... args) {
+	public SpecificationErrorMsg(SpecificationErrors errorType, String message1, Object... args) {
 		this.errorType = errorType;
-		this.exc = exception;
+		this.message = message1;
 		this.args = args;
 		buildDescriptions();
 	}
@@ -212,7 +211,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case EDGE_QUERY_UNSATISFIED: {
 			/*-item, queryNode, qClassName*/
-			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			String excmsg = message;
 			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
@@ -220,7 +219,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			} else {
 				Edge edge = (Edge) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(excmsg);
+				String msg = excmsg;
 				verbose1 = category() + getRef(edge) + ": " + msg;
 				verbose2 = category() + errorName() + edge + ": " + msg + "\n[Specification: " + qNode + "].";
 			}
@@ -228,7 +227,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case NODE_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
-			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			String excmsg = message;
 			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
@@ -236,7 +235,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			} else {
 				Node node = (Node) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(excmsg);
+				String msg = excmsg;
 				String prompt = getRef(node);
 				if (!msg.contains(prompt))
 					verbose1 = category() + getRef(node) + " " + msg;
@@ -249,7 +248,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case PROPERTY_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
-			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			String excmsg = message;
 			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
@@ -257,7 +256,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			} else {
 				Property property = (Property) args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(excmsg);
+				String msg = excmsg;
 				String prompt = "Property '" + property.getKey() + "=" + property.getValue() + "'";
 				if (!msg.contains(prompt))
 					verbose1 = category() + "Property '" + property.getKey() + "=" + property.getValue() + "' " + msg;
@@ -270,7 +269,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 		case ITEM_QUERY_UNSATISFIED: {
 			/*-item, queryNode*/
-			String excmsg = exc.getMessage().replaceAll(queryFailedStr, "");
+			String excmsg = message;
 			Duple<String, String> result = getSubArchMsg(excmsg);
 			if (result != null) {
 				verbose1 = result.getFirst();
@@ -278,7 +277,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			} else {
 				Object item = args[0];
 				Node qNode = (Node) args[1];
-				String msg = parseQueryMsg(excmsg);
+				String msg = excmsg;
 				verbose1 = category() + item + ": " + msg;
 				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification=" + qNode + "].";
 			}
@@ -403,19 +402,6 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		return null;
 	}
 
-	private String parseQueryMsg(String msg) {
-		// This conflicts with the use of "|" for index strings
-//		if (msg.contains("||")) {
-//			String[] parts = msg.split("\\|");
-//			for (int i = 0; i < parts.length; i++) {
-//				if (parts[i].equals("") && (i + 1) < parts.length) {
-//					return parts[i + 1];
-//				}
-//			}
-//			return msg;
-//		}
-		return msg;
-	}
 
 	@Override
 	public String verbose1() {
@@ -450,8 +436,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		sb.append("verbose2: ");
 		sb.append(verbose2);
 		sb.append("\n");
-		sb.append("Exception: ");
-		sb.append(exc.toString());
+		sb.append("Message: ");
+		sb.append(message);
 		sb.append("\n");
 		return sb.toString();
 	}
