@@ -68,24 +68,31 @@ import fr.ens.biologie.generic.utils.Duple;
 public class SpecificationErrorMsg implements ErrorMessagable {
 
 	/** the error raised by the check() method */
-	private String message;
 
 	private SpecificationErrors errorType;
 
+	private String actionMsg;
+
+	private String constraintMsg;
+
 	private Object[] args;
 
-	private String verbose1;
+	private String actionInfo;
 
-	private String verbose2;
+	private String detailsInfo;
+
+	private String debugInfo;
 
 	/**
 	 * @param errorType
 	 * @param exception
 	 * @param args
 	 */
-	public SpecificationErrorMsg(SpecificationErrors errorType, String message1, Object... args) {
+	public SpecificationErrorMsg(SpecificationErrors errorType, String actionMsg, String constraintMsg,
+			Object... args) {
 		this.errorType = errorType;
-		this.message = message1;
+		this.actionMsg = actionMsg;
+		this.constraintMsg = constraintMsg;
 		this.args = args;
 		buildDescriptions();
 	}
@@ -98,20 +105,32 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		return errorType;
 	}
 
-	private static String getRef(Element e) {
-		return e.classId() + ":" + e.id();
-	}
-
 	private void buildDescriptions() {
 		switch (errorType) {
-		case TREE_MULTIPLE_ROOTS:{
+		case TREE_MULTIPLE_ROOTS: {
 			@SuppressWarnings("unchecked")
-			Tree<? extends TreeNode> treeToCheck =(Tree<? extends TreeNode> )args[0];
+			Tree<? extends TreeNode> treeToCheck = (Tree<? extends TreeNode>) args[0];
+			Element constraintSpec = (Element) args[1];
+
 			String refs = "";
-			for (TreeNode node:treeToCheck.roots()) 
-				refs+=getRef(node)+",";
-			verbose1 = category()+ "Tree must only have one root but found "+refs;
-			verbose2 = category()+errorName()+"\"Tree must only have one root but found:\n"+treeToCheck.roots();
+			for (TreeNode node : treeToCheck.roots())
+				refs += "," + node.toShortString();
+			refs = refs.replaceFirst(",", "");
+
+			actionMsg = "Set parent to all but one of [" + refs + "] nodes.";
+			constraintMsg = "Expected 1 root node but found " + treeToCheck.roots().size() + ".";
+
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 		case QUERY_PROPERTY_CLASS_UNKNOWN: {
@@ -119,12 +138,27 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			log.severe("Cannot get class for archetype check property" + queryNode);
 			e.printStackTrace();
 			*/
-			TreeNode specs = (TreeNode) args[0];
-			Property property = (Property) args[1];
-			verbose1 = category() + " Cannot find property value '" + property.getKey() + "' in '" + getRef(specs)
-					+ "'.";
-			verbose2 = category() + errorName() + " Cannot find property value '" + property.getKey() + "' in '" + specs
-					+ "'.";
+			System.out.println("TODO!: " + errorType);
+			Exception e = (Exception) args[0];
+			TreeNode constraintSpec = (TreeNode) args[1];
+			Property property = (Property) args[2];
+			actionMsg = "Correct the property class for '" + property.getKey() + "' property in '"
+					+ constraintSpec.toShortString() + "'.";
+			constraintMsg = "Cannot get class for archetype check property " + constraintSpec.toShortString() + "'.";
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+
+			detailsInfo += "\nException message: " + e.getMessage();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nException: " + e;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 		case ELEMENT_MISSING_PROPERTY_LIST: {
@@ -133,14 +167,28 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				element, propertyArchetype));
 			  */
 			Element element = (Element) args[0];
-			Node specs = (Node) args[1];
-			verbose1 = category() + "No property list found for '" + getRef(element) + "'.";
-			verbose2 = category() + errorName() + "No property list found for '" + element + "'.\nSpecification=["
-					+ specs + "].";
+			Element constraintSpec = (Element) args[1];
+			actionMsg = "Add a property list.";
+			constraintMsg = "Must have property list but none found.";
+
+			actionInfo = category() + element.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + element.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + element;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 
 		case NODE_MISSING_SPECIFICATION: {
+			System.out.println("TODO!: " + errorType);
 			/*
 			 * "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount) +
 			 * " nodes which didn't comply)";
@@ -152,146 +200,226 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			@SuppressWarnings("unchecked")
 			List<TreeNode> compliantNodes = (List<TreeNode>) args[2];
 			List<TreeNode> nonCompliantNodes = new ArrayList<>();
+			String ncNames = "";
 			for (TreeNode node : treeToCheck.nodes())
-				if (!compliantNodes.contains(node))
+				if (!compliantNodes.contains(node)) {
 					nonCompliantNodes.add(node);
-			verbose1 = category() + "Expected all nodes to have matching specifications. Found "
-					+ (treeToCheck.nNodes() - complyCount) + " which didn't comply.";
-			verbose2 = category() + errorName() + "Expected all nodes to have matching specifications. Found "
-					+ (treeToCheck.nNodes() - complyCount) + " which didn't comply:\n";
-			for (TreeNode node : nonCompliantNodes)
-				verbose2 += getRef(node) + ",\n";
+					ncNames += "," + node.toShortString();
+				}
+			ncNames = ncNames.replaceFirst(",", "");
+
+			int nMissing = treeToCheck.nNodes() - complyCount;
+			actionMsg = "Add " + nMissing + " specifications.";
+			constraintMsg = "Expected all nodes to have matching specifications. Found " + nMissing
+					+ " which didn't comply [" + ncNames + "].";
+
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+
+			debugInfo = detailsInfo;
+			debugInfo += "\nCategory class: " + errorType;
 			break;
 		}
 		case PROPERTY_MISSING: {
 			/*-	"'" + aaToNode + "' property missing for edge specification " + edgeSpec);*/
-
+			/*- "'" + aaHasName + "' property missing for property specification " + propertyArchetype;
+			*/
 			Element target = (Element) args[0];
-			Element spec = (Element) args[1];
+			Element constraintSpec = (Element) args[1];
 			String key = (String) args[2];
-			verbose1 = category() + "Property '" + key + "' is missing from '" + getRef(target) + "'.";
-			verbose2 = category() + errorName() + "Property '" + key + "' is missing from " + target
-					+ ".\n[Specification: " + spec + "].";
+			actionMsg = "Add '" + key + "' property to '" + target.toShortString() + "'.";
+			constraintMsg = "Expected property '" + key + "' in " + target.toShortString() + "'.";
+
+			actionInfo = category() + target.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + target.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + target;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 
 		case NODE_RANGE_INCORRECT1: {
-			/*-	"Expected " + range + " nodes of class '" + requiredClass
-			+ "' with parents '" + parentList + "' (got " + count + ") archetype="
-			+ hasNode.toUniqueString();
-			*/
-			Node spec = (Node) args[0];
+			/*-null,null,hasNode, requiredClass,parentList, range, count*/
+			Element constraintSpec = (Element) args[0];
 			String requiredClass = (String) args[1];
 			StringTable parentList = (StringTable) args[2];
 			IntegerRange range = (IntegerRange) args[3];
 			Integer count = (Integer) args[4];
-			// could rephrase depending on count being less or greater than range.last
-			verbose1 = category() + "Expected " + range + " nodes of class '" + requiredClass + "' with parents '"
-					+ parentList + "' but found " + count + ".";
-			verbose2 = category() + errorName() + "Expected " + range + " nodes of class '" + requiredClass
-					+ "' with parents '" + parentList + "' but found " + count + ".\n[Specification: " + spec + "].";
-			break;
-		}
-		/*-"Expected " + childMult + " nodes of class '" + childClassName
-			+ "' with parent '" + n.classId() + "' (got " + children.size()
-			+ ") archetype=" + hasNode.toUniqueString();*/
-		case NODE_RANGE_INCORRECT2: {
-			/*-targetNode, childClassName, childMult,children.size(), hasNode*/
-			Node parent = (Node) args[0];
-			String childClassName = (String) args[1];
-			IntegerRange range = (IntegerRange) args[2];
-			Integer nChildren = (Integer) args[3];
-			TreeNode spec = (TreeNode) args[4];
-			// can rephase for not enough or too many
-			verbose1 = category() + "Expected " + range + " child nodes with reference [" + childClassName
-					+ ":] from parent '" + getRef(parent) + "' but found " + nChildren + ".";
-			verbose2 = category() + errorName() + "Expected " + range + " child nodes with reference [" + childClassName
-					+ "] from parent '" + parent + " but found " + nChildren + ".\n[Specification: " + spec + "].";
-			break;
-		}
-		case EDGE_QUERY_UNSATISFIED: {
-			/*-item, queryNode, qClassName*/
-			String excmsg = message;
-			Duple<String, String> result = getSubArchMsg(excmsg);
-			if (result != null) {
-				verbose1 = result.getFirst();
-				verbose2 = result.getSecond();
-			} else {
-				Edge edge = (Edge) args[0];
-				Node qNode = (Node) args[1];
-				String msg = excmsg;
-				verbose1 = category() + getRef(edge) + ": " + msg;
-				verbose2 = category() + errorName() + edge + ": " + msg + "\n[Specification: " + qNode + "].";
-			}
-			break;
-		}
-		case NODE_QUERY_UNSATISFIED: {
-			/*-item, queryNode*/
-			String excmsg = message;
-			Duple<String, String> result = getSubArchMsg(excmsg);
-			if (result != null) {
-				verbose1 = result.getFirst();
-				verbose2 = result.getSecond();
-			} else {
-				Node node = (Node) args[0];
-				Node qNode = (Node) args[1];
-				String msg = excmsg;
-				String prompt = getRef(node);
-				if (!msg.contains(prompt))
-					verbose1 = category() + getRef(node) + " " + msg;
-				else
-					verbose1 = category() + msg;
-				verbose2 = category() + errorName() + node + " " + msg + "\n[Specification: " + qNode + "].";
-			}
+			if (count < range.getLast())
+				actionMsg = "Add node '" + requiredClass + "' to " + parentList + ".";
+			else
+				actionMsg = "Remove child node '" + requiredClass + "' from " + parentList + ".";
+			constraintMsg = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '" + parentList
+					+ "' but found " + count + ".";
+
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nCategory: " + errorType.category();
+			detailsInfo += "\nTarget?? :" + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget?? :" + constraintSpec;
+			debugInfo += "TODO: Check this when circumstance arises!!";
 
 			break;
 		}
+		case NODE_RANGE_INCORRECT2: {
+			Node target = (Node) args[0];
+			String childClassName = (String) args[1];
+			IntegerRange range = (IntegerRange) args[2];
+			Integer nChildren = (Integer) args[3];
+			TreeNode constraintSpec = (TreeNode) args[4];
+
+			if (nChildren < range.getLast())
+				actionMsg = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
+			else
+				actionMsg = "Delete node '" + childClassName + ":' from '" + target.toShortString() + "'.";
+
+			constraintMsg = "Expected " + range + " child nodes with reference [" + childClassName + "] from parent '"
+					+ target.toShortString() + "' but found " + nChildren;
+			actionInfo = category() + target.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + target.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + target;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			break;
+		}
+		case EDGE_QUERY_UNSATISFIED: {
+			/*-actionMsg, constraintMsg,item,queryNameStr,queryNode*/
+			Element edge = (Element) args[0];
+			String queryClass = (String) args[1];
+			Element constraintSpec = (Element) args[1];
+			actionInfo = category() + edge.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nQuery class: " + queryClass;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + edge.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nQuery class: " + queryClass;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nQuery item: " + edge;
+
+			break;
+
+		}
+		case NODE_QUERY_UNSATISFIED: {
+			/*-actionMsg, constraintMsg,item,queryNameStr,queryNode*/
+			Element node = (Element) args[0];
+			String queryClass = (String) args[1];
+			Element constraintSpec = (Element) args[2];
+
+			actionInfo = category() + node.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nQuery class: " + queryClass;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + node.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nQuery class: " + queryClass;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nQuery item: " + node;
+			break;
+		}
 		case PROPERTY_QUERY_UNSATISFIED: {
-			/*-item, queryNode*/
-			String excmsg = message;
-			Duple<String, String> result = getSubArchMsg(excmsg);
-			if (result != null) {
-				verbose1 = result.getFirst();
-				verbose2 = result.getSecond();
-			} else {
-				Property property = (Property) args[0];
-				Node qNode = (Node) args[1];
-				String msg = excmsg;
-				String prompt = "Property '" + property.getKey() + "=" + property.getValue() + "'";
-				if (!msg.contains(prompt))
-					verbose1 = category() + "Property '" + property.getKey() + "=" + property.getValue() + "' " + msg;
-				else
-					verbose1 = category() + msg;
-				verbose2 = category() + errorName() + "Property '" + property.getKey() + "=" + property.getValue()
-						+ "': " + msg + "\n[Specification: " + qNode + "].";
-			}
+			/*-actionMsg, constraintMsg,item,queryNameStr,queryNode*/
+			Property property = (Property) args[0];
+			String queryClass = (String) args[1];
+			Node constraintSpec = (Node) args[2];
+
+			actionInfo = category() + property.getKey() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nQuery class: " + queryClass;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + property;
+
+			debugInfo = detailsInfo;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+
 			break;
 		}
 		case ITEM_QUERY_UNSATISFIED: {
-			/*-item, queryNode*/
-			String excmsg = message;
-			Duple<String, String> result = getSubArchMsg(excmsg);
-			if (result != null) {
-				verbose1 = result.getFirst();
-				verbose2 = result.getSecond();
-			} else {
-				Object item = args[0];
-				Node qNode = (Node) args[1];
-				String msg = excmsg;
-				verbose1 = category() + item + ": " + msg;
-				verbose2 = category() + errorName() + item + ": " + msg + "\n[Specification=" + qNode + "].";
-			}
+			/*-item, queryNameStr,queryNode*/
+			Object item = args[0];
+			String queryClass = (String) args[1];
+			Element constraintSpec = (Element) args[2];
+
+			actionInfo = category() + item + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nQuery class: " + queryClass;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + item;
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nQuery class: " + queryClass;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nQuery item: " + item;
+
 			break;
 		}
 		case EDGE_CLASS_UNKNOWN: {
 			/*-ed,edgeSpec, edgeLabel*/
 			/* "Class '" + edgeLabel + "' not found for edge " + ed */
 			Element target = (Element) args[0];
-			Node specs = (Node) args[1];
+			Element constraintSpec = (Element) args[1];
 			String label = (String) args[2];
-			verbose1 = category() + "Class '" + label + "' not found for edge " + getRef(target) + ".";
-			verbose2 = category() + errorName() + "Class '" + label + "' not found for edge " + getRef(target)
-					+ "[Specification=" + specs + "].";
+			actionMsg = "Add edge class '" + label + ":' to TwConfigFactory";
+			constraintMsg = "Class '" + label + "' not found for edge " + target.toShortString() + ".";
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + target.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nQuery item: " + target;
+
 			break;
 		}
 		case EDGE_CLASS_INCORRECT: {
@@ -300,13 +428,25 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			ed, edgeSpec,edgeLabel));
 			 */
 			Element target = (Element) args[0];
-			Node spec = (Node) args[1];
+			Element constraintSpec = (Element) args[1];
 			String label = (String) args[2];
-			verbose1 = category() + "Edge " + getRef(target) + " should be of class [" + label + "]. Class ["
+			actionMsg = "Change edge class of '" + target.toShortString() + "' to '" + label + "'.";
+			constraintMsg = "Edge " + target.toShortString() + " should be of class [" + label + "]. Class ["
 					+ target.classId() + "] found instead.";
-			verbose2 = category() + errorName() + "Edge " + target + " should be of class [" + label + "]. Class ["
-					+ target.classId() + "] found instead." + "[Specification=" + spec + "].";
 
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+			detailsInfo += "\nQuery item: " + target.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget:: " + target;
 			break;
 		}
 		case EDGE_ID_INCORRECT: {
@@ -316,33 +456,45 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			 */
 			Element edge = (Element) args[0];
 			String id = (String) args[1];
-			verbose1 = category() + "Edge " + getRef(edge) + " should have id [" + id + "]. Id [" + edge.id()
+			actionInfo = category() + "Edge " + edge.toShortString() + " should have id [" + id + "]. Id [" + edge.id()
 					+ "] found instead.";
-			verbose2 = category() + errorName() + "Edge " + edge + " should have id [" + id + "]. Id [" + edge.id()
+			detailsInfo = category() + errorName() + "Edge " + edge + " should have id [" + id + "]. Id [" + edge.id()
 					+ "] found instead.";
 
 			break;
 		}
 		case EDGE_RANGE_INCORRECT: {
-			/*-
-			 "Expected " + nodeToCheck + " to have " + edgeMult + " out edge(s) to nodes that match ["
-				+ toNodeRef + "] with label '" + edgeLabel + "' (found " + edgeEnds.size() + ") ");
-				
-			nodeToCheck,edgeMult, edgeLabel, toNodeRef,edgeEnds.size(),edgeSpec
-			 */
-			Node nodeToCheck = (Node) args[0];
-			IntegerRange edgeMult = (IntegerRange) args[1];
+			/*-nodeToCheck, edgeMult, edgeLabel, toNodeRef, edgeEnds.size(), edgeSpec*/
+			Element target = (Element) args[0];
+			IntegerRange range = (IntegerRange) args[1];
 			String edgeLabel = (String) args[2];
 			String toNodeRef = (String) args[3];
-			Integer edgeEndsSize = (Integer) args[4];
-			Node spec = (Node) args[5];
-			verbose1 = category() + "Expected " + getRef(nodeToCheck) + " to have " + edgeMult
-					+ " out edge(s) to nodes that match '" + toNodeRef + "' with label '" + edgeLabel + "' but found "
-					+ edgeEndsSize + "'.";
-			verbose2 = category() + errorName() + "Expected " + nodeToCheck + " to have " + edgeMult
-					+ " out edge(s) to nodes that match '" + toNodeRef + "' with label '" + edgeLabel + "' but found "
-					+ edgeEndsSize + "'." + "[Specification=" + spec + "].";
+			Integer nEdges = (Integer) args[4];
+			Element constraintSpec = (Element) args[5];
 
+			if (nEdges < range.getLast())
+				actionMsg = "Add edge '" + edgeLabel + ":' from '" + target.toShortString() + "' to '" + toNodeRef
+						+ "'.";
+			else
+				actionMsg = "Remove edge '" + edgeLabel + ":' from '" + target.toShortString() + "' to '" + toNodeRef
+						+ "'.";
+
+			constraintMsg = "Expected " + target + " to have " + range + " out edge(s) to nodes that match '"
+					+ toNodeRef + "' with label '" + edgeLabel + "' but found " + nEdges + "'.";
+
+			actionInfo = category() + target.toShortString() + ": " + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + target.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + target;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 //		case code13_PropertyMissing: {
@@ -354,12 +506,23 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			element, propertyArchetype, key
 			*/
 			Element element = (Element) args[0];
-			TreeNode spec = (TreeNode) args[1];
+			Element constraintSpec = (Element) args[1];
 			String key = (String) args[2];
-			verbose1 = category() + "Unknown property type for property '" + key + "' in '" + getRef(element) + "'.";
-			verbose2 = category() + errorName() + "Unknown property type for property '" + key + "' in '" + element
-					+ "'." + "[Specification=" + spec + "].";
+			actionMsg = "Add property type '" + key + "' to the system.";
+			constraintMsg = "Unknown property type for property '" + key + "' in '" + element + "'.";
+			actionInfo = category() + actionMsg;
 
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + element.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + element;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
 		case PROPERTY_TYPE_INCORRECT: {
@@ -370,19 +533,33 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				element, propertyArchetype, key, typeName, ptype;
 			 */
 			Element element = (Element) args[0];
-			Node specs = (Node) args[1];
+			Element constraintSpec = (Element) args[1];
 			String key = (String) args[2];
-			String typeName = (String) args[3];
-			String ptype = (String) args[4];
-			verbose1 = category() + "Property '" + key + "' in '" + getRef(element) + "' is not of the required type '"
-					+ typeName + "'. Type '" + ptype + "' found instead.";
-			verbose2 = category() + errorName() + "Property '" + key + "' in '" + element
-					+ "' is not of the required type '" + typeName + "'. Type '" + ptype
-					+ "' found instead.\nSpecification=[" + specs + "].";
+			String requiredType = (String) args[3];
+			String foundType = (String) args[4];
 
+			actionMsg = "Change property type '" + foundType + "' to '" + requiredType + "' in '"
+					+ element.toShortString() + "'.";
+			
+			constraintMsg = "Property '" + key + "' in '" + element.toShortString()
+			+ "' is not of the required type '" + requiredType + "'. Type '" + foundType + "' found instead.";
+
+			actionInfo = category() + actionMsg;
+
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nTarget: " + element.toShortString();
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
+
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + element;
+			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
 		}
-		
+
 		default: {
 			System.out.println(errorType);
 			throw new AotException("Unrecognized ErrorType in CheckMessage");
@@ -390,27 +567,19 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 	}
 
-	private Duple<String, String> getSubArchMsg(String message) {
-		int v1 = message.indexOf("verbose1:");
-		int v2 = message.indexOf("verbose2:");
-		int e3 = message.indexOf("Exception:");
-		if (v1 >= 0 && v2 >= 0 && e3 >= 0) {
-			String s1 = message.substring(v1, v2 - 1).replace("verbose1: ", "");
-			String s2 = message.substring(v2, e3 - 1).replace("verbose2: ", "");
-			return new Duple<String, String>(s1, s2);
-		}
-		return null;
-	}
-
-
 	@Override
-	public String verbose1() {
-		return verbose1;
+	public String actionInfo() {
+		return actionInfo;
 	}
 
 	@Override
-	public String verbose2() {
-		return verbose2;
+	public String detailsInfo() {
+		return detailsInfo;
+	}
+
+	@Override
+	public String debugInfo() {
+		return debugInfo;
 	}
 
 	@Override
@@ -430,14 +599,14 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("verbose1: ");
-		sb.append(verbose1);
+		sb.append("actionInfo: ");
+		sb.append(actionInfo);
 		sb.append("\n");
-		sb.append("verbose2: ");
-		sb.append(verbose2);
+		sb.append("detailsInfo: ");
+		sb.append(detailsInfo);
 		sb.append("\n");
-		sb.append("Message: ");
-		sb.append(message);
+		sb.append("debugInfo: ");
+		sb.append(debugInfo);
 		sb.append("\n");
 		return sb.toString();
 	}
