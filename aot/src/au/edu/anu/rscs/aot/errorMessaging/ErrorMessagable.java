@@ -63,10 +63,12 @@ package au.edu.anu.rscs.aot.errorMessaging;
  */
 public interface ErrorMessagable {
 	/* Brief description */
-	public String verbose1();
+	public String actionInfo();
 
 	/* Detailed description */
-	public String verbose2();
+	public String detailsInfo();
+	
+	public String debugInfo();
 
 	/*
 	 * Allows some way of organizing msgs in some category order. Best used as a
