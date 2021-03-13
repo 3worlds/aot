@@ -37,12 +37,9 @@ import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.graph.property.Property;
 import au.edu.anu.rscs.aot.util.IntegerRange;
-import fr.cnrs.iees.graph.Edge;
 import fr.cnrs.iees.graph.Element;
-import fr.cnrs.iees.graph.Node;
 import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
-import fr.ens.biologie.generic.utils.Duple;
 
 /**
  * A class to store error messages from archetype checks.
@@ -279,19 +276,22 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			break;
 		}
 		case NODE_RANGE_INCORRECT2: {
-			Node target = (Node) args[0];
+			Element target = (Element) args[0];
 			String childClassName = (String) args[1];
 			IntegerRange range = (IntegerRange) args[2];
 			Integer nChildren = (Integer) args[3];
 			TreeNode constraintSpec = (TreeNode) args[4];
+			String[] msg = ErrorMessageText.getNODE_RANGE_INCORRECT2(childClassName,target,range,nChildren);
 
-			if (nChildren < range.getLast())
-				actionMsg = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
-			else
-				actionMsg = "Delete node '" + childClassName + ":' from '" + target.toShortString() + "'.";
-
-			constraintMsg = "Expected " + range + " child nodes with reference [" + childClassName + "] from parent '"
-					+ target.toShortString() + "' but found " + nChildren;
+			actionMsg = msg[0];
+			constraintMsg = msg[1];
+//			if (nChildren < range.getLast())
+//				actionMsg = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
+//			else
+//				actionMsg = "Delete node '" + childClassName + ":' from '" + target.toShortString() + "'.";
+//
+//			constraintMsg = "Expected " + range + " child nodes with reference '" + childClassName + "' from parent '"
+//					+ target.toShortString() + "' but found " + nChildren;
 			actionInfo = category() + target.toShortString() + ": " + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -358,7 +358,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			/*-actionMsg, constraintMsg,item,queryNameStr,queryNode*/
 			Property property = (Property) args[0];
 			String queryClass = (String) args[1];
-			Node constraintSpec = (Node) args[2];
+			Element constraintSpec = (Element) args[2];
 
 			actionInfo = category() + property.getKey() + ": " + actionMsg;
 
@@ -479,7 +479,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				actionMsg = "Remove edge '" + edgeLabel + ":' from '" + target.toShortString() + "' to '" + toNodeRef
 						+ "'.";
 
-			constraintMsg = "Expected " + target + " to have " + range + " out edge(s) to nodes that match '"
+			constraintMsg = "Expected '" + target.toShortString() + "' to have " + range + " out edge(s) to nodes that match '"
 					+ toNodeRef + "' with label '" + edgeLabel + "' but found " + nEdges + "'.";
 
 			actionInfo = category() + target.toShortString() + ": " + actionMsg;
