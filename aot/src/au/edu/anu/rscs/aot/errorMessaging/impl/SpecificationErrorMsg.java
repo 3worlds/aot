@@ -109,12 +109,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Tree<? extends TreeNode> treeToCheck = (Tree<? extends TreeNode>) args[0];
 			Element constraintSpec = (Element) args[1];
 
-			String refs = "";
+			List<String> refs = new ArrayList<>();
 			for (TreeNode node : treeToCheck.roots())
-				refs += "," + node.toShortString();
-			refs = refs.replaceFirst(",", "");
+				refs.add(node.toShortString());
 
-			actionMsg = "Set parent to all but one of [" + refs + "] nodes.";
+			actionMsg = "Set parent to all but one of "+ refs + " nodes.";
 			constraintMsg = "Expected 1 root node but found " + treeToCheck.roots().size() + ".";
 
 			actionInfo = category() + actionMsg;
@@ -125,7 +124,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			break;
@@ -152,7 +151,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nException: " + e;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -177,7 +176,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + element;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -197,18 +196,17 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			@SuppressWarnings("unchecked")
 			List<TreeNode> compliantNodes = (List<TreeNode>) args[2];
 			List<TreeNode> nonCompliantNodes = new ArrayList<>();
-			String ncNames = "";
+			List<String> ncNames = new ArrayList<>();
 			for (TreeNode node : treeToCheck.nodes())
 				if (!compliantNodes.contains(node)) {
 					nonCompliantNodes.add(node);
-					ncNames += "," + node.toShortString();
+					ncNames.add(node.toShortString());
 				}
-			ncNames = ncNames.replaceFirst(",", "");
 
 			int nMissing = treeToCheck.nNodes() - complyCount;
 			actionMsg = "Add " + nMissing + " specifications.";
 			constraintMsg = "Expected all nodes to have matching specifications. Found " + nMissing
-					+ " which didn't comply [" + ncNames + "].";
+					+ " which didn't comply " + ncNames + ".";
 
 			actionInfo = category() + actionMsg;
 
@@ -238,7 +236,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + target;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -263,12 +261,12 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			detailsInfo = "\nAction: " + actionMsg;
 			detailsInfo += "\nConstraint: " + constraintMsg;
-			detailsInfo += "\nCategory: " + errorType.category();
+			detailsInfo += "\nCategory: " + category();
 			detailsInfo += "\nTarget?? :" + constraintSpec.toShortString();
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget?? :" + constraintSpec;
 			debugInfo += "TODO: Check this when circumstance arises!!";
@@ -301,7 +299,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + target;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -322,7 +320,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nQuery class: " + queryClass;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -347,7 +345,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nQuery class: " + queryClass;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -369,7 +367,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			detailsInfo += "\nQuery item: " + property;
 
 			debugInfo = detailsInfo;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 
 			break;
@@ -391,7 +389,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nQuery class: " + queryClass;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			debugInfo += "\nQuery item: " + item;
@@ -415,7 +413,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			debugInfo += "\nQuery item: " + target;
@@ -443,7 +441,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
 			debugInfo += "\nTarget:: " + target;
@@ -491,7 +489,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + target;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -519,7 +517,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + element;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
@@ -553,7 +551,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
-			debugInfo += "\nCategory: " + errorType.category();
+			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + element;
 			debugInfo += "\nConstraint Specification: " + constraintSpec;
