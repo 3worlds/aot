@@ -154,7 +154,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nException: " + e;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 		case ELEMENT_MISSING_PROPERTY_LIST: {
@@ -179,7 +179,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nTarget: " + element;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 
@@ -238,8 +238,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget: " + target;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget: " + target.toDetailedString();
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 
@@ -262,13 +262,13 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			detailsInfo = "\nAction: " + actionMsg;
 			detailsInfo += "\nConstraint: " + constraintMsg;
 			detailsInfo += "\nCategory: " + category();
-			detailsInfo += "\nTarget?? :" + constraintSpec.toShortString();
+			detailsInfo += "\nTarget(?):" + constraintSpec.toShortString();
 
 			debugInfo = "\nAction: " + actionMsg;
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget?? :" + constraintSpec;
+			debugInfo += "\nTarget(?):" + constraintSpec.toDetailedString();
 			debugInfo += "TODO: Check this when circumstance arises!!";
 
 			break;
@@ -301,8 +301,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget: " + target;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget: " + target.toDetailedString();
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 		case EDGE_QUERY_UNSATISFIED: {
@@ -323,8 +323,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nQuery class: " + queryClass;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
-			debugInfo += "\nQuery item: " + edge;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
+			debugInfo += "\nQuery item: " + edge.toDetailedString();
 
 			break;
 
@@ -348,8 +348,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nQuery class: " + queryClass;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
-			debugInfo += "\nQuery item: " + node;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
+			debugInfo += "\nQuery item: " + node.toDetailedString();
 			break;
 		}
 		case PROPERTY_QUERY_UNSATISFIED: {
@@ -366,7 +366,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			detailsInfo += "\nConstraint Specification: " + constraintSpec.toShortString();
 			detailsInfo += "\nQuery item: " + property;
 
-			debugInfo = detailsInfo;
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
+			detailsInfo += "\nQuery class: " + queryClass;
+			detailsInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
+			detailsInfo += "\nQuery item: " + property;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 
@@ -391,7 +395,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nQuery class: " + queryClass;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			debugInfo += "\nQuery item: " + item;
 
 			break;
@@ -415,8 +419,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
-			debugInfo += "\nQuery item: " + target;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
+			debugInfo += "\nQuery item: " + target.toDetailedString();
 
 			break;
 		}
@@ -443,8 +447,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
-			debugInfo += "\nTarget:: " + target;
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
+			debugInfo += "\nTarget:: " + target.toDetailedString();
 			break;
 		}
 		case EDGE_ID_INCORRECT: {
@@ -452,6 +456,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			 * "Edge " + ed + " should have id [" + edgeId + "]. Id ["+ ed.id() + "] found instead.");
 				ed, edgeId));
 			 */
+			
+			//TODO test and finish actionmsg
 			Element edge = (Element) args[0];
 			String id = (String) args[1];
 			actionInfo = category() + "Edge " + edge.toShortString() + " should have id [" + id + "]. Id [" + edge.id()
@@ -491,8 +497,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget: " + target;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget: " + target.toDetailedString();
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 //		case code13_PropertyMissing: {
@@ -519,8 +525,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget: " + element;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget: " + element.toDetailedString();
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 		case PROPERTY_TYPE_INCORRECT: {
@@ -553,8 +559,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nConstraint: " + constraintMsg;
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
-			debugInfo += "\nTarget: " + element;
-			debugInfo += "\nConstraint Specification: " + constraintSpec;
+			debugInfo += "\nTarget: " + element.toDetailedString();
+			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
 			break;
 		}
 
