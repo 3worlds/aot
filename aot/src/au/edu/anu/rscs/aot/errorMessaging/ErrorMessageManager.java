@@ -38,7 +38,7 @@ import java.util.List;
  *
  * Date Dec 12, 2018
  */
-public class ErrorList {
+public class ErrorMessageManager {
 	private static List<ErrorListListener> listeners = new ArrayList<>();
 
 	private static boolean haveErrors;
@@ -47,12 +47,7 @@ public class ErrorList {
 		return haveErrors;
 	}
 
-	/*
-	 * TODO: Flaw here as we have this static class AND an instance in the Archetype
-	 * ("checkFailList"). Seems to work because this is probably required for
-	 * collecting errors in sub-archetypes but not sure.
-	 */
-	public static void add(ErrorMessagable msg) {
+	public static void dispatch(ErrorMessagable msg) {
 		haveErrors = true;
 		for (ErrorListListener listener : listeners)
 			listener.onReceiveMsg(msg);
