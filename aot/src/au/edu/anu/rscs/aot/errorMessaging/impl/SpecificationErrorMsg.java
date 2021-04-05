@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.edu.anu.rscs.aot.AotException;
+import au.edu.anu.rscs.aot.TextTranslations;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.graph.property.Property;
@@ -112,9 +113,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			List<String> refs = new ArrayList<>();
 			for (TreeNode node : treeToCheck.roots())
 				refs.add(node.toShortString());
+			String[] msgs = TextTranslations.getTREE_MULTIPLE_ROOTS(refs, treeToCheck.roots().size());
 
-			actionMsg = "Set parent to all but one of "+ refs + " nodes.";
-			constraintMsg = "Expected 1 root node but found " + treeToCheck.roots().size() + ".";
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + actionMsg;
 
@@ -138,9 +140,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Exception e = (Exception) args[0];
 			TreeNode constraintSpec = (TreeNode) args[1];
 			Property property = (Property) args[2];
-			actionMsg = "Correct the property class for '" + property.getKey() + "' property in '"
-					+ constraintSpec.toShortString() + "'.";
-			constraintMsg = "Cannot get class for archetype check property " + constraintSpec.toShortString() + "'.";
+			String[] msgs = TextTranslations.getQUERY_PROPERTY_CLASS_UNKNOWN(property.getKey(),constraintSpec.toShortString());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
+			
 			actionInfo = category() + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -164,8 +167,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			  */
 			Element element = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
-			actionMsg = "Add a property list.";
-			constraintMsg = "Must have property list but none found.";
+			
+			String[] msgs = TextTranslations.getELEMENT_MISSING_PROPERTY_LIST(element.toShortString());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + element.toShortString() + ": " + actionMsg;
 
@@ -204,9 +209,9 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 				}
 
 			int nMissing = treeToCheck.nNodes() - complyCount;
-			actionMsg = "Add " + nMissing + " specifications.";
-			constraintMsg = "Expected all nodes to have matching specifications. Found " + nMissing
-					+ " which didn't comply " + ncNames + ".";
+			String [] msgs = TextTranslations.getNODE_MISSING_SPECIFICATION(nMissing,ncNames);
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + actionMsg;
 
@@ -224,8 +229,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element target = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
 			String key = (String) args[2];
-			actionMsg = "Add '" + key + "' property to '" + target.toShortString() + "'.";
-			constraintMsg = "Expected property '" + key + "' in " + target.toShortString() + "'.";
+			
+			String[] msgs = TextTranslations.getPROPERTY_MISSING(key,target.toShortString());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + target.toShortString() + ": " + actionMsg;
 
@@ -250,12 +257,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			StringTable parentList = (StringTable) args[2];
 			IntegerRange range = (IntegerRange) args[3];
 			Integer count = (Integer) args[4];
-			if (count < range.getLast())
-				actionMsg = "Add node '" + requiredClass + "' to " + parentList + ".";
-			else
-				actionMsg = "Remove child node '" + requiredClass + "' from " + parentList + ".";
-			constraintMsg = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '" + parentList
-					+ "' but found " + count + ".";
+			
+			String[] msgs = TextTranslations.getNODE_RANGE_INCORRECT1(requiredClass, parentList, range, count);
+
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + actionMsg;
 
@@ -279,17 +285,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			IntegerRange range = (IntegerRange) args[2];
 			Integer nChildren = (Integer) args[3];
 			TreeNode constraintSpec = (TreeNode) args[4];
-			String[] msg = ErrorMessageText.getNODE_RANGE_INCORRECT2(childClassName,target,range,nChildren);
+			String[] msg = TextTranslations.getNODE_RANGE_INCORRECT2(childClassName,target,range,nChildren);
 
 			actionMsg = msg[0];
 			constraintMsg = msg[1];
-//			if (nChildren < range.getLast())
-//				actionMsg = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
-//			else
-//				actionMsg = "Delete node '" + childClassName + ":' from '" + target.toShortString() + "'.";
-//
-//			constraintMsg = "Expected " + range + " child nodes with reference '" + childClassName + "' from parent '"
-//					+ target.toShortString() + "' but found " + nChildren;
+
 			actionInfo = category() + target.toShortString() + ": " + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -406,8 +406,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element target = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
 			String label = (String) args[2];
-			actionMsg = "Add edge class '" + label + ":' to TwConfigFactory";
-			constraintMsg = "Class '" + label + "' not found for edge " + target.toShortString() + ".";
+			
+			String[] msgs = TextTranslations.getEDGE_CLASS_UNKNOWN(label, target.toShortString());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
+			
 			actionInfo = category() + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -432,9 +435,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element target = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
 			String label = (String) args[2];
-			actionMsg = "Change edge class of '" + target.toShortString() + "' to '" + label + "'.";
-			constraintMsg = "Edge " + target.toShortString() + " should be of class [" + label + "]. Class ["
-					+ target.classId() + "] found instead.";
+			
+			String[] msgs = TextTranslations.getEDGE_CLASS_INCORRECT(target.toShortString(), label, target.classId());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + actionMsg;
 
@@ -448,7 +452,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			debugInfo += "\nCategory: " + category();
 			debugInfo += "\nCategory class: " + errorType;
 			debugInfo += "\nConstraint Specification: " + constraintSpec.toDetailedString();
-			debugInfo += "\nTarget:: " + target.toDetailedString();
+			debugInfo += "\nTarget: " + target.toDetailedString();
 			break;
 		}
 		case EDGE_ID_INCORRECT: {
@@ -460,11 +464,20 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			//TODO test and finish actionmsg
 			Element edge = (Element) args[0];
 			String id = (String) args[1];
-			actionInfo = category() + "Edge " + edge.toShortString() + " should have id [" + id + "]. Id [" + edge.id()
-					+ "] found instead.";
-			detailsInfo = category() + errorName() + "Edge " + edge + " should have id [" + id + "]. Id [" + edge.id()
-					+ "] found instead.";
+			
+			String[] msgs = TextTranslations.getEDGE_ID_INCORRECT(edge.toShortString(), id, edge.id());
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
+			
+			actionInfo = category() +actionMsg;
+			detailsInfo = "\nAction: " + actionMsg;
+			detailsInfo += "\nConstraint: " + constraintMsg;
 
+			debugInfo = "\nAction: " + actionMsg;
+			debugInfo += "\nConstraint: " + constraintMsg;
+			debugInfo += "\nCategory: " + category();
+			debugInfo += "\nCategory class: " + errorType;
+			debugInfo += "\nTarget: " + edge.toDetailedString();
 			break;
 		}
 		case EDGE_RANGE_INCORRECT: {
@@ -475,17 +488,12 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			String toNodeRef = (String) args[3];
 			Integer nEdges = (Integer) args[4];
 			Element constraintSpec = (Element) args[5];
+			
+			String[] msgs = TextTranslations.getEDGE_RANGE_INCORRECT(nEdges, range, edgeLabel, target.toShortString(), toNodeRef);
 
-			if (nEdges < range.getLast())
-				actionMsg = "Add edge '" + edgeLabel + ":' from '" + target.toShortString() + "' to '" + toNodeRef
-						+ "'.";
-			else
-				actionMsg = "Remove edge '" + edgeLabel + ":' from '" + target.toShortString() + "' to '" + toNodeRef
-						+ "'.";
-
-			constraintMsg = "Expected '" + target.toShortString() + "' to have " + range + " out edge(s) to nodes that match '"
-					+ toNodeRef + "' with label '" + edgeLabel + "' but found " + nEdges + "'.";
-
+			actionMsg = msgs[0];
+			constraintMsg = msgs[1];
+			
 			actionInfo = category() + target.toShortString() + ": " + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -512,8 +520,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element element = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
 			String key = (String) args[2];
-			actionMsg = "Add property type '" + key + "' to the system.";
-			constraintMsg = "Unknown property type for property '" + key + "' in '" + element + "'.";
+			String[] msgs = TextTranslations.getPROPERTY_UNKNOWN(key, element.toShortString());
+			actionMsg = msgs[0];		
+			constraintMsg =msgs[1];
+			
 			actionInfo = category() + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
@@ -541,12 +551,12 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			String key = (String) args[2];
 			String requiredType = (String) args[3];
 			String foundType = (String) args[4];
-
-			actionMsg = "Change property type '" + foundType + "' to '" + requiredType + "' in '"
-					+ element.toShortString() + "'.";
 			
-			constraintMsg = "Property '" + key + "' in '" + element.toShortString()
-			+ "' is not of the required type '" + requiredType + "'. Type '" + foundType + "' found instead.";
+			String[] msgs = TextTranslations.getPROPERTY_TYPE_INCORRECT(key,foundType,requiredType,element.toShortString());
+
+			actionMsg = msgs[0];
+			
+			constraintMsg = msgs[1];
 
 			actionInfo = category() + actionMsg;
 
