@@ -46,13 +46,15 @@ public class TextTranslations {
 
 	// NB: for archetype checking msgs, name the static method after the relevant
 	// enum (i.e. SpecificationErrors.java)
+	private static String frOpen = "«";
+	private static String frClose = "»";
 
 	public static String[] getTREE_MULTIPLE_ROOTS(List<String> refs, int nRoots) {
 		String am;// action message
 		String cm;// constraint message
 		if (Language.French()) {
 			//Attendu 1 nœud racine mais trouvé 10. "
-			am = "Attribuez un parent à tous les nœuds <<" + refs +">> sauf un.";
+			am = "Attribuez un parent à tous les nœuds " +Language.oq+ refs +Language.cq+" sauf un.";
 			cm = "Attendu 1 nœud racine mais trouvé "+nRoots+".";
 		} else {// make sure default is English
 			am = "Assign a parent to all but one of " + refs + " nodes.";
@@ -150,11 +152,11 @@ public class TextTranslations {
 		String cm;
 		if (Language.French()) {
 			if (nChildren < range.getLast())
-				am = "Ajouter le nœud <<" + childClassName + ":>> à <<" + target.toShortString() + ">>.";
+				am = "Ajouter le nœud «" + childClassName + ":» à «" + target.toShortString() + "».";
 			else
-				am = "Supprimer le nœud <<" + childClassName + ":>> de <<" + target.toShortString() + ">>.";
-			cm = "Nœuds enfants " + range + " attendus avec la référence <<" + childClassName + ">>  du parent <<"
-					+ target.toShortString() + ">> mais trouvé " + nChildren + ".";
+				am = "Supprimer le nœud «" + childClassName + ":» de «" + target.toShortString() + "».";
+			cm = "Nœuds enfants " + range + " attendus avec la référence «" + childClassName + "»  du parent «"
+					+ target.toShortString() + "» mais trouvé " + nChildren + ".";
 		} else {
 			if (nChildren < range.getLast())
 				am = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
@@ -167,19 +169,6 @@ public class TextTranslations {
 		return result;
 	};
 
-	public static String[] getXXX() {
-		String am;
-		String cm;
-		if (Language.French()) {
-			am = "";
-			cm = "";
-		} else {
-			am = "";
-			cm = "";
-		}
-		String[] result = { am, cm };
-		return result;
-	}
 
 	public static String[] getEDGE_CLASS_UNKNOWN(String klass, String element) {
 		// TODO: we need the factory name
