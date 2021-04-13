@@ -212,9 +212,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 				NodeSpec child = (NodeSpec) tn;
 				StringTable parentList = (StringTable) child.properties().getPropertyValue(aaHasParent);
 				for (int i = 0; i < parentList.size(); i++) {
-					// NB this is not very good coding - the ":" may appear as dangerous flaw later
-					if (parentList.getWithFlatIndex(i).equals(parentClassName + ":"))
-						result.add(child);
+					String s = parentList.getWithFlatIndex(i);
+					if (s!=null)
+						// NB this is not very good coding - the ":" may appear as dangerous flaw later
+						if (s.equals(parentClassName + ":"))
+							result.add(child);
 				}
 			}
 		return result;
