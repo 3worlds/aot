@@ -309,7 +309,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			/*-actionMsg, constraintMsg,item,queryNameStr,queryNode*/
 			Element edge = (Element) args[0];
 			String queryClass = (String) args[1];
-			Element constraintSpec = (Element) args[1];
+			Element constraintSpec = (Element) args[2];
 			actionInfo = category() + edge.toShortString() + ": " + actionMsg;
 
 			detailsInfo = "\nAction: " + actionMsg;
