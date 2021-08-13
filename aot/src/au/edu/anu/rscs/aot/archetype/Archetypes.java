@@ -678,8 +678,26 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					Property prop = nprops.getProperty(key);
 					Object pvalue = prop.getValue();
 					String ptype = null;
-					if (pvalue != null)
+					if (pvalue != null) {
 						ptype = ValidPropertyTypes.typeOf(pvalue);
+						// JG 13/8/2021 hack for properties represented by a superclass (usually, an interface
+						// - case of the geometric classes in uit
+						if (ptype==null) {
+							Class<?>[] interfaces = pvalue.getClass().getInterfaces();
+							for (Class<?> ic:interfaces) {
+								if (ValidPropertyTypes.isValid(ic.getName()))
+									ptype = ic.getName();
+							}
+							if (ptype==null) {// Last chance!
+								interfaces = pvalue.getClass().getSuperclass().getInterfaces();
+								for (Class<?> ic:interfaces) {
+									if (ValidPropertyTypes.isValid(ic.getName()))
+										ptype = ic.getName();
+								}
+							}
+						}
+						// end hack
+					}
 					if (ptype == null) { // the property type is not in the valid property type list
 //						Exception e = new AotException(
 //								"Unknown property type for property '" + key + "' in element " + element);
