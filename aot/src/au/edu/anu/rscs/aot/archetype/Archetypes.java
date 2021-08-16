@@ -685,14 +685,14 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						if (ptype==null) {
 							Class<?>[] interfaces = pvalue.getClass().getInterfaces();
 							for (Class<?> ic:interfaces) {
-								if (ValidPropertyTypes.isValid(ic.getName()))
-									ptype = ic.getName();
+								if (ValidPropertyTypes.isValid(ic.getSimpleName()))
+									ptype = ic.getSimpleName();
 							}
 							if (ptype==null) {// Last chance!
 								interfaces = pvalue.getClass().getSuperclass().getInterfaces();
 								for (Class<?> ic:interfaces) {
-									if (ValidPropertyTypes.isValid(ic.getName()))
-										ptype = ic.getName();
+									if (ValidPropertyTypes.isValid(ic.getSimpleName()))
+										ptype = ic.getSimpleName();
 								}
 							}
 						}
