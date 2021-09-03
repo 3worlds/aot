@@ -46,8 +46,8 @@ public class TextTranslations {
 
 	// NB: for archetype checking msgs, name the static method after the relevant
 	// enum (i.e. SpecificationErrors.java)
-	private static String frOpen = "«";
-	private static String frClose = "»";
+//	private static String frOpen = "«";
+//	private static String frClose = "»";
 
 	public static String[] getTREE_MULTIPLE_ROOTS(List<String> refs, int nRoots) {
 		String am;// action message
