@@ -32,7 +32,7 @@
 	<dependencies>
 		<dependency org="fr.ens.biologie" name="generics" rev="[0.3.0,)"/>
 		<dependency org="au.edu.anu.rscs.aot" name="omugi" rev="[0.5.0,)"/>
-		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.1.4,)"/>
+		<dependency org="au.edu.anu.rscs.aot" name="qgraph" rev="[0.2.0,)"/>
 	</dependencies>
 
 </ivy-module>
