@@ -32,6 +32,7 @@ package au.edu.anu.rscs.aot;
 import fr.cnrs.iees.graph.Node;
 
 /**
+ * The class to use for exceptions occurring within the aot library
  * 
  * @author Shayne Flint - veery long ago
  *

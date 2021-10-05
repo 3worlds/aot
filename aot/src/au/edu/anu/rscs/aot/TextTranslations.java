@@ -27,81 +27,114 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-
 package au.edu.anu.rscs.aot;
 
 import java.util.List;
 
-import au.edu.anu.omhtk.Language;
+import static au.edu.anu.omhtk.Language.*;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.Element;
 
 /**
- * @author Ian Davies
- *
- * @date 14 Mar. 2021
+ * <p>Error messages to use with specification archetypes. All methods are static and return an array of
+ * two messages, an <em>action</em> message and a <em>constraint</em> message. The former explains
+ * what should be done to fix the problem while the latter gives the cause of the problem.</p>
+ * <p>Supports various languages (cf. {@link au.edu.anu.omhtk.Language Language}). <small>[Well, currently only English and French are supported. Translations to other languages
+ * welcome]</small></p>
+ * 
+ * @author Ian Davies - 14 Mar. 2021
  */
 public class TextTranslations {
 
 	// NB: for archetype checking msgs, name the static method after the relevant
 	// enum (i.e. SpecificationErrors.java)
-//	private static String frOpen = "«";
-//	private static String frClose = "»";
 
+	/**
+	 * Error message: a tree has multiple roots.
+	 * @param refs the list of tree nodes without a parent (= the multiple roots)
+	 * @param nRoots number of tree root nodes found
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getTREE_MULTIPLE_ROOTS(List<String> refs, int nRoots) {
 		String am;// action message
 		String cm;// constraint message
-		if (Language.French()) {
-			//Attendu 1 nœud racine mais trouvé 10. "
-			am = "Attribuez un parent à tous les nœuds " +Language.oq+ refs +Language.cq+" sauf un.";
-			cm = "Attendu 1 nœud racine mais trouvé "+nRoots+".";
+		if (French()) {
+			am = "Attribuer un parent à tous les nœuds " +oq+ refs +cq+" sauf un.";
+			cm = "1 nœud racine attendu, mais "+nRoots+" trouvés.";
 		} else {// make sure default is English
-			am = "Assign a parent to all but one of " + refs + " nodes.";
+			am = "Assign a parent to all but one of " +oq+ refs +cq+ " nodes.";
 			cm = "Expected 1 root node but found " + nRoots + ".";
 		}
 		String[] result = { am, cm };
 		return result;
 	}
 
+	/**
+	 * Error message: property class is unknown.
+	 * @param propertyKey the property name
+	 * @param spec the node holding the properties
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getQUERY_PROPERTY_CLASS_UNKNOWN(String propertyKey, String spec) {
 		String am;
 		String cm;
-		if (Language.French()) {
-			am = "Correct the property class for '" + propertyKey + "' property in '" + spec + "'.";
-			cm = "Cannot get class for archetype check property '" + spec + "'.";
+		if (French()) {
+			am = "Corriger la classe de la propriété " +oq+propertyKey+cq+ " du nœud " +oq+spec+cq+ ".";
+			cm = "Classe de la propriété " +oq+ spec +cq+ " inconnue.";
 		} else {
-			am = "Correct the property class for '" + propertyKey + "' property in '" + spec + "'.";
-			cm = "Cannot get class for archetype check property '" + spec + "'.";
+			am = "Correct the property class for " +oq+ propertyKey +cq+ " property in " +oq+ spec +cq+ ".";
+			cm = "Cannot get class for archetype check property " +oq+ spec +cq+ "'.";
 		}
-
 		String[] result = { am, cm };
 		return result;
 	}
 
+	/**
+	 * Error message: graph element lacks property list
+	 * @param element the element
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getELEMENT_MISSING_PROPERTY_LIST(String element) {
 		String am;
 		String cm;
-		if (Language.French()) {
-			am = "Add a property list.";
-			cm = "Expected '" + element + "' to contain a property list but found none.";
+		if (French()) {
+			am = "Ajouter une liste de propriétés.";
+			cm = "L'élément " +oq+ element +cq+ " devrait avoir une liste de propriétés.";
 		} else {
 			am = "Add a property list.";
-			cm = "Expected '" + element + "' to contain a property list but found none.";
+			cm = "Expected " +oq+ element +cq+ " to contain a property list but found none.";
 		}
 		String[] result = { am, cm };
 		return result;
 	}
 
+	/**
+	 * Error message: nodes without specification found in an exclusive archetype
+	 * @param nMissing number of nodes without matching specification
+	 * @param elementNames identifiers of all nodes without matching specification
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getNODE_MISSING_SPECIFICATION(int nMissing, List<String> elementNames) {
 		String am;
 		String cm;
-		if (Language.French()) {
-			am = "Add " + nMissing + " specifications.";
-			cm = "Expected all nodes to have matching specifications. Found " + nMissing + " which did not comply "
+		if (French()) {
+			if (nMissing==1) {
+				am = "Rajouter " + nMissing + " spécification.";
+				cm = "Tous les nœuds devraient correspondre à une spécification, mais " + nMissing + " n'en a pas : "
+						+ elementNames + ".";
+			}
+			else {
+				am = "Rajouter " + nMissing + " spécifications.";
+				cm = "Tous les nœuds devraient correspondre à une spécification, mais " + nMissing + " n'en ont pas : "
 					+ elementNames + ".";
-		} else {
-			am = "Add " + nMissing + " specifications.";
+			}
+		} 
+		else {
+			if (nMissing==1)
+				am = "Add " + nMissing + " specification.";
+			else
+				am = "Add " + nMissing + " specifications.";
 			cm = "Expected all nodes to have matching specifications. Found " + nMissing + " which did not comply "
 					+ elementNames + ".";
 		}
@@ -109,61 +142,83 @@ public class TextTranslations {
 		return result;
 	}
 
+	/**
+	 * Error message: missing property
+	 * @param propertyKey the property name
+	 * @param element the element lacking the property
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getPROPERTY_MISSING(String propertyKey, String element) {
 		String am;
 		String cm;
-		if (Language.French()) {
-			am = "Add '" + propertyKey + "' property to '" + element + "'.";
-			cm = "Expected property '" + propertyKey + "' in " + element + "'.";
+		if (French()) {
+			am = "Rajouter la propriété " +oq+ propertyKey +cq+ " à l'élément " +oq+ element +cq+ ".";
+			cm = "La propriété " +oq+ propertyKey +cq+ " manque à l'élément " +oq+ element +cq+ ".";
 		} else {
-			am = "Add '" + propertyKey + "' property to '" + element + "'.";
-			cm = "Expected property '" + propertyKey + "' in " + element + "'.";
+			am = "Add " +oq+ propertyKey +cq+ " property to " +oq+ element +cq+ ".";
+			cm = "Expected property " +oq+ propertyKey +cq+  " in " +oq+ element +cq+ ".";
 		}
 		String[] result = { am, cm };
 		return result;
 	}
 
+	/**
+	 * Error message: wrong number of nodes under a parent compared to multiplicity
+	 * @param requiredClass the class of this node
+	 * @param parentList the list of possible parents
+	 * @param range the expected multiplicity
+	 * @param count the effective number of nodes
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getNODE_RANGE_INCORRECT1(String requiredClass, StringTable parentList, IntegerRange range,
 			int count) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			if (count < range.getLast())
-				am = "Add node '" + requiredClass + "' to " + parentList + ".";
+				am = "Rajouter un nœud enfant de type " +oq+ requiredClass +cq+ " à " + parentList + ".";
 			else
-				am = "Remove child node '" + requiredClass + "' from " + parentList + ".";
-			cm = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '" + parentList
-					+ "' but found " + count + ".";
+				am = "Enlever un nœud enfant de type " +oq+ requiredClass +cq+ " à " + parentList + ".";
+			cm = range + " nœuds de type " +oq+ requiredClass +cq+ ", de parents " +oq+ parentList +cq
+					+ " attendus, mais " + count + " trouvés.";
 		} else {
 			if (count < range.getLast())
-				am = "Add node '" + requiredClass + "' to " + parentList + ".";
+				am = "Add node " +oq+ requiredClass +cq+ " to " + parentList + ".";
 			else
-				am = "Remove child node '" + requiredClass + "' from " + parentList + ".";
-			cm = "Expected " + range + " nodes of class '" + requiredClass + "' with parents '" + parentList
-					+ "' but found " + count + ".";
+				am = "Remove child node " +oq+ requiredClass +cq+ " from " + parentList + ".";
+			cm = "Expected " + range + " nodes of class " +oq+ requiredClass +cq+ " with parents " +oq+ parentList +cq
+					+ " but found " + count + ".";
 		}
 		String[] result = { am, cm };
 		return result;
 	}
 
+	/**
+	 * Error message: wrong number of children compared to multiplicity
+	 * @param childClassName the class of child nodes
+	 * @param target the parent node
+	 * @param range the expected multiplicity
+	 * @param nChildren the effective number of children found
+	 * @return action and constraint messages in a {@code String} array
+	 */
 	public static String[] getNODE_RANGE_INCORRECT2(String childClassName, Element target, IntegerRange range,
 			Integer nChildren) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			if (nChildren < range.getLast())
-				am = "Ajouter le nœud «" + childClassName + ":» à «" + target.toShortString() + "».";
+				am = "Ajouter le nœud " +oq+ childClassName +cq+ " à " +oq+ target.toShortString() +cq+ ".";
 			else
-				am = "Supprimer le nœud «" + childClassName + ":» de «" + target.toShortString() + "».";
-			cm = "Nœuds enfants " + range + " attendus avec la référence «" + childClassName + "»  du parent «"
-					+ target.toShortString() + "» mais trouvé " + nChildren + ".";
+				am = "Supprimer le nœud " +oq+ childClassName +cq+ " de " +oq+ target.toShortString() +cq+ ".";
+			cm = range + " nœuds enfants de type " +oq+ childClassName +cq+ ", de parent " +oq
+					+ target.toShortString() +cq+ " attendus, mais " + nChildren + "trouvé(s).";
 		} else {
 			if (nChildren < range.getLast())
-				am = "Add node '" + childClassName + ":' to '" + target.toShortString() + "'.";
+				am = "Add node " +oq+ childClassName +cq+ " to " +oq+ target.toShortString() +cq+ ".";
 			else
-				am = "Delete node '" + childClassName + ":' from '" + target.toShortString() + "'.";
-			cm = "Expected " + range + " child nodes with reference '" + childClassName + "' from parent '"
-					+ target.toShortString() + "' but found " + nChildren + ".";
+				am = "Delete node " +oq+ childClassName +cq+ " from " +oq+ target.toShortString() +cq+ ".";
+			cm = "Expected " + range + " child nodes with reference " +oq+ childClassName +cq+ " from parent " +oq
+					+ target.toShortString() +cq+ " but found " + nChildren + ".";
 		}
 		String[] result = { am, cm };
 		return result;
@@ -174,7 +229,7 @@ public class TextTranslations {
 		// TODO: we need the factory name
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			am = "Add edge class '" + klass + ":' to TwConfigFactory";
 			cm = "Class '" + klass + "' not found for edge " + element + ".";
 		} else {
@@ -188,7 +243,7 @@ public class TextTranslations {
 	public static String[] getEDGE_CLASS_INCORRECT(String element, String klass, String foundClass) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			am = "Change edge class of '" + element + "' to '" + klass + "'.";
 			cm = "Edge " + element + " should be of class [" + klass + "]. Class [" + foundClass + "] found instead.";
 		} else {
@@ -202,7 +257,7 @@ public class TextTranslations {
 	public static String[] getEDGE_ID_INCORRECT(String targetName, String requiredId, String foundId) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			am = "Expected '" + targetName + "' to have id '" + requiredId + "' but found '" + foundId + "'.";
 			cm = "Expected '" + targetName + "' to have id '" + requiredId + "' but found '" + foundId + "'.";
 		} else {
@@ -217,7 +272,7 @@ public class TextTranslations {
 			String toNodeRef) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			if (nEdges < range.getLast())
 				am = "Add edge '" + edgeLabel + ":' from '" + edgeName + "' to '" + toNodeRef + "'.";
 			else
@@ -239,7 +294,7 @@ public class TextTranslations {
 	public static String[] getPROPERTY_UNKNOWN(String propertyKey, String element) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			am = "Add property type '" + propertyKey + "' to the system.";
 			cm = "Unknown property type for property '" + propertyKey + "' in '" + element + "'.";
 		} else {
@@ -254,7 +309,7 @@ public class TextTranslations {
 			String element) {
 		String am;
 		String cm;
-		if (Language.French()) {
+		if (French()) {
 			am = "Change property type '" + foundType + "' to '" + requiredType + "' in '" + element + "'.";
 			cm = "Expected property '" + propertyKey + "' in '" + element + "' to have type '" + requiredType
 					+ "' but found '" + foundType + "'.";
