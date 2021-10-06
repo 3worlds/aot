@@ -36,6 +36,7 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
+ * A Node specification. Nodes of a specification represent entities of the target system.
  * 
  * @author Jacques Gignoux - 7 mars 2019
  *

@@ -36,8 +36,10 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
+ * Specification for a constraint to apply on a node, edge or property. Constraints are implemented
+ * as queries from the <strong>qgraph</strong> library (class {@code Queryable}).
  * 
- * @author gignoux 20/3/2019
+ * @author Jacques Gignoux -  20/3/2019
  *
  */
 public class ConstraintSpec extends SimpleDataTreeNode {

@@ -30,14 +30,27 @@
 
 package au.edu.anu.rscs.aot.errorMessaging;
 
-
 /**
- * Author Ian Davies
- *
- * Date Dec 12, 2018
+ * Listener to error messages.
+ * 
+ * @author Ian Davies - Dec 12, 2018
  */
 public interface ErrorListListener {
+	
+	/**
+	 * Action undertaken on error message reception
+	 * @param msg the error message
+	 */
 	public void onReceiveMsg(ErrorMessagable msg);
+	
+	/**
+	 * Action undertaken at the start of listening
+	 */
 	public void onStartCheck();
+	
+	/**
+	 * Action undertaken at the end of listening
+	 * @param valid {@code true} if no error was found
+	 */
 	public void onEndCheck(boolean valid);
 }

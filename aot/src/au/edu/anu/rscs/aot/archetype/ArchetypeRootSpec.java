@@ -36,8 +36,9 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
+ * Specification of the root of an archetype. An archetype is a tree, and as such must have a root.
  * 
- * @author gignoux 20/3/2019
+ * @author Jacques Gignoux -  20/3/2019
  *
  */
 public class ArchetypeRootSpec extends SimpleDataTreeNode {

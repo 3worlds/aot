@@ -28,26 +28,64 @@
  *                                                                        *
  **************************************************************************/
 package au.edu.anu.rscs.aot.archetype;
+
 /**
- * @author Ian Davies
- *
- * @date 8 Aug 2019
+ * <p>Definition of the vocabulary used in the <em>archetype for archetypes</em>.</p>
+ * 
+ * <p>This interface only contains static constant fields.</p>
+ * <p>CAUTION: changing anything here will trash the whole aot checking procedure.</p>
+ * 
+ * @author Ian Davies - 8 Aug 2019
  */
-// prefixed with 'aa' (Archetype Archetype - TODO could convert to enum (but don't really need the class field)
+// prefixed with 'aa' (Archetype Archetype - TODO could convert to enum (but don't really 
+// need the class field)
 public interface ArchetypeArchetypeConstants {
-	public static final String aaIsOfClass = "isOfClass";
-	public static final String aaMultiplicity = "multiplicity";
-	public static final String aaHasParent = "hasParent";
-	public static final String aaHasEdge = "hasEdge";
-	public static final String aaHasNode ="hasNode" ;
-	public static final String aaHasProperty = "hasProperty";
-	public static final String aaMustSatisfyQuery = "mustSatisfyQuery";
-	public static final String aaHasName = "hasName";
-	public static final String aaClassName = "className";
-	public final static String aaToNode = "toNode";
-	public final static String aaHasId = "hasId";
-	public final static String aaType = "type";
-
 	
-
+	/** requirement for the class of a graph element or property - 
+	 * matches the {@code isOfClass} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaIsOfClass = "isOfClass";
+	
+	/** requirement for the multiplicity of a graph element or property - 
+	 * matches the {@code multiplicity} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaMultiplicity = "multiplicity";
+	
+	/** requirement of possible parents for a node - 
+	 * matches the {@code hasParent} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaHasParent = "hasParent";
+	
+	/** requirement for an edge - 
+	 * matches the {@code hasEdge} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaHasEdge = "hasEdge";
+	
+	/** requirement for a Node - 
+	 * matches the {@code hasNode} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaHasNode ="hasNode" ;
+	
+	/** requirement for a property - 
+	 * matches the {@code hasProperty} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaHasProperty = "hasProperty";
+	
+	/** requirement for a graph element or property to satisfy a query - 
+	 * matches the {@code mustSatisfyQuery} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaMustSatisfyQuery = "mustSatisfyQuery";
+	
+	/** requirement for a property to have a particular name - 
+	 * matches the {@code hasName} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaHasName = "hasName";
+	
+	/** requirement for a query to be of a particular class - 
+	 * matches the {@code className} keyword in the <em>archetype for archetypes</em> */
+	public static final String aaClassName = "className";
+	
+	/** requirement for the end node of an edge - 
+	 * matches the {@code toNode} keyword in the <em>archetype for archetypes</em> */
+	public final static String aaToNode = "toNode";
+	
+	/** requirement for a graph element to have a particular identifier - 
+	 * matches the {@code hasId} keyword in the <em>archetype for archetypes</em> */
+	public final static String aaHasId = "hasId";
+	
+	/** requirement for a property to be of a certain type - 
+	 * matches the {@code type} keyword in the <em>archetype for archetypes</em> */
+	public final static String aaType = "type";
 }

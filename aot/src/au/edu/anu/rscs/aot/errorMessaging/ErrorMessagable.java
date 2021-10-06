@@ -31,55 +31,59 @@
 package au.edu.anu.rscs.aot.errorMessaging;
 
 /**
- * Message purpose: These messages inform the user as to what steps to take to
- * get a model constructed and running. I think it is no exaggeration to say
- * that the success of tw, measured as uptake, depends largely on how easy these
+ * <p>An interface to manage error messages in a user-friendly way.</p>
+ * 
+ * <p>Purpose: these messages inform the user as to what steps to take to
+ * get a possibly complex specification valid. I think it is no exaggeration to say
+ * that the success of AOT, measured as uptake, depends largely on how easy these
  * messages are to interpret. But there are contexts and its a problem to write
- * msg at a low level that have meaning as they bubble up to new contexts. So
- * for any error these is the error and action.
+ * a message at a low level that have meaning as they bubble up to new contexts. So:
+ * </p>
  * 
- * Faced with a Graph: 3Worlds:projec1->DataDefinition:dataDef1, it seems better
- * to say:
+ * <ol>
+ * <li>for any error there is the error description and action to undertake to fix it, 
+ * hence two messages;</li>
+ * <li>the error context can be described by increasing message verbosity.</li>
+ * </ol>
  * 
- * "Add 'dataDefinition' node to '3worlds.prjt1'"
+ * <ul>
+ * <li>The lowest verbosity ('brief') just returns the action message</li>
+ * <li>The intermediate verbosity ('detailed') adds to it the error message</li>
+ * <li>The highest verbosity ('debug') adds to it context information</li> 
+ * </ul>
  * 
- * instead of:
- * 
- * "Expected 1..* children of class 'dataDefinition' for parents of{ 3worlds}"
- * 
- * So aims are: Have all msg strings in one place rather than dist. over many
- * classes.
- * 
- * Allow modification / addition of messages in new context.
- * 
- * Allow different levels of detail (verbosity) so ultimately everything can be
- * examined but also you can choose not to be overwhelmed with detail.
- */
-
-/**
- * @author Ian Davies
- *
- * @date 30 Nov 2019
+ * @author Ian Davies - 30 Nov 2019
  */
 public interface ErrorMessagable {
-	/* Brief description */
+	
+	/**
+	 * Brief description of the error
+	 * @return the action message
+	 */
 	public String actionInfo();
 
-	/* Detailed description */
+	/**
+	 * Detailed description of the error
+	 * @return the action message + error message
+	 */
 	public String detailsInfo();
 	
+	/**
+	 * Debugging information about the error
+	 * @return the action message + error message + context information
+	 */
 	public String debugInfo();
 
-	/*
-	 * Allows some way of organizing msgs in some category order. Best used as a
-	 * prefix to all verbose1/2 strings
+	/**
+	 * Allows some way of organizing messages in some category order. Best used as a
+	 * prefix to all verbose1/2 strings.
 	 */
 	public String category();
 
-	/*
-	 * Largely for debugging. Some string that indicates exactly the type of msg.
+	/**
+	 * Largely for debugging. Some string that indicates exactly the type of message.
 	 * For example implementations may use enums and so the type could be the
-	 * enum.name(). Additionl prefix to verbose2 strings
+	 * enum.name(). Additional prefix to verbose2 strings.
 	 */
 	public String errorName();
 	

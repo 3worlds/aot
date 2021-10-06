@@ -36,8 +36,10 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
+ * An Edge specification. Edges in a specification represent relations between entities of the
+ * target system.
  * 
- * @author gignoux 20/3/2019
+ * @author Jacques Gignoux - 20/3/2019
  *
  */
 public class EdgeSpec extends SimpleDataTreeNode {

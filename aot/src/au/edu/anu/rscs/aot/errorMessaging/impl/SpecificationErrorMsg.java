@@ -43,25 +43,10 @@ import fr.cnrs.iees.graph.Tree;
 import fr.cnrs.iees.graph.TreeNode;
 
 /**
- * A class to store error messages from archetype checks.
+ * <p>A class to store error messages from archetype checks.</p>
  * 
- * A class to store all available data for message text construction. Generally
- * messages are either brief or verbose. Brief means the elements noted as
- * classId:id pairs. Verbose is "Brief" plus the detailed String of Elements.
- * 
- * NOTE: Ian, feel free to adapt this class to your needs by putting in any
- * useful information for user feedback. These messages are created by
- * Archetypes.check(...) methods.
- * 
- * Ok
- * 
- * @author Jacques Gignoux - 6 mai 2019
- *
- */
-/**
- * @author Ian Davies
- *
- * @date 30 Nov 2019
+ * @author designed by Jacques Gignoux - 6 mai 2019
+ * @author made useful by Ian Davies - 30 Nov 2019
  */
 public class SpecificationErrorMsg implements ErrorMessagable {
 
@@ -82,9 +67,11 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	private String debugInfo;
 
 	/**
-	 * @param errorType
-	 * @param exception
-	 * @param args
+	 * 
+	 * @param errorType the type of error
+	 * @param actionMsg the action message as produced by {@link au.edu.anu.rscs.aot.TextTranslations TextTranslations} methods
+	 * @param constraintMsg the constraint message as produced by {@link au.edu.anu.rscs.aot.TextTranslations TextTranslations} methods
+	 * @param args context-specific information on the error
 	 */
 	public SpecificationErrorMsg(SpecificationErrors errorType, String actionMsg, String constraintMsg,
 			Object... args) {
@@ -95,10 +82,18 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		buildDescriptions();
 	}
 
+	/**
+	 * Getter for context-specific arguments.
+	 * @return
+	 */
 	public Object[] args() {
 		return args;
 	}
 
+	/**
+	 * Getter for error type.
+	 * @return
+	 */
 	public SpecificationErrors errorType() {
 		return errorType;
 	}
@@ -406,8 +401,9 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element target = (Element) args[0];
 			Element constraintSpec = (Element) args[1];
 			String label = (String) args[2];
+			String factoryName = (String) args[3];
 			
-			String[] msgs = TextTranslations.getEDGE_CLASS_UNKNOWN(label, target.toShortString());
+			String[] msgs = TextTranslations.getEDGE_CLASS_UNKNOWN(label, target.toShortString(), factoryName);
 			actionMsg = msgs[0];
 			constraintMsg = msgs[1];
 			
@@ -606,6 +602,10 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		return "[" + errorType.category() + "] ";
 	}
 
+	/**
+	 * Another getter for error type. Why?
+	 * @return
+	 */
 	public SpecificationErrors error() {
 		return errorType;
 	}

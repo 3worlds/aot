@@ -34,35 +34,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Author Ian Davies
- *
- * Date Dec 12, 2018
+ * Error message sender. Sends messages to any number of {@link ErrorListListener}s.
+ * 
+ * @author Ian Davies - 12, 2018
  */
 public class ErrorMessageManager {
+	
 	private static List<ErrorListListener> listeners = new ArrayList<>();
 
 	private static boolean haveErrors;
 
+	/**
+	 * 
+	 * @return {@code true} if any error was found
+	 */
 	public static boolean haveErrors() {
 		return haveErrors;
 	}
 
+	/**
+	 * Send an error message to all its listeners.
+	 * 
+	 * @param msg the message to send
+	 */
 	public static void dispatch(ErrorMessagable msg) {
 		haveErrors = true;
 		for (ErrorListListener listener : listeners)
 			listener.onReceiveMsg(msg);
 	}
 
+	/**
+	 * Initialise all listeners
+	 */
 	public static void startCheck() {
 		haveErrors = false;
 		for (ErrorListListener listener : listeners)
 			listener.onStartCheck();
 	}
 
+	/**
+	 * Add a listener to send messages to.
+	 * @param listener
+	 */
 	public static void addListener(ErrorListListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * Stops error sending operations.
+	 */
 	public static void endCheck() {
 		for (ErrorListListener listener : listeners)
 			listener.onEndCheck(!haveErrors);

@@ -36,8 +36,9 @@ import fr.cnrs.iees.properties.SimplePropertyList;
 import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 
 /**
+ * A property specification. Properties are values attached to nodes or edges of the target system.
  * 
- * @author gignoux 20/3/2019
+ * @author Jacques Gignoux - 20/3/2019
  *
  */
 public class PropertySpec extends SimpleDataTreeNode {

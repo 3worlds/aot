@@ -68,6 +68,8 @@ import static au.edu.anu.rscs.aot.queries.base.SequenceQuery.*;
 import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
 
 /**
+ * <p>Checks that a set of <em>specifications</em> complies with the set of rules and constraints 
+ * grouped in an <em>archetype</em>.</p>
  * <p>
  * This code was initially developed by Shayne Flint as the core of
  * Aspect-Oriented Thinking (AOT) and has been deeply refactored by J. Gignoux.
@@ -82,18 +84,13 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  * i.e. complies with the requirements needed to call a graph an archetype.
  * </p>
  * <p>
- * There are two sets of methods here: the <em>check(...)</em> methods perform
- * the checks and capture all errors (as exceptions) in a list. the
- * <em>complies(...)</em> methods perform a check and return false if an
- * Exception was found during the checking process.
- * </p>
- * <p>
- * Afer a call to {@linkplain check()}, {@link checkList()} may be called to
+ * Afer a call to any of the {@code check(...)} methods, 
+ * {@link Archetypes#errorList() errorList()} may be called to
  * retrieve all checking errors.
  * </p>
  * <p>
- * NB: an archetype is a {@linkplain Tree}, but a configuration/specification
- * graph is a {@linkplain TreeGraph}.
+ * NB: an archetype is a {@link Tree}, but a configuration/specification
+ * graph is a {@link TreeGraph}.
  * </p>
  * <p>
  * NOTE: by default this class spits a lot of log messages. These are logged at
@@ -124,9 +121,9 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 
 	/**
 	 * checks that an archetype is an archetype (= check it against
-	 * archetypeArchetype)
+	 * the <em>archetype for archetypes</em>)
 	 *
-	 * @param archetype the archetype to check
+	 * @param graphToCheck the archetype to check
 	 */
 	public void checkArchetype(Tree<? extends TreeNode> graphToCheck) {
 		if (archetypeArchetype != null)
@@ -471,7 +468,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					if (ed.factory().edgeClass(ed.classId()) == null) {
 						checkFailList.add(
 							new SpecificationErrorMsg(SpecificationErrors.EDGE_CLASS_UNKNOWN,null, null, ed,
-							edgeSpec, edgeLabel));
+							edgeSpec, edgeLabel, ed.factory().toString()));
 					}
 					if (NodeReference.matchesRef((TreeNode) ed.endNode(), toNodeRef)
 							&& NodeReference.matchesRef((TreeNode) ed.startNode(), fromNodeRef)
@@ -488,10 +485,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						// check edge id
 						if (edgeId != null)
 							if (!ed.id().equals(edgeId)) {
-								String msg = "Edge " + ed + " should have id [" + edgeId + "]. Id [" + ed.id()
-									+ "] found instead.";
+//								String msg = "Edge " + ed + " should have id [" + edgeId + "]. Id [" + ed.id()
+//									+ "] found instead."; // not used in method
 								checkFailList.add(
-									new SpecificationErrorMsg(SpecificationErrors.EDGE_ID_INCORRECT,null, msg,
+//									new SpecificationErrorMsg(SpecificationErrors.EDGE_ID_INCORRECT,null, msg,
+									new SpecificationErrorMsg(SpecificationErrors.EDGE_ID_INCORRECT,null, null,
 									ed, edgeId));
 								ok = false;
 							}
@@ -660,6 +658,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	}
 
 	// temporary, for debugging
+	@Override
 	public String toString() {
 		return archetypeArchetype.toString();
 	}

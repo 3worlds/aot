@@ -27,14 +27,12 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-
 package au.edu.anu.rscs.aot.errorMessaging.impl;
 
-
 /**
- * @author Ian Davies
- *
- * @date 30 Nov 2019
+ * Type of errors encountered when checking a specification against an archetype.
+ * 
+ * @author Ian Davies - 30 Nov 2019
  */
 public enum SpecificationErrors {
 	QUERY_PROPERTY_CLASS_UNKNOWN/* */("Archetype"), // 
@@ -47,6 +45,7 @@ public enum SpecificationErrors {
 	EDGE_QUERY_UNSATISFIED/*       */("Edge"), //
 	EDGE_RANGE_INCORRECT/*         */("Edge"), //
 	EDGE_CLASS_UNKNOWN/*           */("Edge"), //
+	/** Aren't they all self-explained?*/
 	EDGE_CLASS_INCORRECT/*         */("Edge"), //
 	EDGE_ID_INCORRECT/*            */("Edge"), // 
 	PROPERTY_QUERY_UNSATISFIED/*   */("Property"), //
