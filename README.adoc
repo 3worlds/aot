@@ -1,0 +1,26 @@
+= The AOT library
+
+**A**spect-**O**riented **T**hinking - classes for software specification and generation.
+
+Aspect-oriented thinking (Flint, 2006), aka AOT, relies on formal _specification archetypes_ to register the rules used to assemble elements from specific domains of knowledge to form specifications for systems with a clearly defined specific purpose. If these rules are followed, the resulting specification will have precise meaning and can be used to generate an operational system (e.g. some specialised piece of software).
+
+AOT specification archetypes comprise a set of constraints (rules) for bringing together concepts from widely differing domains of knowledge, to form specifications.
+
+These specifications are not generic - they specify systems of a specific type. The meaning of these specifications is understood by special purpose tools that translate or interpret these specifications into real systems, simulations etc. That is, these tools can _only_ process specifications that comply with a specific archetype.
+
+This library contains:
+
+* the archetype for archetypes, i.e. how an archetype to specify anything should be written;
+* classes to load an archetype and check it against the archetype for archetypes, to make sure it is a valid archetype;
+* classes to load a specification file and check it against an archetype it is supposed to comply to.
+
+Archetypes are implemented as `Trees` (cf. the *omugi* library) and specifications are implemented as `TreeGraphs`.
+
+
+See the link:https://3worlds.github.io/aot/aot/javadoc/index.html[javadoc]
+
+Depends on: https://github.com/3worlds/omhtk[omhtk], https://github.com/3worlds/omugi[omugi], https://github.com/3worlds/qgraph[qgraph]
+
+*Reference:*
+
+Flint SR (2006) __Aspect-Oriented Thinking - An approach to bridging the disciplinary divides__. PhD, Australian National University, Canberra, Australia
