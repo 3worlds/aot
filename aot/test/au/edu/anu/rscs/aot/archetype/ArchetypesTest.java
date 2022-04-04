@@ -44,7 +44,7 @@ class ArchetypesTest {
 	@Test
 	void testArchetypes() {
 		Archetypes arch = new Archetypes();
-		System.out.println(arch.toString());
+//		System.out.println(arch.toString());
 		assertNotNull(arch);		
 	}
 
@@ -61,15 +61,15 @@ class ArchetypesTest {
 		Tree<? extends TreeNode> graph  = (Tree<? extends TreeNode>) fi.getGraph();
 		arch.checkArchetype(graph);
 		String indent = "";
-		printTree(graph.root(),indent);
+//		printTree(graph.root(),indent);
 		Iterable<ErrorMessagable> errors = arch.errorList();
 		if (errors!=null) {
-			System.out.println("There were errors in specifications: ");
-			for (ErrorMessagable m:errors)
-				System.out.println(m.toString()+"\n");
+//			System.out.println("There were errors in specifications: ");
+//			for (ErrorMessagable m:errors)
+//				System.out.println(m.toString()+"\n");
 		}
 		else 
-			System.out.println("Specifications checked with no error.");
+//			System.out.println("Specifications checked with no error.");
 		assertNull(errors);
 	}
 	
