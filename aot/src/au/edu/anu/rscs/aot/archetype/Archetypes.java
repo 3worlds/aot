@@ -562,6 +562,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
 			String key = null;
+			System.out.println("HEY!");
 			if (pprops.hasProperty(aaHasName))
 				key = (String) pprops.getPropertyValue(aaHasName);
 			else { // this is an error, a property must have a name
