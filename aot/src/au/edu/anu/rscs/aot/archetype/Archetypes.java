@@ -565,6 +565,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, null, element,
 					propertyArchetype, aaHasName));
 			}
+			if (key.equals("interval"))
+				System.out.println(pprops);
 			// property spec type
 			String typeName = null;
 			if (pprops.hasProperty(aaType))
