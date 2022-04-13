@@ -540,8 +540,20 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 //					+ "' referenced by [" + ref + "] (found " + otherInCount + ")", node);
 	}
 
+	private static void showElementProperties(Object element) {
+		if (element instanceof ReadOnlyDataHolder) {
+			ReadOnlyPropertyList props = ((ReadOnlyDataHolder) element).properties();
+			if (props.hasProperty("interval")) {
+				Object value = props.getPropertyValue("interval");
+				if (value ==null) {
+					System.out.println(element.getClass().getSimpleName()+ "Properties: "+props);
+				}
+			}
+		}
+	}
 	@SuppressWarnings("unchecked")
 	private void checkNodeProperties(Object element, NodeSpec hasNode) {
+		showElementProperties(element);
 		// get the 'hasProperty' label from the archetype factory
 		String pLabel = hasNode.factory().nodeClassName(PropertySpec.class);
 		List<PropertySpec> lp = (List<PropertySpec>) get(hasNode, children(), selectZeroOrMany(hasTheLabel(pLabel)));
@@ -550,6 +562,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 
 	@SuppressWarnings("unchecked")
 	private void checkEdgeProperties(Object element, EdgeSpec hasEdge) {
+		showElementProperties(element);
 		// get the 'hasProperty' label from the archetype factory
 		String pLabel = hasEdge.factory().nodeClassName(PropertySpec.class);
 		List<PropertySpec> lp = (List<PropertySpec>) get(hasEdge, children(), selectZeroOrMany(hasTheLabel(pLabel)));
@@ -569,14 +582,14 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, null, element,
 					propertyArchetype, aaHasName));
 			}
-			if (key.equals("interval"))
-				System.out.println(pprops);
+//			if (key.equals("interval"))
+//				System.out.println(pprops);
 			// property spec type
 			String typeName = null;
 			if (pprops.hasProperty(aaType)) {
 				typeName = (String) pprops.getPropertyValue(aaType);
-				if (key.equals("interval"))
-					System.out.println(typeName);
+//				if (key.equals("interval"))
+//					System.out.println(typeName);
 			}else { // this is an error, a property must have a name
 				String msg = "'" + aaType + "' property missing for property specification " + propertyArchetype;
 				checkFailList.add(
@@ -587,8 +600,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			IntegerRange multiplicity = new IntegerRange(1, 1);
 			if (pprops.hasProperty(aaMultiplicity)) {
 				multiplicity = (IntegerRange) pprops.getPropertyValue(aaMultiplicity);
-				if (key.equals("interval"))
-					System.out.println(multiplicity);
+//				if (key.equals("interval"))
+//					System.out.println(multiplicity);
 			}else { // this is an error, a property must have a name
 				String msg = "'" + aaMultiplicity + "' property missing for property specification "
 					+ propertyArchetype;
@@ -596,14 +609,15 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, null,msg, element,
 					propertyArchetype, aaMultiplicity));
 			}
-			if (key.equals("interval")) {
-				System.out.println(element.getClass());
-				System.out.println("Is instance of ReadOnlyDataHolder: "+(element instanceof ReadOnlyDataHolder)); 
-			}
+//			if (key.equals("interval")) {
+//				System.out.println(element.getClass());
+//				System.out.println("Is instance of ReadOnlyDataHolder: "+(element instanceof ReadOnlyDataHolder)); 
+//			}
 			if (element instanceof ReadOnlyDataHolder) {
+				// Problem is element has property value for 'key' of null
 				ReadOnlyPropertyList nprops = ((ReadOnlyDataHolder) element).properties();
 				if (!nprops.hasProperty(key)) { // property not found
-					if (key.equals("interval")) System.out.println(key+ " not found branch.");
+//					if (key.equals("interval")) System.out.println(key+ " not found branch.");
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						String msg = "Required property '" + key + "' missing for element " + element;
 						checkFailList.add(
@@ -611,16 +625,16 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							propertyArchetype, key));
 					}
 				} else { // property is here
-					if (key.equals("interval")) System.out.println(key +" found in "+nprops);
+//					if (key.equals("interval")) System.out.println(key +" found in "+nprops);
 					Property prop = nprops.getProperty(key);
-					if (key.equals("interval")) System.out.println("prop :"+prop);
+//					if (key.equals("interval")) System.out.println("prop :"+prop);
 					Object pvalue = prop.getValue();
-					if (key.equals("interval")) System.out.println("pvalue: "+pvalue);
+//					if (key.equals("interval")) System.out.println("pvalue: "+pvalue);
 					String ptype = null;
 					if (pvalue != null) {
-						if (key.equals("interval")) System.out.println("searching for "+pvalue+" in ValidPropertyTypes.");
+//						if (key.equals("interval")) System.out.println("searching for "+pvalue+" in ValidPropertyTypes.");
 						ptype = ValidPropertyTypes.typeOf(pvalue);
-						if (key.equals("interval")) System.out.println("Found:" +ptype);
+//						if (key.equals("interval")) System.out.println("Found:" +ptype);
 						// JG 13/8/2021 hack for properties represented by a superclass (usually, an interface
 						// - case of the geometric classes in uit
 						if (ptype==null) {
@@ -640,7 +654,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						// end hack
 					}
 					if (ptype == null) { // the property type is not in the valid property type list
-						if (key.equals("interval")) System.out.println("the property type is not in the valid property type list");
+//						if (key.equals("interval")) System.out.println("the property type is not in the valid property type list");
 						checkFailList.add(
 							new SpecificationErrorMsg(SpecificationErrors.PROPERTY_UNKNOWN, null,null, element,
 							propertyArchetype, key));
