@@ -562,7 +562,6 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
 			String key = null;
-//			System.out.println("HEY!");
 			if (pprops.hasProperty(aaHasName))
 				key = (String) pprops.getPropertyValue(aaHasName);
 			else { // this is an error, a property must have a name
@@ -570,11 +569,15 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, null, element,
 					propertyArchetype, aaHasName));
 			}
+			if (key.equals("interval"))
+				System.out.println(pprops);
 			// property spec type
 			String typeName = null;
-			if (pprops.hasProperty(aaType))
+			if (pprops.hasProperty(aaType)) {
 				typeName = (String) pprops.getPropertyValue(aaType);
-			else { // this is an error, a property must have a name
+				if (key.equals("interval"))
+					System.out.println(typeName);
+			}else { // this is an error, a property must have a name
 				String msg = "'" + aaType + "' property missing for property specification " + propertyArchetype;
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, msg, element,
@@ -582,18 +585,25 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			}
 			// property spec multiplicity
 			IntegerRange multiplicity = new IntegerRange(1, 1);
-			if (pprops.hasProperty(aaMultiplicity))
+			if (pprops.hasProperty(aaMultiplicity)) {
 				multiplicity = (IntegerRange) pprops.getPropertyValue(aaMultiplicity);
-			else { // this is an error, a property must have a name
+				if (key.equals("interval"))
+					System.out.println(multiplicity);
+			}else { // this is an error, a property must have a name
 				String msg = "'" + aaMultiplicity + "' property missing for property specification "
 					+ propertyArchetype;
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, null,msg, element,
 					propertyArchetype, aaMultiplicity));
 			}
+			if (key.equals("interval")) {
+				System.out.println(element.getClass());
+				System.out.println("Is instance of ReadOnlyDataHolder: "+(element instanceof ReadOnlyDataHolder)); 
+			}
 			if (element instanceof ReadOnlyDataHolder) {
 				ReadOnlyPropertyList nprops = ((ReadOnlyDataHolder) element).properties();
 				if (!nprops.hasProperty(key)) { // property not found
+					if (key.equals("interval")) System.out.println(key+ " not found branch.");
 					if (!multiplicity.inRange(0)) { // this is an error, this property should be there!
 						String msg = "Required property '" + key + "' missing for element " + element;
 						checkFailList.add(
@@ -601,11 +611,16 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							propertyArchetype, key));
 					}
 				} else { // property is here
+					if (key.equals("interval")) System.out.println(key +" found in "+nprops);
 					Property prop = nprops.getProperty(key);
+					if (key.equals("interval")) System.out.println("prop :"+prop);
 					Object pvalue = prop.getValue();
+					if (key.equals("interval")) System.out.println("pvalue: "+pvalue);
 					String ptype = null;
 					if (pvalue != null) {
+						if (key.equals("interval")) System.out.println("searching for "+pvalue+" in ValidPropertyTypes.");
 						ptype = ValidPropertyTypes.typeOf(pvalue);
+						if (key.equals("interval")) System.out.println("Found:" +ptype);
 						// JG 13/8/2021 hack for properties represented by a superclass (usually, an interface
 						// - case of the geometric classes in uit
 						if (ptype==null) {
@@ -625,6 +640,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 						// end hack
 					}
 					if (ptype == null) { // the property type is not in the valid property type list
+						if (key.equals("interval")) System.out.println("the property type is not in the valid property type list");
 						checkFailList.add(
 							new SpecificationErrorMsg(SpecificationErrors.PROPERTY_UNKNOWN, null,null, element,
 							propertyArchetype, key));
