@@ -546,8 +546,10 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			if (props.hasProperty("interval")) {
 				Object value = props.getPropertyValue("interval");
 				if (value ==null) {
-					System.out.println(element.getClass().getSimpleName()+ "Properties: "+props);
-				}
+					System.out.println("?? "+element.getClass().getSimpleName()+ "Properties: "+props);
+				} else
+					System.out.println("OK "+element.getClass().getSimpleName()+ "Properties: "+props);
+
 			}
 		}
 	}
