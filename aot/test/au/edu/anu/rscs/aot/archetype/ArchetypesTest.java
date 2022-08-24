@@ -48,7 +48,7 @@ class ArchetypesTest {
 		assertNotNull(arch);		
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	@Test
 	void testCheckArchetype() {
 		Archetypes arch = new Archetypes();
@@ -73,6 +73,7 @@ class ArchetypesTest {
 		assertNull(errors);
 	}
 	
+	@SuppressWarnings("unused")
 	private void printTree(TreeNode parent,String indent) {
 		if (parent.getParent()!=null)
 			System.out.println(indent+parent.getParent().id()+"->"+parent.classId()+":"+parent.id());
