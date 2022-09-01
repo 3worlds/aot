@@ -37,6 +37,7 @@ import fr.cnrs.iees.graph.Node;
  * @author Shayne Flint - veery long ago
  *
  */
+@Deprecated
 public class AotException extends RuntimeException {
 
 	/**

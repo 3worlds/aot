@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.errorMessaging.impl.SpecificationErrorMsg;
@@ -159,7 +158,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	 */
 	public void check(NodeSet<?> graphToCheck, Tree<? extends TreeNode> archetype) {
 		if (!(archetype.root() instanceof ArchetypeRootSpec))
-			throw new AotException("Archetype does not have " + ArchetypeRootSpec.class.getSimpleName()
+			throw new IllegalArgumentException("Archetype does not have " + ArchetypeRootSpec.class.getSimpleName()
 					+ " as its root! " + archetype.root());
 		for (TreeNode arch : archetype.nodes())
 			if (arch instanceof ArchetypeRootSpec)
@@ -237,8 +236,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		Tree<? extends TreeNode> treeToCheck = null;
 		try {
 			treeToCheck = (Tree<? extends TreeNode>) graphToCheck;
-		} catch (ClassCastException e) {
-			throw new AotException("Graph to be checked must be a Tree.");
+		} catch (ClassCastException cause) {
+			throw new IllegalArgumentException("Graph to be checked must be a Tree.",cause);
 		}
 		// Check that the tree has only one root - otherwise disaster!
 		Integer nRoots = 0;

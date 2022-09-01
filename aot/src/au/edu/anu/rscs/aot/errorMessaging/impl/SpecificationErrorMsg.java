@@ -32,7 +32,6 @@ package au.edu.anu.rscs.aot.errorMessaging.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.edu.anu.rscs.aot.AotException;
 import au.edu.anu.rscs.aot.TextTranslations;
 import au.edu.anu.rscs.aot.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
@@ -571,8 +570,8 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 
 		default: {
-			System.out.println(errorType);
-			throw new AotException("Unrecognized ErrorType in CheckMessage");
+//			System.out.println(errorType);
+			throw new IllegalArgumentException("Unrecognized ErrorType in CheckMessage ["+errorType+"]");
 		}
 		}
 	}
