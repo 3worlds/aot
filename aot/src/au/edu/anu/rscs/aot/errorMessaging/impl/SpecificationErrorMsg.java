@@ -250,7 +250,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			String requiredClass = (String) args[1];
 			StringTable parentList = (StringTable) args[2];
 			IntegerRange range = (IntegerRange) args[3];
-			Integer count = (Integer) args[4];
+			int count = (Integer) args[4];
 			
 			String[] msgs = TextTranslations.getNODE_RANGE_INCORRECT1(requiredClass, parentList, range, count);
 
@@ -277,7 +277,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			Element target = (Element) args[0];
 			String childClassName = (String) args[1];
 			IntegerRange range = (IntegerRange) args[2];
-			Integer nChildren = (Integer) args[3];
+			int nChildren = (Integer) args[3];
 			TreeNode constraintSpec = (TreeNode) args[4];
 			String[] msg = TextTranslations.getNODE_RANGE_INCORRECT2(childClassName,target,range,nChildren);
 
@@ -481,7 +481,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 			IntegerRange range = (IntegerRange) args[1];
 			String edgeLabel = (String) args[2];
 			String toNodeRef = (String) args[3];
-			Integer nEdges = (Integer) args[4];
+			int nEdges = (Integer) args[4];
 			Element constraintSpec = (Element) args[5];
 			
 			String[] msgs = TextTranslations.getEDGE_RANGE_INCORRECT(nEdges, range, edgeLabel, target.toShortString(), toNodeRef);

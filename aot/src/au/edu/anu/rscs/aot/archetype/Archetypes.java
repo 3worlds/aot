@@ -240,7 +240,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			throw new IllegalArgumentException("Graph to be checked must be a Tree.",cause);
 		}
 		// Check that the tree has only one root - otherwise disaster!
-		Integer nRoots = 0;
+		int nRoots = 0;
 		for (TreeNode root : treeToCheck.roots()) {
 			nRoots++;
 		}
