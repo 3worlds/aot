@@ -103,7 +103,55 @@ import static au.edu.anu.rscs.aot.queries.CoreQueries.*;
  *
  */
 // tested OK with version 0.1.2 on 21/5/2019
-public class Archetypes implements ArchetypeArchetypeConstants {
+public class Archetypes {
+	
+	/** requirement for the class of a graph element or property - 
+	 * matches the {@code isOfClass} keyword in the <em>archetype for archetypes</em> */
+	public static final String IS_OF_CLASS = "isOfClass";
+	
+	/** requirement for the multiplicity of a graph element or property - 
+	 * matches the {@code multiplicity} keyword in the <em>archetype for archetypes</em> */
+	public static final String MULTIPLICITY = "multiplicity";
+	
+	/** requirement of possible parents for a node - 
+	 * matches the {@code hasParent} keyword in the <em>archetype for archetypes</em> */
+	public static final String HAS_PARENT = "hasParent";
+	
+	/** requirement for an edge - 
+	 * matches the {@code hasEdge} keyword in the <em>archetype for archetypes</em> */
+	public static final String HAS_EDGE = "hasEdge";
+	
+	/** requirement for a Node - 
+	 * matches the {@code hasNode} keyword in the <em>archetype for archetypes</em> */
+	public static final String HAS_NODE ="hasNode" ;
+	
+	/** requirement for a property - 
+	 * matches the {@code hasProperty} keyword in the <em>archetype for archetypes</em> */
+	public static final String HAS_PROPERTY = "hasProperty";
+	
+	/** requirement for a graph element or property to satisfy a query - 
+	 * matches the {@code mustSatisfyQuery} keyword in the <em>archetype for archetypes</em> */
+	public static final String MUST_SATISFY_QUERY = "mustSatisfyQuery";
+	
+	/** requirement for a property to have a particular name - 
+	 * matches the {@code hasName} keyword in the <em>archetype for archetypes</em> */
+	public static final String HAS_NAME = "hasName";
+	
+	/** requirement for a query to be of a particular class - 
+	 * matches the {@code className} keyword in the <em>archetype for archetypes</em> */
+	public static final String CLASS_NAME = "className";
+	
+	/** requirement for the end node of an edge - 
+	 * matches the {@code toNode} keyword in the <em>archetype for archetypes</em> */
+	public final static String TO_NODE = "toNode";
+	
+	/** requirement for a graph element to have a particular identifier - 
+	 * matches the {@code hasId} keyword in the <em>archetype for archetypes</em> */
+	public final static String HAS_ID = "hasId";
+	
+	/** requirement for a property to be of a certain type - 
+	 * matches the {@code type} keyword in the <em>archetype for archetypes</em> */
+	public final static String TYPE = "type";
 
 	/** The universal archetype - the archetype for archetypes */
 	private Tree<? extends TreeNode> archetypeArchetype = null;
@@ -204,11 +252,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	// this will cause n² loops on the archetype.
 	private List<NodeSpec> getChildrenSpecs(NodeSpec parentReq, ArchetypeRootSpec archetype) {
 		List<NodeSpec> result = new ArrayList<>();
-		String parentClassName = (String) parentReq.properties().getPropertyValue(aaIsOfClass);
+		String parentClassName = (String) parentReq.properties().getPropertyValue(IS_OF_CLASS);
 		for (TreeNode tn : archetype.getChildren())
 			if (tn instanceof NodeSpec) {
 				NodeSpec child = (NodeSpec) tn;
-				StringTable parentList = (StringTable) child.properties().getPropertyValue(aaHasParent);
+				StringTable parentList = (StringTable) child.properties().getPropertyValue(HAS_PARENT);
 				for (int i = 0; i < parentList.size(); i++) {
 					String s = parentList.getWithFlatIndex(i);
 					if (s!=null)
@@ -258,11 +306,11 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			for (TreeNode tn : archetype.getChildren())
 				if (tn instanceof NodeSpec) {
 					NodeSpec hasNode = (NodeSpec) tn;
-					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(aaHasParent);
-					String requiredClass = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
+					StringTable parentList = (StringTable) hasNode.properties().getPropertyValue(HAS_PARENT);
+					String requiredClass = (String) hasNode.properties().getPropertyValue(IS_OF_CLASS);
 					String requiredId = null;
-					if (hasNode.properties().hasProperty(aaHasId))
-						requiredId = (String) hasNode.properties().getPropertyValue(aaHasId);
+					if (hasNode.properties().hasProperty(HAS_ID))
+						requiredId = (String) hasNode.properties().getPropertyValue(HAS_ID);
 					List<NodeSpec> childrenSpec = getChildrenSpecs(hasNode, archetype);
 					// count must be made by parent, because multiplicities apply to parents
 					Map<TreeNode, Integer> countByParent = new HashMap<>();
@@ -284,8 +332,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 							// checking that required children are here
 							for (NodeSpec childSpec : childrenSpec) {
 								IntegerRange childMult = (IntegerRange) childSpec.properties()
-										.getPropertyValue(aaMultiplicity);
-								String childClassName = (String) childSpec.properties().getPropertyValue(aaIsOfClass);
+										.getPropertyValue(MULTIPLICITY);
+								String childClassName = (String) childSpec.properties().getPropertyValue(IS_OF_CLASS);
 								List<TreeNode> children = (List<TreeNode>) get(targetNode.getChildren(),
 										selectZeroOrMany(hasTheLabel(childClassName)));
 								if (!childMult.inRange(children.size())) {
@@ -298,8 +346,8 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 					}
 					// checking multiplicity within parent
 					IntegerRange range = null;
-					if (hasNode.properties().hasProperty(aaMultiplicity))
-						range = (IntegerRange) hasNode.properties().getPropertyValue(aaMultiplicity);
+					if (hasNode.properties().hasProperty(MULTIPLICITY))
+						range = (IntegerRange) hasNode.properties().getPropertyValue(MULTIPLICITY);
 					else
 						range = new IntegerRange(0, Integer.MAX_VALUE);
 					for (int count : countByParent.values())
@@ -323,9 +371,9 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 	private Set<String> getArchetypePropertyList(String archetypeNodeLabel) {
 		Set<String> result = new HashSet<String>();
 		TreeNode an = (TreeNode) get(archetypeArchetype.root(), children(), selectOne(hasTheName(archetypeNodeLabel)));
-		for (TreeNode prop : (List<TreeNode>) get(an, children(), selectZeroOrMany(hasTheLabel(aaHasProperty))))
+		for (TreeNode prop : (List<TreeNode>) get(an, children(), selectZeroOrMany(hasTheLabel(HAS_PROPERTY))))
 			if (SimpleDataTreeNode.class.isAssignableFrom(prop.getClass()))
-				result.add((String) ((SimpleDataTreeNode) prop).properties().getPropertyValue(aaHasName));
+				result.add((String) ((SimpleDataTreeNode) prop).properties().getPropertyValue(HAS_NAME));
 		return result;
 	}
 
@@ -336,7 +384,7 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 		for (ConstraintSpec queryNode : (List<ConstraintSpec>) get(spec, children(),
 				selectZeroOrMany(hasTheLabel(qLabel)))) {
 			ReadOnlyPropertyList queryProps = queryNode.properties();
-			String queryClassName = (String) queryProps.getPropertyValue(aaClassName);
+			String queryClassName = (String) queryProps.getPropertyValue(CLASS_NAME);
 			log.info("checking query: " + queryClassName);
 			// default properties: potential list
 			Set<String> defaultProps = getArchetypePropertyList("ConstraintSpec");
@@ -429,35 +477,35 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			SimplePropertyList eprops = edgeSpec.properties();
 			// edge spec toNode
 			String toNodeRef = null;
-			if (eprops.hasProperty(aaToNode))
-				toNodeRef = (String) eprops.getPropertyValue(aaToNode);
+			if (eprops.hasProperty(TO_NODE))
+				toNodeRef = (String) eprops.getPropertyValue(TO_NODE);
 			else { // this is an error, an edge spec must have a toNode property
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, null,null, nodeToCheck,
-					edgeSpec, aaToNode));
+					edgeSpec, TO_NODE));
 			}
 			// edge spec fromNode (= the parent hasNode class type)
 			String fromNodeRef = null;
-			if (hasNode.properties().hasProperty(aaIsOfClass))
-				fromNodeRef = (String) hasNode.properties().getPropertyValue(aaIsOfClass);
+			if (hasNode.properties().hasProperty(IS_OF_CLASS))
+				fromNodeRef = (String) hasNode.properties().getPropertyValue(IS_OF_CLASS);
 			else { // error, parent must have a class
-				String msg = "'" + aaIsOfClass + "' property missing for edge 'from' node specification " + edgeSpec;
+				String msg = "'" + IS_OF_CLASS + "' property missing for edge 'from' node specification " + edgeSpec;
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, null,msg, nodeToCheck,
-					edgeSpec, aaIsOfClass));
+					edgeSpec, IS_OF_CLASS));
 			}
 			// edge spec multiplicity
 			IntegerRange edgeMult = new IntegerRange(1, 1);
-			if (eprops.hasProperty(aaMultiplicity))
-				edgeMult = (IntegerRange) eprops.getPropertyValue(aaMultiplicity);
+			if (eprops.hasProperty(MULTIPLICITY))
+				edgeMult = (IntegerRange) eprops.getPropertyValue(MULTIPLICITY);
 			// edge spec label
 			String edgeLabel = null; // valid default value ???
-			if (eprops.hasProperty(aaIsOfClass))
-				edgeLabel = (String) eprops.getPropertyValue(aaIsOfClass);
+			if (eprops.hasProperty(IS_OF_CLASS))
+				edgeLabel = (String) eprops.getPropertyValue(IS_OF_CLASS);
 			// edge spec id
 			String edgeId = null;
-			if (eprops.hasProperty(aaHasId))
-				edgeId = (String) eprops.getPropertyValue(aaHasId);
+			if (eprops.hasProperty(HAS_ID))
+				edgeId = (String) eprops.getPropertyValue(HAS_ID);
 			// search for edges that point to nodes types or names listed in the spec
 			List<Duple<Node, Node>> edgeEnds = new LinkedList<>();
 			// for nodeToCheck to have edges, it must be a subclass of Node
@@ -573,33 +621,33 @@ public class Archetypes implements ArchetypeArchetypeConstants {
 			SimplePropertyList pprops = propertyArchetype.properties();
 			// property spec name
 			String key = null;
-			if (pprops.hasProperty(aaHasName))
-				key = (String) pprops.getPropertyValue(aaHasName);
+			if (pprops.hasProperty(HAS_NAME))
+				key = (String) pprops.getPropertyValue(HAS_NAME);
 			else { // this is an error, a property must have a name
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, null, element,
-					propertyArchetype, aaHasName));
+					propertyArchetype, HAS_NAME));
 			}
 			// property spec type
 			String typeName = null;
-			if (pprops.hasProperty(aaType)) {
-				typeName = (String) pprops.getPropertyValue(aaType);
+			if (pprops.hasProperty(TYPE)) {
+				typeName = (String) pprops.getPropertyValue(TYPE);
 			}else { // this is an error, a property must have a name
-				String msg = "'" + aaType + "' property missing for property specification " + propertyArchetype;
+				String msg = "'" + TYPE + "' property missing for property specification " + propertyArchetype;
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING,null, msg, element,
-					propertyArchetype, aaType));
+					propertyArchetype, TYPE));
 			}
 			// property spec multiplicity
 			IntegerRange multiplicity = new IntegerRange(1, 1);
-			if (pprops.hasProperty(aaMultiplicity)) {
-				multiplicity = (IntegerRange) pprops.getPropertyValue(aaMultiplicity);
+			if (pprops.hasProperty(MULTIPLICITY)) {
+				multiplicity = (IntegerRange) pprops.getPropertyValue(MULTIPLICITY);
 			}else { // this is an error, a property must have a name
-				String msg = "'" + aaMultiplicity + "' property missing for property specification "
+				String msg = "'" + MULTIPLICITY + "' property missing for property specification "
 					+ propertyArchetype;
 				checkFailList.add(
 					new SpecificationErrorMsg(SpecificationErrors.PROPERTY_MISSING, null,msg, element,
-					propertyArchetype, aaMultiplicity));
+					propertyArchetype, MULTIPLICITY));
 			}
 			if (element instanceof ReadOnlyDataHolder) {
 				// Problem is element has property value for 'key' of null
