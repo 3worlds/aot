@@ -41,11 +41,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import au.edu.anu.qgraph.queries.Queryable;
-import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.omugi.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.rscs.aot.errorMessaging.impl.SpecificationErrorMsg;
 import au.edu.anu.rscs.aot.errorMessaging.impl.SpecificationErrors;
-import au.edu.anu.rscs.aot.graph.property.Property;
+import au.edu.anu.omugi.graph.property.Property;
 
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.Direction;

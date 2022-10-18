@@ -32,7 +32,7 @@ package au.edu.anu.rscs.aot;
 import java.util.List;
 
 import static au.edu.anu.omhtk.Language.*;
-import au.edu.anu.rscs.aot.collections.tables.StringTable;
+import au.edu.anu.omugi.collections.tables.StringTable;
 import au.edu.anu.rscs.aot.util.IntegerRange;
 import fr.cnrs.iees.graph.Element;
 
