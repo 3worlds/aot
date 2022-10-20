@@ -34,12 +34,10 @@ import java.util.List;
 
 import au.edu.anu.aot.TextTranslations;
 import au.edu.anu.aot.errorMessaging.ErrorMessagable;
-import au.edu.anu.omugi.collections.tables.StringTable;
-import au.edu.anu.omugi.graph.property.Property;
+import fr.cnrs.iees.omugi.collections.tables.StringTable;
+import fr.cnrs.iees.omugi.graph.property.Property;
 import au.edu.anu.omhtk.util.IntegerRange;
-import fr.cnrs.iees.graph.Element;
-import fr.cnrs.iees.graph.Tree;
-import fr.cnrs.iees.graph.TreeNode;
+import fr.cnrs.iees.omugi.graph.*;
 
 /**
  * <p>A class to store error messages from archetype checks.</p>

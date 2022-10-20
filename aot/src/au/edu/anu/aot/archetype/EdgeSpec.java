@@ -29,11 +29,11 @@
  **************************************************************************/
 package au.edu.anu.aot.archetype;
 
-import fr.cnrs.iees.graph.NodeFactory;
-import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
-import fr.cnrs.iees.identity.Identity;
-import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
+import fr.cnrs.iees.omugi.graph.NodeFactory;
+import fr.cnrs.iees.omugi.graph.impl.SimpleDataTreeNode;
+import fr.cnrs.iees.omugi.identity.Identity;
+import fr.cnrs.iees.omugi.properties.SimplePropertyList;
+import fr.cnrs.iees.omugi.properties.impl.ExtendablePropertyListImpl;
 
 /**
  * An Edge specification. Edges in a specification represent relations between entities of the

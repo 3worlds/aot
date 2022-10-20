@@ -36,17 +36,17 @@ import java.util.logging.*;
 import au.edu.anu.qgraph.queries.Queryable;
 import au.edu.anu.aot.errorMessaging.ErrorMessagable;
 import au.edu.anu.aot.errorMessaging.impl.*;
-import au.edu.anu.omugi.collections.tables.StringTable;
-import au.edu.anu.omugi.graph.property.Property;
+import fr.cnrs.iees.omugi.collections.tables.StringTable;
+import fr.cnrs.iees.omugi.graph.property.Property;
 
 import au.edu.anu.omhtk.util.IntegerRange;
-import fr.cnrs.iees.graph.*;
-import fr.cnrs.iees.graph.impl.*;
-import fr.cnrs.iees.graph.io.GraphImporter;
-import fr.cnrs.iees.properties.*;
+import fr.cnrs.iees.omugi.graph.*;
+import fr.cnrs.iees.omugi.graph.impl.*;
+import fr.cnrs.iees.omugi.graph.io.GraphImporter;
+import fr.cnrs.iees.omugi.properties.*;
 import fr.cnrs.iees.omhtk.utils.*;
-import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
-import fr.cnrs.iees.io.parsing.impl.NodeReference;
+import fr.cnrs.iees.omugi.io.parsing.ValidPropertyTypes;
+import fr.cnrs.iees.omugi.io.parsing.impl.NodeReference;
 import static au.edu.anu.qgraph.queries.base.SequenceQuery.*;
 import static au.edu.anu.qgraph.queries.CoreQueries.*;
 

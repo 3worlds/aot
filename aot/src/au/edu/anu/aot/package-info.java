@@ -58,8 +58,8 @@
  * comply to.</li>
  * </ul>
  * 
- * <p>Archetypes are implemented as {@link fr.cnrs.iees.graph.Tree Tree}s (cf. the <strong>omugi</strong> library) and 
- * specifications are implemented as {@link fr.cnrs.iees.graph.impl.TreeGraph TreeGraph}s.</p>
+ * <p>Archetypes are implemented as {@link fr.cnrs.iees.omugi.graph.Tree Tree}s (cf. the <strong>omugi</strong> library) and 
+ * specifications are implemented as {@link fr.cnrs.iees.omugi.graph.impl.TreeGraph TreeGraph}s.</p>
  * 
  * <h3>References</h3>
  * <p>Flint SR (2006) <em>Aspect-Oriented Thinking - An approach to 

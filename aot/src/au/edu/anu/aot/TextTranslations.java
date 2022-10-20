@@ -32,9 +32,9 @@ package au.edu.anu.aot;
 import java.util.List;
 
 import static au.edu.anu.omhtk.Language.*;
-import au.edu.anu.omugi.collections.tables.StringTable;
+import fr.cnrs.iees.omugi.collections.tables.StringTable;
 import au.edu.anu.omhtk.util.IntegerRange;
-import fr.cnrs.iees.graph.Element;
+import fr.cnrs.iees.omugi.graph.Element;
 
 /**
  * <p>Error messages to use with specification archetypes. All methods are static and return an array of

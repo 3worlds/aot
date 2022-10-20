@@ -29,11 +29,11 @@
  **************************************************************************/
 package au.edu.anu.aot.archetype;
 
-import fr.cnrs.iees.graph.NodeFactory;
-import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
-import fr.cnrs.iees.identity.Identity;
-import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
+import fr.cnrs.iees.omugi.graph.NodeFactory;
+import fr.cnrs.iees.omugi.graph.impl.SimpleDataTreeNode;
+import fr.cnrs.iees.omugi.identity.Identity;
+import fr.cnrs.iees.omugi.properties.SimplePropertyList;
+import fr.cnrs.iees.omugi.properties.impl.ExtendablePropertyListImpl;
 
 /**
  * Specification of the root of an archetype. An archetype is a tree, and as such must have a root.
@@ -44,7 +44,7 @@ import fr.cnrs.iees.properties.impl.ExtendablePropertyListImpl;
 public class ArchetypeRootSpec extends SimpleDataTreeNode {
 
 	// NOTE: the constructor must be made public for the TreeFactory to find it as the TreeFactory
-	// belongs to package fr.cnrs.iees.graph.impl
+	// belongs to package fr.cnrs.iees.omugi.graph.impl
 	public ArchetypeRootSpec(Identity id, SimplePropertyList props, NodeFactory factory) {
 		super(id, props, factory);
 	}

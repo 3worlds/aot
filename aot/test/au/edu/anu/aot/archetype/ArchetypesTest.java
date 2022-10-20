@@ -34,11 +34,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
-import au.edu.anu.aot.archetype.Archetypes;
 import au.edu.anu.aot.errorMessaging.ErrorMessagable;
-import fr.cnrs.iees.graph.Tree;
-import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.io.FileImporter;
+import fr.cnrs.iees.omugi.graph.*;
+import fr.cnrs.iees.omugi.io.FileImporter;
 
 class ArchetypesTest {
 
