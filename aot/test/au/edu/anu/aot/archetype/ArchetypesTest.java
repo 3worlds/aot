@@ -27,7 +27,7 @@
  *  along with UIT.  If not, see <https://www.gnu.org/licenses/gpl.html>. *
  *                                                                        *
  **************************************************************************/
-package au.edu.anu.rscs.aot.archetype;
+package au.edu.anu.aot.archetype;
 
 import static org.junit.jupiter.api.Assertions.*;
 

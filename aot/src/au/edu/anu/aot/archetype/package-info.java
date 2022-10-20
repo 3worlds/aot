@@ -26,11 +26,11 @@ tree // Archetype for all archetypes - an archetype is a tree!
 	// the scope for node ids coming from this file
 	scope =            String("AOT-archetype")
 	// labels used in this file
-	hasNode =          String("au.edu.anu.rscs.aot.archetype.NodeSpec")
-	hasProperty =      String("au.edu.anu.rscs.aot.archetype.PropertySpec")
-	hasEdge =          String("au.edu.anu.rscs.aot.archetype.EdgeSpec")
-	mustSatisfyQuery = String("au.edu.anu.rscs.aot.archetype.ConstraintSpec")
-	archetype =        String("au.edu.anu.rscs.aot.archetype.ArchetypeRootSpec")
+	hasNode =          String("au.edu.anu.aot.archetype.NodeSpec")
+	hasProperty =      String("au.edu.anu.aot.archetype.PropertySpec")
+	hasEdge =          String("au.edu.anu.aot.archetype.EdgeSpec")
+	mustSatisfyQuery = String("au.edu.anu.aot.archetype.ConstraintSpec")
+	archetype =        String("au.edu.anu.aot.archetype.ArchetypeRootSpec")
 
 //-------------------------------------------------------
 // 1 this is an archetype

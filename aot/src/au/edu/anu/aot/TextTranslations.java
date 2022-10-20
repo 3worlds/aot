@@ -33,7 +33,7 @@ import java.util.List;
 
 import static au.edu.anu.omhtk.Language.*;
 import au.edu.anu.omugi.collections.tables.StringTable;
-import au.edu.anu.rscs.aot.util.IntegerRange;
+import au.edu.anu.omhtk.util.IntegerRange;
 import fr.cnrs.iees.graph.Element;
 
 /**

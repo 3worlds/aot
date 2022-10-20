@@ -30,38 +30,21 @@
 package au.edu.anu.aot.archetype;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
+import java.util.logging.*;
 
 import au.edu.anu.qgraph.queries.Queryable;
 import au.edu.anu.aot.errorMessaging.ErrorMessagable;
-import au.edu.anu.aot.errorMessaging.impl.SpecificationErrorMsg;
-import au.edu.anu.aot.errorMessaging.impl.SpecificationErrors;
+import au.edu.anu.aot.errorMessaging.impl.*;
 import au.edu.anu.omugi.collections.tables.StringTable;
 import au.edu.anu.omugi.graph.property.Property;
 
-import au.edu.anu.rscs.aot.util.IntegerRange;
-import fr.cnrs.iees.graph.Direction;
-import fr.cnrs.iees.graph.Edge;
-import fr.cnrs.iees.graph.NodeSet;
-import fr.cnrs.iees.graph.Node;
-import fr.cnrs.iees.graph.ReadOnlyDataHolder;
-import fr.cnrs.iees.graph.Tree;
-import fr.cnrs.iees.graph.TreeNode;
-import fr.cnrs.iees.graph.impl.SimpleDataTreeNode;
-import fr.cnrs.iees.graph.impl.TreeGraph;
+import au.edu.anu.omhtk.util.IntegerRange;
+import fr.cnrs.iees.graph.*;
+import fr.cnrs.iees.graph.impl.*;
 import fr.cnrs.iees.graph.io.GraphImporter;
-import fr.cnrs.iees.properties.ReadOnlyPropertyList;
-import fr.cnrs.iees.properties.SimplePropertyList;
-import fr.ens.biologie.generic.utils.Duple;
-import fr.ens.biologie.generic.utils.Logging;
+import fr.cnrs.iees.properties.*;
+import fr.cnrs.iees.omhtk.utils.*;
 import fr.cnrs.iees.io.parsing.ValidPropertyTypes;
 import fr.cnrs.iees.io.parsing.impl.NodeReference;
 import static au.edu.anu.qgraph.queries.base.SequenceQuery.*;
