@@ -2,7 +2,7 @@
  * <p>The core classes of the archetype checking system and the <em>archetype for archetypes</em>:.</p>
  * 
  * <ul>
- * <li>classes matching the vocabulary defined in {@link ArchetypeArchetypeConstants};</li>
+ * <li>classes matching the vocabulary defined in {@link Archetypes};</li>
  * <li>{@link Archetypes}, which implements all the checking methods used to validate 
  * archetypes and specifications;</li>
  * <li>the <em>archetype for archetypes</em> as a text file representing a tree from the <strong>omugi</strong>

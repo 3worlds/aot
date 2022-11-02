@@ -79,21 +79,21 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		buildDescriptions();
 	}
 
-	/**
-	 * Getter for context-specific arguments.
-	 * @return
-	 */
-	public Object[] args() {
-		return args;
-	}
+//	/**
+//	 * Getter for context-specific arguments.
+//	 * @return
+//	 */
+//	public Object[] args() {
+//		return args;
+//	}
 
-	/**
-	 * Getter for error type.
-	 * @return
-	 */
-	public SpecificationErrors errorType() {
-		return errorType;
-	}
+//	/**
+//	 * Getter for error type.
+//	 * @return
+//	 */
+//	public SpecificationErrors errorType() {
+//		return errorType;
+//	}
 
 	private void buildDescriptions() {
 		switch (errorType) {
@@ -600,8 +600,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 	}
 
 	/**
-	 * Another getter for error type. Why?
-	 * @return
+	 * @return The {@link SpecificationErrors specification error}.
 	 */
 	public SpecificationErrors error() {
 		return errorType;

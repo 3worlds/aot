@@ -36,19 +36,30 @@ import fr.cnrs.iees.omugi.properties.SimplePropertyList;
 import fr.cnrs.iees.omugi.properties.impl.ExtendablePropertyListImpl;
 
 /**
- * A property specification. Properties are values attached to nodes or edges of the target system.
+ * A property specification. Properties are values attached to nodes or edges of
+ * the target system.
  * 
  * @author Jacques Gignoux - 20/3/2019
  *
  */
 public class PropertySpec extends SimpleDataTreeNode {
 
-	// NOTE: the constructor must be made public for the TreeFactory to find it as the TreeFactory
+	// NOTE: the constructor must be made public for the TreeFactory to find it as
+	// the TreeFactory
 	// belongs to package fr.cnrs.iees.graph.impl
+	/**
+	 * @param id      Unique identifier of the specification.
+	 * @param props   Node property list.
+	 * @param factory The factory to create nodes for this specification graph.
+	 */
 	public PropertySpec(Identity id, SimplePropertyList props, NodeFactory factory) {
 		super(id, props, factory);
 	}
 
+	/**
+	 * @param id      Unique identifier of the specification.
+	 * @param factory The factory to create nodes for this specification graph.
+	 */
 	public PropertySpec(Identity id, NodeFactory factory) {
 		super(id, new ExtendablePropertyListImpl(), factory);
 	}

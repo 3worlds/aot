@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"au.edu.anu.aot"},{"l":"au.edu.anu.aot.archetype"},{"l":"au.edu.anu.aot.errorMessaging"},{"l":"au.edu.anu.aot.errorMessaging.impl"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"au.edu.anu.aot.errorMessaging"},{"l":"au.edu.anu.aot.errorMessaging.impl"}];updateSearchResults();

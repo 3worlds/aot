@@ -146,6 +146,9 @@ public class Archetypes {
 
 	private List<ErrorMessagable> checkFailList = new LinkedList<ErrorMessagable>();
 
+	/**
+	 * Parameterless constructor to create the archetype graph from file.
+	 */
 	@SuppressWarnings("unchecked")
 	public Archetypes() {
 		super();

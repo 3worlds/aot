@@ -45,10 +45,19 @@ public class NodeSpec extends SimpleDataTreeNode {
 
 	// NOTE: the constructor must be made public for the TreeFactory to find it as the TreeFactory
 	// belongs to package fr.cnrs.iees.graph.impl
+	/**
+	 * @param id  Unique identifier of the specification.
+	 * @param props Node property list.
+	 * @param factory The factory to create nodes for this graph.
+	 */
 	public NodeSpec(Identity id, SimplePropertyList props, NodeFactory factory) {
 		super(id, props, factory);
 	}
 
+	/**
+	 * @param id Unique identifier of the specification.
+	 * @param factory The factory to create nodes for this graph.
+	 */
 	public NodeSpec(Identity id, NodeFactory factory) {
 		super(id, new ExtendablePropertyListImpl(), factory);
 	}

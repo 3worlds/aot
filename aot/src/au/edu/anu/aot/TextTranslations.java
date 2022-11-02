@@ -234,6 +234,7 @@ public class TextTranslations {
 	 * Error message: edge class is unknown
 	 * @param klass the expected edge class
 	 * @param element the edge id
+	 * @param factoryName The factory for implementing graph edges
 	 * @return action and constraint messages in a {@code String} array
 	 */
 	public static String[] getEDGE_CLASS_UNKNOWN(String klass, String element, String factoryName) {
