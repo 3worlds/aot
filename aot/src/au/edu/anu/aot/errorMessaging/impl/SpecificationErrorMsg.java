@@ -181,7 +181,7 @@ public class SpecificationErrorMsg implements ErrorMessagable {
 		}
 
 		case NODE_MISSING_SPECIFICATION: {
-			System.out.println("TODO!: " + errorType);
+//			System.out.println("TODO!: " + errorType);
 			/*
 			 * "Expected all nodes to comply (got " + (treeToCheck.nNodes() - complyCount) +
 			 * " nodes which didn't comply)";
