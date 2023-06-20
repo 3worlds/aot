@@ -75,7 +75,7 @@ public class VersionSettings {
 	 */
 	protected static String[][] DEPS = {
 		{"fr.cnrs.iees.omhtk", "generics", "[0.5.1,)", null},
-		{"fr.cnrs.iees.omugi", "omugi", "[0.6.1,)", null},
+		{"fr.cnrs.iees.omugi", "omugi", "[0.7.0,)", null},
 		{"au.edu.anu.qgraph", "qgraph", "[0.3.0,)", null}
 	};
 
